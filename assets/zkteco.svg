@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="10 5 280 75">
+  <text x="15" y="70" font-family="'Helvetica Neue', Arial, sans-serif" font-weight="900" font-size="64" fill="#3B4958" letter-spacing="-1">ZKT<tspan fill="#3B4958" font-weight="600">eco</tspan></text>
+  <!-- Accent leaf over the K -->
+  <path d="M 125 15 C 135 5, 145 15, 135 25 C 125 35, 115 25, 125 15 Z" fill="#8AC53F" />
+</svg>
