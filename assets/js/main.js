@@ -1,52 +1,40 @@
 /**
- * FOSEM CONTROLS — Main Application Logic (Performance-Optimized)
- * ---------------------------------------------------------------
- * Perf changes vs previous version:
- *  - Removed infinite rAF loop (updateScrollFeatures ran every frame)
- *  - Removed canvas particle system (40-particle O(n²) line drawing)
- *  - Removed skewY/scroll velocity card transform (forced layout/reflow)
- *  - Removed typographic elasticity (unnecessary extra observer + setTimeout)
- *  - Replaced raw scroll listener with passive + rAF-gated version
- *  - IntersectionObservers: disconnected after first trigger where possible
- *  - Carousel: setInterval only, no rAF overhead
- *  - All event listeners marked passive where applicable
+ * FOSEM CONTROLS — Main Application Logic
+ * --------------------------------------
+ * Handles:
+ * - Header scroll transparency & shadow
+ * - Mobile menu & dropdown toggles
+ * - Logo tagline interactive toggle
+ * - Hero carousel with preloading support
+ * - Animation intersection observers
+ * - Animated stat counters
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-
-  /* ─── Respect reduced-motion preference ─── */
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  /* ─── Navigation & Header ─── */
-  const header        = document.getElementById('site-header');
+  
+  /* --- Navigation & Header --- */
+  const header = document.getElementById('site-header');
   const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-  const mainNav       = document.getElementById('main-nav');
+  const mainNav = document.getElementById('main-nav');
   const logoContainer = document.getElementById('logo-container');
-  const logoTagline   = document.getElementById('logo-tagline');
+  const logoTagline = document.getElementById('logo-tagline');
 
-  // Throttled scroll handler — only triggers rAF once per frame
-  let scrollTicking = false;
-  function onScroll() {
-    if (!scrollTicking) {
-      requestAnimationFrame(() => {
-        header.classList.toggle('scrolled', window.scrollY > 20);
-        scrollTicking = false;
-      });
-      scrollTicking = true;
-    }
-  }
-  window.addEventListener('scroll', onScroll, { passive: true });
+  // Scroll transparency & shadow
+  window.addEventListener('scroll', () => {
+    header.classList.toggle('scrolled', window.scrollY > 20);
+  }, { passive: true });
 
-  // Mobile menu
-  if (mobileMenuBtn && mainNav) {
-    mobileMenuBtn.addEventListener('click', () => {
-      mainNav.classList.toggle('active');
+  // Mobile menu toggle
+  if (mobileMenuBtn) {
+    mobileBtnCallback = () => {
+      mainNav.classList.toggle('active'); // CSS might use .open or .active, let's keep both for safety
       mainNav.classList.toggle('open');
       mobileMenuBtn.classList.toggle('active');
-    });
+    };
+    mobileMenuBtn.addEventListener('click', mobileBtnCallback);
   }
 
-  // Mobile dropdown toggles (only bind on mobile)
+  // Mobile dropdown toggles
   if (window.innerWidth <= 768) {
     document.querySelectorAll('.nav-item .nav-link').forEach(link => {
       link.addEventListener('click', () => {
@@ -64,124 +52,157 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  /* ─── Hero Carousel ─── */
-  const track      = document.getElementById('carousel-track');
-  const slides     = Array.from(document.querySelectorAll('.carousel-slide'));
-  const dots       = Array.from(document.querySelectorAll('.carousel-dot'));
-  const prevBtn    = document.getElementById('carousel-prev');
-  const nextBtn    = document.getElementById('carousel-next');
+  /* --- Hero Carousel --- */
+  const track = document.getElementById('carousel-track');
+  const slides = Array.from(document.querySelectorAll('.carousel-slide'));
+  const dots = Array.from(document.querySelectorAll('.carousel-dot'));
+  const prevBtn = document.getElementById('carousel-prev');
+  const nextBtn = document.getElementById('carousel-next');
+  
+  let currentSlideIndex = 0;
+  let carouselInterval = null;
   const totalSlides = slides.length;
-  let currentSlide  = 0;
-  let autoTimer     = null;
 
-  function goTo(index) {
+  function updateCarousel(index) {
+    // Wrap around
     if (index < 0) index = totalSlides - 1;
     if (index >= totalSlides) index = 0;
-    currentSlide = index;
-    if (track) track.style.transform = `translateX(-${currentSlide * 100}vw)`;
-    slides.forEach((s, i) => s.classList.toggle('active', i === currentSlide));
-    dots.forEach((d, i)   => d.classList.toggle('active', i === currentSlide));
+    
+    currentSlideIndex = index;
+
+    // Move track (using transform for performance)
+    if (track) {
+      track.style.transform = `translateX(-${currentSlideIndex * 100}vw)`;
+    }
+
+    // Update active states
+    slides.forEach((slide, i) => {
+      slide.classList.toggle('active', i === currentSlideIndex);
+    });
+    
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('active', i === currentSlideIndex);
+    });
   }
 
   function startAuto() {
     stopAuto();
-    autoTimer = setInterval(() => goTo(currentSlide + 1), 8000);
+    carouselInterval = setInterval(() => updateCarousel(currentSlideIndex + 1), 8000);
   }
+
   function stopAuto() {
-    if (autoTimer) clearInterval(autoTimer);
+    if (carouselInterval) clearInterval(carouselInterval);
   }
 
-  if (nextBtn) nextBtn.addEventListener('click', () => { goTo(currentSlide + 1); startAuto(); });
-  if (prevBtn) prevBtn.addEventListener('click', () => { goTo(currentSlide - 1); startAuto(); });
-  dots.forEach((dot, i) => dot.addEventListener('click', () => { goTo(i); startAuto(); }));
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      updateCarousel(currentSlideIndex + 1);
+      startAuto();
+    });
+  }
 
-  // Swipe support
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      updateCarousel(currentSlideIndex - 1);
+      startAuto();
+    });
+  }
+
+  dots.forEach((dot, i) => {
+    dot.addEventListener('click', () => {
+      updateCarousel(i);
+      startAuto();
+    });
+  });
+
+  // Swipe Support
+  let touchStartX = 0;
+  let touchEndX = 0;
+
   if (track) {
-    let touchStartX = 0;
-    track.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
-    track.addEventListener('touchend', e => {
-      const diff = touchStartX - e.changedTouches[0].screenX;
-      if (Math.abs(diff) > 50) { goTo(currentSlide + (diff > 0 ? 1 : -1)); startAuto(); }
+    track.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    track.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      const diff = touchStartX - touchEndX;
+      if (Math.abs(diff) > 50) {
+        if (diff > 0) updateCarousel(currentSlideIndex + 1);
+        else updateCarousel(currentSlideIndex - 1);
+        startAuto();
+      }
     }, { passive: true });
   }
 
   startAuto();
 
-  /* ─── Scroll-triggered fade animations ─── */
-  // Skip animations entirely if user prefers reduced motion
-  if (!prefersReducedMotion) {
-    const animObserver = new IntersectionObserver((entries, obs) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('animate-in');
-          obs.unobserve(entry.target); // fire once, then stop watching
-        }
-      });
-    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  /* --- Animation Intersection Observer --- */
+  const observerOptions = {
+    threshold: 0.15,
+    rootMargin: '0px 0px -50px 0px'
+  };
 
-    document.querySelectorAll('.fade-up, .fade-left, .fade-right, .scale-in').forEach(el => {
-      animObserver.observe(el);
+  const animationObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('animate-in');
+        animationObserver.unobserve(entry.target);
+      }
     });
-  } else {
-    // Immediately show all animated elements for reduced-motion users
-    document.querySelectorAll('.fade-up, .fade-left, .fade-right, .scale-in').forEach(el => {
-      el.classList.add('animate-in');
-    });
-  }
+  }, observerOptions);
 
-  /* ─── Stat Counters ─── */
-  const statNumbers   = document.querySelectorAll('.mv-stat-number');
-  let   statsStarted  = false;
+  document.querySelectorAll('.fade-up, .fade-left, .fade-right, .scale-in').forEach(el => {
+    animationObserver.observe(el);
+  });
+
+  /* --- Stat Counter Observer --- */
+  const statNumbers = document.querySelectorAll('.mv-stat-number');
+  let statsStarted = false;
+
+  const statsObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !statsStarted) {
+        statsStarted = true;
+        animateStats();
+        statsObserver.disconnect();
+      }
+    });
+  }, { threshold: 0.3 });
 
   function animateStats() {
     statNumbers.forEach(num => {
-      const target   = parseInt(num.dataset.target, 10);
-      const duration = prefersReducedMotion ? 0 : 1800;
-      if (duration === 0) { num.textContent = target; return; }
-
+      const target = parseInt(num.dataset.target);
+      const duration = 2000;
       const start = performance.now();
       num.classList.add('counting');
 
-      function tick(now) {
-        const progress = Math.min((now - start) / duration, 1);
-        const ease     = 1 - Math.pow(1 - progress, 3); // cubic ease-out
-        num.textContent = Math.round(target * ease);
-        if (progress < 1) requestAnimationFrame(tick);
-        else              num.classList.remove('counting');
+      const ghost = document.createElement('span');
+      ghost.classList.add('mv-stat-ghost');
+      num.parentElement.appendChild(ghost);
+
+      function update(now) {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 4);
+        const currentValue = Math.round(target * ease);
+        
+        num.textContent = currentValue;
+        ghost.textContent = currentValue;
+        
+        if (progress < 1) {
+          requestAnimationFrame(update);
+        } else {
+          num.classList.remove('counting');
+          ghost.classList.add('ghost-burst');
+          setTimeout(() => ghost.remove(), 1000);
+        }
       }
-      requestAnimationFrame(tick);
+      requestAnimationFrame(update);
     });
   }
 
-  if (statNumbers.length) {
-    const statsContainer = document.querySelector('.mv-stats');
-    if (statsContainer) {
-      const statsObs = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && !statsStarted) {
-          statsStarted = true;
-          animateStats();
-          statsObs.disconnect();
-        }
-      }, { threshold: 0.3 });
-      statsObs.observe(statsContainer);
-    }
-  }
-
-  /* ─── Service Card Click-to-Expand ─── */
-  const serviceCards = document.querySelectorAll('.svc-card');
-  serviceCards.forEach(card => {
-    card.addEventListener('click', () => {
-      const wasExpanded = card.classList.contains('expanded');
-      serviceCards.forEach(c => c.classList.remove('expanded'));
-      if (!wasExpanded) {
-        card.classList.add('expanded');
-        // Use scrollIntoView only if card is outside viewport
-        const rect = card.getBoundingClientRect();
-        if (rect.bottom > window.innerHeight || rect.top < 0) {
-          card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-      }
-    });
-  });
+  const statsContainer = document.querySelector('.mv-stats');
+  if (statsContainer) statsObserver.observe(statsContainer);
 
 });
