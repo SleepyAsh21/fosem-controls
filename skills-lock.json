@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "custom-icons-skill": {
+      "source": "jkc66/custom-icons-skill",
+      "sourceType": "github",
+      "skillPath": "skills/SKILL.md",
+      "computedHash": "99ef0a915387d1c0a0e238c81c3cda3e0950d292eb3b2a2eb60a07d52202c9e5"
+    },
     "ui-ux-design-pro": {
       "source": "saifyxpro/ui-ux-design-pro-skill",
       "sourceType": "github",
