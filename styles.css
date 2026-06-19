@@ -1622,24 +1622,46 @@ ul {
    FOOTER
    ============================================ */
 .site-footer {
+  position: relative;
+  overflow: hidden;
   background: #0f172a;
-  background-image: url('assets/images/fosem-grain.png');
-  background-repeat: repeat;
-  background-size: 128px 128px;
-  color: #94a3b8;
-  padding: 80px 40px 24px;
+  background-image: 
+    linear-gradient(rgba(14, 165, 233, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(14, 165, 233, 0.02) 1px, transparent 1px),
+    url('assets/images/fosem-grain.png');
+  background-size: 32px 32px, 32px 32px, 128px 128px;
+  background-repeat: repeat, repeat, repeat;
+  color: var(--text-light);
+  padding: 80px 40px 32px;
+}
+
+.footer-watermark {
+  position: absolute;
+  bottom: -40px;
+  right: -20px;
+  font-size: 32rem;
+  font-family: var(--font-heading), 'Outfit', sans-serif;
+  font-weight: 900;
+  line-height: 1;
+  color: rgba(14, 165, 233, 0.018); /* ~1.8% opacity */
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
 }
 
 .footer-inner {
+  position: relative;
+  z-index: 1;
   max-width: var(--max-width);
   margin: 0 auto;
 }
 
 .footer-top {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1.5fr;
-  gap: 60px;
+  grid-template-columns: 2.2fr 1fr 1fr 1fr 1fr 2.2fr;
+  gap: 40px;
   margin-bottom: 60px;
+  align-items: start;
 }
 
 .footer-brand .footer-logo {
@@ -1665,17 +1687,59 @@ ul {
   font-size: 0.95rem;
   line-height: 1.7;
   max-width: 320px;
+  margin-bottom: 24px;
+  color: var(--text-light);
 }
 
+/* Social Icons */
+.footer-social {
+  display: flex;
+  gap: 16px;
+}
+
+.footer-social a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-light);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.footer-social a:hover {
+  background: rgba(14, 165, 233, 0.1);
+  border-color: var(--primary-light);
+  color: var(--primary-light);
+  transform: translateY(-3px);
+}
+
+.social-svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.3s ease;
+}
+
+.footer-social a:hover .social-svg {
+  transform: scale(1.1);
+}
+
+/* Headings with vertical Fosem blue accent */
 .footer-links h4,
 .footer-contact h4 {
   font-family: var(--font-heading);
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 700;
   color: #fff;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
+  padding-left: 10px;
+  border-left: 2.5px solid var(--primary-light);
+  line-height: 1.2;
 }
 
 .svc-title {
@@ -1697,31 +1761,114 @@ ul {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
+/* Link Interactions */
 .footer-links a {
-  color: #94a3b8;
+  position: relative;
+  display: inline-block;
+  color: var(--text-light);
   text-decoration: none;
-  font-size: 0.95rem;
-  transition: color 200ms ease;
+  font-size: 0.92rem;
+  font-weight: 500;
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), color 0.3s ease;
+}
+
+.footer-links a::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  transform: scaleX(0);
+  height: 1.5px;
+  bottom: -2px;
+  left: 0;
+  background-color: var(--primary-light);
+  transform-origin: bottom right;
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .footer-links a:hover {
+  color: #fff;
+  transform: translateX(4px);
+}
+
+.footer-links a:hover::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+/* Contact Blocks */
+.footer-contact-block {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  text-decoration: none;
+  border-left: 2.5px solid rgba(14, 165, 233, 0.15);
+  background: rgba(255, 255, 255, 0.01);
+  border-radius: 0 4px 4px 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.footer-contact-block:hover {
+  border-left-color: var(--primary-light);
+  background: rgba(14, 165, 233, 0.05);
+  transform: translateX(4px);
+}
+
+.contact-icon {
+  color: var(--text-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.contact-svg {
+  width: 18px;
+  height: 18px;
+}
+
+.footer-contact-block:hover .contact-icon {
+  color: var(--primary-light);
+  transform: scale(1.1);
+}
+
+.contact-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.contact-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.contact-value {
+  font-size: 0.88rem;
+  color: #fff;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.footer-contact-block:hover .contact-value {
   color: var(--primary-light);
 }
 
-.footer-contact p {
-  font-size: 0.95rem;
-  margin-bottom: 12px;
-  line-height: 1.6;
-}
-
 .footer-bottom {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(14, 165, 233, 0.1);
   padding-top: 24px;
+  margin-top: 50px;
   text-align: center;
   font-size: 0.85rem;
+  color: var(--text-muted);
 }
 
 
@@ -1748,6 +1895,11 @@ ul {
 
   .carousel-dots {
     left: 60px;
+  }
+
+  .footer-top {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
   }
 }
 
@@ -1920,6 +2072,10 @@ ul {
 
   .why-us-title {
     font-size: 2rem;
+  }
+
+  .site-footer {
+    padding: 60px 24px 32px;
   }
 
   .footer-top {
