@@ -1858,6 +1858,10 @@ ul {
   transition: color 0.3s ease;
 }
 
+.footer-contact-block--locations .contact-value {
+  line-height: 1.7;
+}
+
 .footer-contact-block:hover .contact-value {
   color: var(--primary-light);
 }
