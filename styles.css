@@ -363,19 +363,6 @@ ul {
   object-position: center;
   position: relative;
   z-index: 1;
-  transition: transform 14s ease-out;
-  will-change: transform;
-  /* Crystal Clear Rendering Hooks */
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: crisp-edges;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  transform: translateZ(0) scale(1);
-  filter: contrast(1.1) saturate(1.15); /* Boosts native sharpness */
-}
-
-.carousel-slide.active img {
-  transform: translateZ(0) scale(1.08);
 }
 
 /* Dark overlay — left-heavy for text readability */
