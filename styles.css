@@ -1631,8 +1631,8 @@ ul {
     url('assets/images/fosem-grain.png');
   background-size: 32px 32px, 32px 32px, 128px 128px;
   background-repeat: repeat, repeat, repeat;
-  color: var(--text-light);
-  padding: 80px 40px 32px;
+  color: rgba(255, 255, 255, 0.92);
+  padding: 100px 48px 44px;
 }
 
 .footer-watermark {
@@ -1659,8 +1659,8 @@ ul {
 .footer-top {
   display: grid;
   grid-template-columns: 2.2fr 1fr 1fr 1fr 1fr 2.2fr;
-  gap: 40px;
-  margin-bottom: 60px;
+  gap: 48px;
+  margin-bottom: 72px;
   align-items: start;
 }
 
@@ -1685,10 +1685,10 @@ ul {
 .footer-desc {
   font-family: var(--font-body);
   font-size: 0.95rem;
-  line-height: 1.7;
-  max-width: 320px;
-  margin-bottom: 24px;
-  color: var(--text-light);
+  line-height: 1.75;
+  max-width: 340px;
+  margin-bottom: 28px;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 /* Social Icons */
@@ -1701,12 +1701,12 @@ ul {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: var(--text-light);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.9);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -1731,14 +1731,14 @@ ul {
 .footer-links h4,
 .footer-contact h4 {
   font-family: var(--font-heading);
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: #fff;
-  margin-bottom: 28px;
+  margin-bottom: 32px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  padding-left: 10px;
-  border-left: 2.5px solid var(--primary-light);
+  padding-left: 12px;
+  border-left: 3px solid var(--primary-light);
   line-height: 1.2;
 }
 
@@ -1761,16 +1761,16 @@ ul {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
 /* Link Interactions */
 .footer-links a {
   position: relative;
   display: inline-block;
-  color: var(--text-light);
+  color: rgba(255, 255, 255, 0.82);
   text-decoration: none;
-  font-size: 0.92rem;
+  font-size: 0.95rem;
   font-weight: 500;
   transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), color 0.3s ease;
 }
@@ -1820,7 +1820,7 @@ ul {
 }
 
 .contact-icon {
-  color: var(--text-light);
+  color: rgba(255, 255, 255, 0.85);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1843,12 +1843,12 @@ ul {
 }
 
 .contact-label {
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.55);
   font-weight: 600;
-  margin-bottom: 2px;
+  margin-bottom: 3px;
 }
 
 .contact-value {
@@ -1867,12 +1867,12 @@ ul {
 }
 
 .footer-bottom {
-  border-top: 1px solid rgba(14, 165, 233, 0.1);
-  padding-top: 24px;
-  margin-top: 50px;
+  border-top: 1px solid rgba(14, 165, 233, 0.12);
+  padding-top: 28px;
+  margin-top: 60px;
   text-align: center;
-  font-size: 0.85rem;
-  color: var(--text-muted);
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 
