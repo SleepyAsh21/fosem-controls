@@ -1631,7 +1631,7 @@ ul {
     url('assets/images/fosem-grain.png');
   background-size: 32px 32px, 32px 32px, 128px 128px;
   background-repeat: repeat, repeat, repeat;
-  color: rgba(255, 255, 255, 0.92);
+  color: #fff;
   padding: 100px 48px 44px;
 }
 
@@ -1688,7 +1688,7 @@ ul {
   line-height: 1.75;
   max-width: 340px;
   margin-bottom: 28px;
-  color: rgba(255, 255, 255, 0.85);
+  color: #fff;
 }
 
 /* Social Icons */
@@ -1704,9 +1704,9 @@ ul {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -1731,14 +1731,16 @@ ul {
 .footer-links h4,
 .footer-contact h4 {
   font-family: var(--font-heading);
-  font-size: 1.1rem;
+  font-size: 0.82rem;
   font-weight: 700;
-  color: #fff;
-  margin-bottom: 32px;
+  color: var(--primary-light);
+  margin-bottom: 28px;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  padding-left: 12px;
-  border-left: 3px solid var(--primary-light);
+  letter-spacing: 0.14em;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(14, 165, 233, 0.2);
+  padding-left: 0;
+  border-left: none;
   line-height: 1.2;
 }
 
@@ -1761,41 +1763,50 @@ ul {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 0;
 }
 
 /* Link Interactions */
-.footer-links a {
-  position: relative;
-  display: inline-block;
-  color: rgba(255, 255, 255, 0.82);
-  text-decoration: none;
-  font-size: 0.95rem;
-  font-weight: 500;
-  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), color 0.3s ease;
+.footer-links li {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
 
-.footer-links a::after {
-  content: '';
-  position: absolute;
-  width: 100%;
-  transform: scaleX(0);
-  height: 1.5px;
-  bottom: -2px;
-  left: 0;
-  background-color: var(--primary-light);
-  transform-origin: bottom right;
-  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+.footer-links li:last-child {
+  border-bottom: none;
+}
+
+.footer-links a {
+  position: relative;
+  display: flex;
+  align-items: center;
+  color: #fff;
+  text-decoration: none;
+  font-size: 0.93rem;
+  font-weight: 500;
+  padding: 11px 0;
+  transition: color 0.25s ease, padding-left 0.25s ease;
+}
+
+.footer-links a::before {
+  content: '›';
+  display: inline-block;
+  width: 0;
+  overflow: hidden;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary-light);
+  margin-right: 0;
+  transition: width 0.25s ease, margin-right 0.25s ease;
 }
 
 .footer-links a:hover {
-  color: #fff;
-  transform: translateX(4px);
+  color: var(--primary-light);
+  padding-left: 2px;
 }
 
-.footer-links a:hover::after {
-  transform: scaleX(1);
-  transform-origin: bottom left;
+.footer-links a:hover::before {
+  width: 10px;
+  margin-right: 4px;
 }
 
 /* Contact Blocks */
@@ -1820,7 +1831,7 @@ ul {
 }
 
 .contact-icon {
-  color: rgba(255, 255, 255, 0.85);
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1846,7 +1857,7 @@ ul {
   font-size: 0.78rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.7);
   font-weight: 600;
   margin-bottom: 3px;
 }
@@ -1867,12 +1878,12 @@ ul {
 }
 
 .footer-bottom {
-  border-top: 1px solid rgba(14, 165, 233, 0.12);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   padding-top: 28px;
   margin-top: 60px;
   text-align: center;
   font-size: 0.88rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.75);
 }
 
 
