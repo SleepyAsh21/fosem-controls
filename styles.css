@@ -2370,3 +2370,193 @@ ul {
     transition: none;
   }
 }
+
+/* ============================================
+   SUBPAGE STYLES (CATEGORY PAGES)
+   ============================================ */
+.subpage-container {
+  padding-top: 100px;
+  background-color: var(--bg-white);
+}
+
+.subpage-hero {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 60px 40px;
+  display: flex;
+  gap: 60px;
+  align-items: center;
+}
+
+.subpage-hero-content {
+  flex: 1.2;
+}
+
+.subpage-hero-label {
+  font-family: var(--font-heading);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--primary-light);
+  margin-bottom: 16px;
+  display: inline-block;
+  border-bottom: 2px solid var(--primary-accent);
+  padding-bottom: 4px;
+}
+
+.subpage-hero-title {
+  font-family: var(--font-heading);
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1.2;
+  margin-bottom: 24px;
+}
+
+.subpage-hero-desc {
+  font-family: var(--font-body);
+  font-size: 1.2rem;
+  line-height: 1.7;
+  color: var(--text-body);
+}
+
+.subpage-hero-image {
+  flex: 0.8;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-light);
+}
+
+.subpage-hero-image img {
+  width: 100%;
+  height: 380px;
+  object-fit: cover;
+}
+
+/* Solutions Cards */
+.subpage-solutions {
+  background: var(--bg-light);
+  padding: 80px 40px;
+}
+
+.subpage-solutions-inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+.subpage-section-title {
+  font-family: var(--font-heading);
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.subpage-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 32px;
+}
+
+.subpage-card {
+  background: var(--bg-white);
+  padding: 40px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.subpage-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.subpage-card-icon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 20px;
+  color: var(--primary-light);
+}
+
+.subpage-card-title {
+  font-family: var(--font-heading);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 12px;
+}
+
+.subpage-card-desc {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+/* Image Gallery Section */
+.subpage-gallery {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 80px 40px;
+}
+
+.subpage-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 40px;
+}
+
+.subpage-gallery-item {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-light);
+}
+
+.subpage-gallery-item img {
+  width: 100%;
+  height: 320px;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.subpage-gallery-item:hover img {
+  transform: scale(1.03);
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .subpage-hero {
+    flex-direction: column;
+    gap: 40px;
+    padding: 40px 24px;
+  }
+  .subpage-hero-image {
+    width: 100%;
+  }
+  .subpage-hero-image img {
+    height: 300px;
+  }
+  .subpage-hero-title {
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .subpage-solutions {
+    padding: 60px 24px;
+  }
+  .subpage-gallery {
+    padding: 60px 24px;
+  }
+  .subpage-gallery-grid {
+    grid-template-columns: 1fr;
+  }
+  .subpage-hero-title {
+    font-size: 2.2rem;
+  }
+}
