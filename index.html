@@ -52,8 +52,8 @@
           <div class="dropdown-menu">
             <a href="security-solutions.html">Security Solutions</a>
             <a href="building-systems.html">Building Systems</a>
-            <a href="infrastructure.html">Infrastructure</a>
-            <a href="energy.html">Energy</a>
+            <a href="ict-infrastructure.html">Infrastructure</a>
+            <a href="power-systems.html">Energy</a>
             <a href="mep.html">MEP</a>
           </div>
         </div>
@@ -113,6 +113,8 @@
   <!-- ============================================
        HERO CAROUSEL
        ============================================ -->
+  <main id="home-view" class="view-active">
+
   <section class="hero-section" id="hero">
     <div class="carousel-wrapper">
 
@@ -334,7 +336,7 @@
         <!-- CARD 1 -->
         <div class="service-new-card fade-up" style="--stagger: 100ms" role="gridcell">
           <div class="service-card-image-wrapper">
-            <img src="assets/images/service-design.jpg" alt="End-to-End System Design" loading="lazy">
+            <img src="assets/images/service-design.jpg?v=2" alt="End-to-End System Design" loading="lazy">
           </div>
           <div class="service-card-content">
             <h3 class="service-card-title">End-to-End System Design</h3>
@@ -345,7 +347,7 @@
         <!-- CARD 2 -->
         <div class="service-new-card fade-up" style="--stagger: 200ms" role="gridcell">
           <div class="service-card-image-wrapper">
-            <img src="assets/images/service-procurement.jpg" alt="Procurement" loading="lazy">
+            <img src="assets/images/service-procurement.jpg?v=2" alt="Procurement" loading="lazy">
           </div>
           <div class="service-card-content">
             <h3 class="service-card-title">Procurement</h3>
@@ -356,7 +358,7 @@
         <!-- CARD 3 -->
         <div class="service-new-card fade-up" style="--stagger: 300ms" role="gridcell">
           <div class="service-card-image-wrapper">
-            <img src="assets/images/service-installation.jpg" alt="Installation" loading="lazy">
+            <img src="assets/images/service-installation.jpg?v=2" alt="Installation" loading="lazy">
           </div>
           <div class="service-card-content">
             <h3 class="service-card-title">Installation</h3>
@@ -367,7 +369,7 @@
         <!-- CARD 4 -->
         <div class="service-new-card fade-up" style="--stagger: 100ms" role="gridcell">
           <div class="service-card-image-wrapper">
-            <img src="assets/images/service-programming.jpg" alt="Programming & Configuration" loading="lazy">
+            <img src="assets/images/service-programming.jpg?v=2" alt="Programming & Configuration" loading="lazy">
           </div>
           <div class="service-card-content">
             <h3 class="service-card-title">Programming &amp; Configuration</h3>
@@ -378,7 +380,7 @@
         <!-- CARD 5 -->
         <div class="service-new-card fade-up" style="--stagger: 200ms" role="gridcell">
           <div class="service-card-image-wrapper">
-            <img src="assets/images/service-commissioning.jpg" alt="Project Commissioning" loading="lazy">
+            <img src="assets/images/service-commissioning.jpg?v=2" alt="Project Commissioning" loading="lazy">
           </div>
           <div class="service-card-content">
             <h3 class="service-card-title">Project Commissioning</h3>
@@ -389,7 +391,7 @@
         <!-- CARD 6 -->
         <div class="service-new-card fade-up" style="--stagger: 300ms" role="gridcell">
           <div class="service-card-image-wrapper">
-            <img src="assets/images/service-integration.jpg" alt="Systems Integration" loading="lazy">
+            <img src="assets/images/service-integration.jpg?v=2" alt="Systems Integration" loading="lazy">
           </div>
           <div class="service-card-content">
             <h3 class="service-card-title">Systems Integration</h3>
@@ -400,7 +402,7 @@
         <!-- CARD 7 -->
         <div class="service-new-card fade-up" style="--stagger: 100ms" role="gridcell">
           <div class="service-card-image-wrapper">
-            <img src="assets/images/service-management.jpg" alt="Project Management & Oversight" loading="lazy">
+            <img src="assets/images/service-management.jpg?v=2" alt="Project Management & Oversight" loading="lazy">
           </div>
           <div class="service-card-content">
             <h3 class="service-card-title">Project Management &amp; Oversight</h3>
@@ -411,7 +413,7 @@
         <!-- CARD 8 -->
         <div class="service-new-card fade-up" style="--stagger: 200ms" role="gridcell">
           <div class="service-card-image-wrapper">
-            <img src="assets/images/service-maintenance.jpg" alt="Maintenance" loading="lazy">
+            <img src="assets/images/service-maintenance.jpg?v=2" alt="Maintenance" loading="lazy">
           </div>
           <div class="service-card-content">
             <h3 class="service-card-title">Maintenance</h3>
@@ -422,7 +424,7 @@
         <!-- CARD 9 -->
         <div class="service-new-card fade-up" style="--stagger: 300ms" role="gridcell">
           <div class="service-card-image-wrapper">
-            <img src="assets/images/service-consulting.jpg" alt="Consulting" loading="lazy">
+            <img src="assets/images/service-consulting.jpg?v=2" alt="Consulting" loading="lazy">
           </div>
           <div class="service-card-content">
             <h3 class="service-card-title">Consulting</h3>
@@ -618,6 +620,43 @@
     </div>
   </section>
 
+  </main> <!-- /home-view -->
+
+  <!-- ============================================
+       SOLUTIONS DETAIL VIEW (SPA)
+       ============================================ -->
+  <main id="solutions-view" class="view-hidden" style="opacity: 0; transition: opacity 0.3s ease-in-out;">
+    <div class="sol-layout-wrapper">
+      
+      <!-- Permanent Left Sidebar -->
+      <aside class="sol-sidebar">
+        <h2 class="sol-sidebar-title">Solutions</h2>
+        <ul class="sol-nav-list">
+          <li class="sol-nav-item-back"><button class="sol-nav-btn-back" id="sol-btn-back">← Back to Home</button></li>
+          <li class="sol-nav-item"><button class="sol-nav-btn" data-sol="security-solutions.html">Security Solutions</button></li>
+          <li class="sol-nav-item"><button class="sol-nav-btn" data-sol="building-systems.html">Building Automation</button></li>
+          <li class="sol-nav-item"><button class="sol-nav-btn" data-sol="networking.html">Networking</button></li>
+          <li class="sol-nav-item"><button class="sol-nav-btn" data-sol="audio-visual.html">Audio Visual</button></li>
+          <li class="sol-nav-item"><button class="sol-nav-btn" data-sol="fire-detection.html">Fire Detection</button></li>
+          <li class="sol-nav-item"><button class="sol-nav-btn" data-sol="power-systems.html">Power Systems</button></li>
+          <li class="sol-nav-item"><button class="sol-nav-btn" data-sol="ict-infrastructure.html">ICT Infrastructure</button></li>
+          <li class="sol-nav-item"><button class="sol-nav-btn" data-sol="data-centre.html">Data Centre</button></li>
+          <li class="sol-nav-item"><button class="sol-nav-btn" data-sol="cloud-solutions.html">Cloud Solutions</button></li>
+          <li class="sol-nav-item"><button class="sol-nav-btn" data-sol="business-automation.html">Business Automation</button></li>
+          <li class="sol-nav-item"><button class="sol-nav-btn" data-sol="support.html">Support</button></li>
+        </ul>
+      </aside>
+
+      <!-- Right Content Panel (Updates via SPA) -->
+      <div class="sol-content-area">
+        <div class="solutions-content" id="solutions-content">
+          <!-- Content Injected by JS -->
+        </div>
+      </div>
+
+    </div>
+  </main>
+
   <!-- ============================================
        FOOTER
        ============================================ -->
@@ -644,30 +683,8 @@
             </a>
           </div>
           <div class="footer-stats">
-            <div class="stat-item"><span class="stat-num">10+</span> Years Experience</div>
-            <div class="stat-item"><span class="stat-num">100+</span> Projects Delivered</div>
-            <div class="stat-item"><span class="stat-num">3</span> Countries Served</div>
             <div class="stat-item"><span class="stat-num">24/7</span> Technical Support</div>
           </div>
-        </div>
-
-        <!-- ZONE 2: SOLUTIONS ZONE -->
-        <div class="footer-links footer-solutions">
-          <h4>Solutions</h4>
-          <ul>
-            <!-- Column 1 -->
-            <li><a href="#services">Smart Security</a></li>
-            <li><a href="#services">BMS &amp; Automation</a></li>
-            <li><a href="#services">Surveillance Systems</a></li>
-            <!-- Column 2 -->
-            <li><a href="#services">Access Control &amp; Intercom</a></li>
-            <li><a href="#services">Integrated Security Management</a></li>
-            <li><a href="#services">IT &amp; Structured Cabling</a></li>
-            <!-- Column 3 -->
-            <li><a href="#services">Fire Detection &amp; Suppression Systems</a></li>
-            <li><a href="#services">Renewable Energy</a></li>
-            <li><a href="#services">MEP (Mechanical, Electrical &amp; Plumbing)</a></li>
-          </ul>
         </div>
 
         <!-- ZONE 3: NAVIGATION ZONE -->
@@ -743,7 +760,6 @@
     </div>
   </footer>
 
-  <!-- Scripts moved to assets/js/main.js -->
-  <script src="assets/js/main.js?v=5.0" defer></script>
+  <!-- Scripts loaded in <head> with defer -->
 </body>
 </html>
