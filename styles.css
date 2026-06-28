@@ -3073,3 +3073,206 @@ ul {
     flex-direction: column;
   }
 }
+
+/* ============================================
+   VERTICAL ENQUIRY BUTTON & SLIDE-OUT PANEL
+   ============================================ */
+.site-footer {
+  position: relative;
+  /* Increase right padding on desktop to clear space for the vertical button */
+  padding: 48px 100px 28px 48px !important;
+}
+
+@media (max-width: 768px) {
+  .site-footer {
+    padding: 40px 24px 20px !important;
+  }
+}
+
+/* Vertical Button */
+.footer-enquiry-toggle-btn {
+  position: absolute;
+  right: 24px;
+  top: 48px;
+  bottom: 28px;
+  width: 48px;
+  background: var(--primary-light); /* Fosem sky blue */
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.15);
+}
+
+.footer-enquiry-toggle-btn span {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  white-space: nowrap;
+}
+
+.footer-enquiry-toggle-btn:hover {
+  background: var(--cta-hover); /* Brighter sky blue */
+  transform: scaleY(1.02);
+}
+
+@media (max-width: 768px) {
+  /* On mobile, stack it as a standard horizontal button at the bottom of the footer */
+  .footer-enquiry-toggle-btn {
+    position: static;
+    width: 100%;
+    height: 48px;
+    margin-top: 24px;
+    margin-bottom: 12px;
+  }
+  .footer-enquiry-toggle-btn span {
+    writing-mode: horizontal-tb;
+    transform: none;
+  }
+}
+
+/* Slide-out Panel */
+.enquiry-panel {
+  position: fixed;
+  top: 0;
+  right: -380px;
+  width: 380px;
+  height: 100vh;
+  background: #0b1329; /* Dark navy, slightly lighter than #0f172a footer */
+  z-index: 2000;
+  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.30);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 40px 32px;
+  display: flex;
+  flex-direction: column;
+  border-left: 2px solid var(--primary-light); /* Thin Fosem sky blue accent line on left edge */
+}
+
+.enquiry-panel.open {
+  transform: translateX(-380px);
+}
+
+@media (max-width: 480px) {
+  .enquiry-panel {
+    width: 100%;
+    right: -100%;
+    border-left: none;
+    border-top: 4px solid var(--primary-light);
+  }
+  .enquiry-panel.open {
+    transform: translateX(-100%);
+  }
+}
+
+.enquiry-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+
+.enquiry-panel-header h3 {
+  font-family: var(--font-heading);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.enquiry-panel-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  transition: color var(--transition-fast);
+}
+
+.enquiry-panel-close:hover {
+  color: #ffffff;
+}
+
+.enquiry-panel-close svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Form Styling */
+.enquiry-panel-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.enquiry-panel-form .form-group input,
+.enquiry-panel-form .form-group textarea {
+  width: 100%;
+  background: #111a36; /* Dark input */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  color: #ffffff;
+  padding: 12px 16px;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.enquiry-panel-form .form-group input::placeholder,
+.enquiry-panel-form .form-group textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.enquiry-panel-form .form-group input:focus,
+.enquiry-panel-form .form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary-light);
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
+}
+
+.enquiry-panel-form textarea {
+  resize: none;
+}
+
+.panel-submit-btn {
+  background: var(--primary-light);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  margin-top: 12px;
+}
+
+.panel-submit-btn:hover {
+  background: var(--cta-hover);
+}
+
+/* Overlay */
+.enquiry-panel-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 17, 30, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.enquiry-panel-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}

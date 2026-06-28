@@ -788,22 +788,10 @@
         </div>
 
       </div>
-
-      <!-- ZONE 5: ENQUIRY ZONE -->
-      <div class="footer-enquiry-strip">
-        <div class="enquiry-left">
-          <h4>Send an Enquiry</h4>
-        </div>
-        <div class="enquiry-right">
-          <form class="enquiry-form-horizontal" id="footer-enquiry-form">
-            <input type="text" id="enquiry-name" name="name" placeholder="Name" required>
-            <input type="email" id="enquiry-email" name="email" placeholder="Email" required>
-            <input type="tel" id="enquiry-phone" name="phone" placeholder="Phone" required>
-            <input type="text" id="enquiry-message" name="message" placeholder="Message" required>
-            <button type="submit" class="enquiry-submit-btn">Submit Enquiry</button>
-          </form>
-        </div>
-      </div>
+      <!-- Vertical Enquiry Toggle Button -->
+      <button class="footer-enquiry-toggle-btn" id="enquiry-toggle-btn" aria-label="Open enquiry panel">
+        <span>Send Enquiry</span>
+      </button>
       <div class="footer-bottom">
         <p>&copy; 2026 Fosem Controls Limited. All rights reserved.</p>
       </div>
@@ -811,5 +799,33 @@
   </footer>
 
   <!-- Scripts loaded in <head> with defer -->
+  <!-- Slide-out Enquiry Panel -->
+  <div class="enquiry-panel" id="enquiry-panel">
+    <div class="enquiry-panel-header">
+      <h3>Send Enquiry</h3>
+      <button class="enquiry-panel-close" id="enquiry-close-btn" aria-label="Close panel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <form class="enquiry-panel-form" id="panel-enquiry-form">
+      <div class="form-group">
+        <input type="text" id="panel-name" name="name" placeholder="Name" required>
+      </div>
+      <div class="form-group">
+        <input type="email" id="panel-email" name="email" placeholder="Email" required>
+      </div>
+      <div class="form-group">
+        <input type="tel" id="panel-phone" name="phone" placeholder="Phone" required>
+      </div>
+      <div class="form-group">
+        <textarea id="panel-message" name="message" placeholder="Message" rows="4" required></textarea>
+      </div>
+      <button type="submit" class="panel-submit-btn">Submit Enquiry</button>
+    </form>
+  </div>
+  <div class="enquiry-panel-overlay" id="enquiry-overlay"></div>
 </body>
 </html>
