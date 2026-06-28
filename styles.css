@@ -2037,13 +2037,14 @@ ul {
 
 /* Footer Enquiry Form */
 .footer-enquiry {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-left: 3px solid var(--primary);
+  background: #111a2e; /* Sleek dark navy card background */
+  border: 1px solid rgba(14, 165, 233, 0.12); /* Subtle Fosem blue border instead of white */
+  border-left: 3px solid var(--primary); /* Glowing Fosem blue left accent */
   border-radius: var(--radius-lg, 12px);
   padding: 24px;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
 .footer-enquiry h4 {
@@ -2059,7 +2060,7 @@ ul {
 .enquiry-form {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
 .enquiry-grid {
@@ -2075,47 +2076,58 @@ ul {
 .enquiry-field input,
 .enquiry-field textarea {
   width: 100%;
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
-  color: #fff;
-  padding: 10px 14px;
+  background: #090e1a; /* Dark inset input background matching theme */
+  border: 1px solid rgba(14, 165, 233, 0.15); /* Zero white, subtle blue border */
+  border-radius: 8px;
+  color: #f8fafc;
+  padding: 12px 14px;
   font-family: var(--font-body);
-  font-size: 0.88rem;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  font-size: 0.9rem;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
 }
 
 .enquiry-field input::placeholder,
 .enquiry-field textarea::placeholder {
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(148, 163, 184, 0.4); /* Soft slate grey placeholder */
 }
 
 .enquiry-field input:focus,
 .enquiry-field textarea:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.15);
+  background-color: #0b1120;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.25);
   outline: none;
 }
 
+.enquiry-field textarea {
+  resize: none;
+  min-height: 80px;
+}
+
 .enquiry-submit-btn {
-  background: var(--primary);
+  background: linear-gradient(135deg, var(--primary), #0284c7);
   color: #fff;
   border: none;
-  border-radius: 6px;
-  padding: 12px;
+  border-radius: 8px;
+  padding: 13px;
   font-family: var(--font-heading);
   font-size: 0.95rem;
   font-weight: 600;
+  letter-spacing: 0.02em;
   cursor: pointer;
-  transition: background 0.25s ease, transform 0.2s ease;
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);
+  transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
 }
 
 .enquiry-submit-btn:hover {
-  background: var(--primary-light, #38bdf8);
+  background: linear-gradient(135deg, #38bdf8, var(--primary));
+  box-shadow: 0 6px 16px rgba(14, 165, 233, 0.3);
+  transform: translateY(-1px);
 }
 
 .enquiry-submit-btn:active {
-  transform: scale(0.98);
+  transform: translateY(1px);
+  box-shadow: 0 2px 6px rgba(14, 165, 233, 0.15);
 }
 
 @media (max-width: 600px) {
