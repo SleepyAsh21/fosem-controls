@@ -695,51 +695,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  /* --- Slide-out Enquiry Panel Handlers --- */
-  const toggleBtn = document.getElementById('enquiry-toggle-btn');
-  const closeBtn = document.getElementById('enquiry-close-btn');
-  const panel = document.getElementById('enquiry-panel');
-  const overlay = document.getElementById('enquiry-overlay');
-  const enquiryForm = document.getElementById('panel-enquiry-form');
-
-  const closePanel = () => {
-    if (panel && overlay) {
-      panel.classList.remove('open');
-      overlay.classList.remove('open');
-      document.body.style.overflow = '';
-    }
-  };
-
-  if (toggleBtn && panel && overlay) {
-    toggleBtn.addEventListener('click', (e) => {
+  /* --- Footer Enquiry Form Handler --- */
+  const footerEnquiryForm = document.getElementById('footer-enquiry-form');
+  if (footerEnquiryForm) {
+    footerEnquiryForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      panel.classList.add('open');
-      overlay.classList.add('open');
-      document.body.style.overflow = 'hidden'; // prevent background scrolling
-    });
-  }
-
-  if (closeBtn) {
-    closeBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      closePanel();
-    });
-  }
-
-  if (overlay) {
-    overlay.addEventListener('click', (e) => {
-      e.preventDefault();
-      closePanel();
-    });
-  }
-
-  if (enquiryForm) {
-    enquiryForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      // Show simple professional notification
       alert('Thank you for your enquiry. We will get back to you shortly.');
-      closePanel();
-      enquiryForm.reset();
+      footerEnquiryForm.reset();
     });
   }
 });
