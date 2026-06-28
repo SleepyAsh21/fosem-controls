@@ -1441,7 +1441,7 @@ ul {
 .parallax-section {
   position: relative;
   height: 500px;
-  background-image: url('assets/control_room.png');
+  background-image: url('assets/control_room.webp');
   background-attachment: fixed;
   background-position: center;
   background-size: cover;

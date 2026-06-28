@@ -458,8 +458,8 @@ const solutionsData = {
       { icon: svgIcons.server, title: 'Facility Management Integration', desc: 'Connecting mechanical systems to building automation.' }
     ],
     gallery: [
-      'assets/images/service-installation.jpg',
-      'assets/images/service-commissioning.jpg'
+      'assets/images/service-installation.webp',
+      'assets/images/service-commissioning.webp'
     ]
   }
 };
