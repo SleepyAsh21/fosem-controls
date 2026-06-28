@@ -571,8 +571,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (href && href.includes('#')) {
         const slug = href.split('#')[1];
         if (solutionsData[slug]) {
-          e.preventDefault();
-          window.fosemApp.loadSolution(slug);
+          const homeView = document.getElementById('home-view');
+          const solView = document.getElementById('solutions-view');
+          if (homeView && solView) {
+            e.preventDefault();
+            window.fosemApp.loadSolution(slug);
+          }
         }
       }
     });
@@ -583,6 +587,15 @@ document.addEventListener('DOMContentLoaded', () => {
   hashLinks.forEach(link => {
     link.addEventListener('click', (e) => {
       const href = link.getAttribute('href');
+      
+      // If this is a solution slug, let the dropdown handler handle it
+      if (href && href.includes('#')) {
+        const slug = href.split('#')[1];
+        if (solutionsData[slug]) {
+          return;
+        }
+      }
+
       const homeView = document.getElementById('home-view');
       if (homeView && homeView.classList.contains('view-hidden')) {
         e.preventDefault();
