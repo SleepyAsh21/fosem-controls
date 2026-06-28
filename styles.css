@@ -293,20 +293,20 @@ ul {
 @media (min-width: 1025px) {
   .dropdown-menu.mega-menu {
     left: 50% !important;
-    transform: translateX(-50%) translateY(-10px) !important;
-    width: 580px;
-    padding: 24px 28px !important;
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr) !important;
-    grid-template-rows: repeat(3, auto) !important;
-    gap: 14px 20px !important;
+    transform: translateX(-50%) translateY(-6px) !important;
+    width: 880px;
+    padding: 32px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
     background: #ffffff !important;
-    border: 1px solid rgba(0, 0, 0, 0.05) !important;
-    border-radius: var(--radius-md) !important;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.04) !important;
+    border: 1px solid #e2e8f0 !important; /* subtle border */
+    border-radius: 20px !important; /* border radius 18px-22px */
+    box-shadow: 0 12px 32px -4px rgba(15, 23, 42, 0.06), 0 4px 12px -2px rgba(15, 23, 42, 0.02) !important; /* soft professional shadow */
     opacity: 0;
     visibility: hidden;
-    transition: opacity var(--transition-normal), transform var(--transition-normal), visibility var(--transition-normal);
+    transition: opacity var(--transition-fast) ease-out, transform var(--transition-fast) ease-out, visibility var(--transition-fast) ease-out !important;
+    top: 100% !important;
   }
 
   .nav-item:hover .dropdown-menu.mega-menu {
@@ -315,26 +315,55 @@ ul {
     transform: translateX(-50%) translateY(0) !important;
   }
 
+  .mega-menu-header {
+    font-family: var(--font-heading);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #0f172a; /* deep navy */
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    padding-bottom: 4px;
+  }
+
+  .mega-menu-header::after {
+    content: "";
+    width: 24px;
+    height: 2px;
+    background: var(--primary-light); /* Fosem sky blue accent line */
+  }
+
+  .mega-menu-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 6px 16px !important;
+    width: 100% !important;
+  }
+
   .dropdown-menu.mega-menu a {
     display: flex !important;
     align-items: center !important;
     justify-content: flex-start !important;
     text-align: left !important;
-    padding: 8px 12px !important;
-    font-size: 0.85rem !important;
-    font-weight: 500 !important;
-    color: var(--primary-accent) !important;
+    padding: 10px 16px !important;
+    font-size: 0.98rem !important; /* ~16px */
+    font-weight: 500 !important; /* medium/semi-bold */
+    color: #0f172a !important; /* deep Fosem navy for normal text */
     background: transparent !important;
     border: none !important;
-    border-radius: var(--radius-sm) !important;
+    border-radius: 8px !important;
     box-shadow: none !important;
     transition: background var(--transition-fast), color var(--transition-fast) !important;
     min-height: auto !important;
+    width: 100% !important;
   }
 
   .dropdown-menu.mega-menu a:hover {
-    background: rgba(14, 165, 233, 0.04) !important;
-    color: var(--primary-light) !important;
+    background: rgba(14, 165, 233, 0.05) !important; /* very light blue-tinted background on hover */
+    color: var(--primary-light) !important; /* Fosem sky blue text on hover */
   }
 }
 
@@ -2314,6 +2343,32 @@ ul {
 
   .nav-item.active .dropdown-menu {
     display: block;
+  }
+
+  .mega-menu-header {
+    display: none !important;
+  }
+
+  .mega-menu-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+  }
+
+  .dropdown-menu.mega-menu a {
+    display: block !important;
+    padding: 10px 16px !important;
+    font-size: 0.875rem !important;
+    font-weight: 400 !important;
+    color: var(--text-dark) !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .dropdown-menu.mega-menu a:hover {
+    color: var(--primary-light) !important;
+    background: transparent !important;
   }
 
   .carousel-wrapper {
