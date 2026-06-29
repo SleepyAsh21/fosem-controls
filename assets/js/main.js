@@ -159,6 +159,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }, observerOptions);
 
+  if (!window.fosemApp) window.fosemApp = {};
+  window.fosemApp.animationObserver = animationObserver;
+
   document.querySelectorAll('.fade-up, .fade-left, .fade-right, .scale-in').forEach(el => {
     animationObserver.observe(el);
   });
@@ -279,7 +282,7 @@ const solutionsData = {
     ],
     gallery: [
       'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1600&q=80',
-      'https://images.unsplash.com/photo-1504307651254-35680f356f67?auto=format&fit=crop&w=1600&q=80'
+      'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1600&q=80'
     ]
   },
   'infrastructure': {
@@ -375,7 +378,7 @@ const solutionsData = {
   'automation-systems': {
     title: 'Automation Systems',
     desc: 'Programmable Logic Controller (PLC) systems, SCADA telemetry platforms, and centralized mechanical-electrical coordination frameworks.',
-    heroImage: 'https://images.unsplash.com/photo-1504307651254-35680f356f67?auto=format&fit=crop&w=1600&q=80',
+    heroImage: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1600&q=80',
     how: 'We streamline facility operations by integrating mechanical-electrical components under high-availability automation logic. Our engineers program rugged PLCs and design intuitive SCADA HMI interfaces to map all mechanical, power, and thermal assets. We deploy edge-gateway routers to gather and analyze fieldbus telemetry (Modbus, BACnet, Profibus), giving operators unified oversight of critical systems.',
     deliverables: [
       { icon: svgIcons.settings, title: 'PLC Development', desc: 'Custom logic control scripts engineered for industrial hardware.' },
@@ -387,7 +390,7 @@ const solutionsData = {
     ],
     gallery: [
       'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1600&q=80',
-      'https://images.unsplash.com/photo-1504307651254-35680f356f67?auto=format&fit=crop&w=1600&q=80'
+      'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1600&q=80'
     ]
   },
   'cctv-surveillance': {
@@ -409,25 +412,26 @@ const solutionsData = {
     ]
   }
 };
-window.fosemApp = {
+if (!window.fosemApp) window.fosemApp = {};
+Object.assign(window.fosemApp, {
   renderContent: function(data, isInitialLoad) {
     const container = document.getElementById('solutions-content');
     
     const applyHtml = () => {
       let html = `
         <!-- 1. Hero -->
-        <section class="sol-hero">
-          <div class="sol-hero-text">
+        <section class="sol-hero fade-up">
+          <div class="sol-hero-text fade-left" style="--stagger: 100ms">
             <h1 class="sol-hero-title">${data.title}</h1>
             <p class="sol-hero-desc">${data.desc}</p>
           </div>
-          <div class="sol-hero-image-wrapper">
-            <img src="${data.heroImage}" alt="${data.title}" class="sol-hero-image">
+          <div class="sol-hero-image-wrapper scale-in" style="--stagger: 200ms">
+            <img src="${data.heroImage}" alt="${data.title}" class="sol-hero-image" decoding="async">
           </div>
         </section>
 
         <!-- 2. How Fosem Delivers -->
-        <section class="sol-section">
+        <section class="sol-section fade-up">
           <h2 class="sol-section-title">How Fosem Delivers This Solution</h2>
           <div class="sol-how">
             <p>${data.how}</p>
@@ -435,11 +439,11 @@ window.fosemApp = {
         </section>
 
         <!-- 3. What We Deliver -->
-        <section class="sol-section">
+        <section class="sol-section fade-up">
           <h2 class="sol-section-title">What We Deliver</h2>
           <div class="sol-deliverables-grid">
-            ${data.deliverables.map(d => `
-              <div class="sol-deliverable">
+            ${data.deliverables.map((d, index) => `
+              <div class="sol-deliverable fade-up" style="--stagger: ${(index % 3 + 1) * 100}ms">
                 <div class="sol-deliverable-icon">${d.icon}</div>
                 <h3>${d.title}</h3>
                 <p>${d.desc}</p>
@@ -449,17 +453,17 @@ window.fosemApp = {
         </section>
 
         <!-- 4. Project Gallery -->
-        <section class="sol-section">
+        <section class="sol-section fade-up">
           <h2 class="sol-section-title">Project Gallery</h2>
           <div class="sol-gallery-grid">
-            ${data.gallery.map(img => `
-              <img src="${img}" alt="Project installation" class="sol-gallery-image">
+            ${data.gallery.map((img, index) => `
+              <img src="${img}" alt="Project installation" class="sol-gallery-image scale-in" style="--stagger: ${(index + 1) * 100}ms" decoding="async">
             `).join('')}
           </div>
         </section>
 
         <!-- 5. Consultation -->
-        <section class="sol-consultation">
+        <section class="sol-consultation fade-up">
           <h2 class="sol-consultation-title">Ready to discuss your project?</h2>
           <p>Talk with our engineering team to design a solution tailored to your requirements.</p>
           <div class="sol-consultation-actions">
@@ -472,6 +476,23 @@ window.fosemApp = {
       container.innerHTML = html;
       document.querySelector('.sol-content-area').scrollTo({ top: 0, behavior: 'instant' });
       
+      // Observe all dynamic fade-up/scale-in elements inside solutions-content
+      if (window.fosemApp.animationObserver) {
+        container.querySelectorAll('.fade-up, .fade-left, .fade-right, .scale-in').forEach(el => {
+          window.fosemApp.animationObserver.observe(el);
+        });
+      }
+
+      // Check visible elements immediately
+      setTimeout(() => {
+        container.querySelectorAll('.fade-up, .fade-left, .fade-right, .scale-in').forEach(el => {
+          const rect = el.getBoundingClientRect();
+          if (rect.top < window.innerHeight && rect.bottom > 0) {
+            el.classList.add('animate-in');
+          }
+        });
+      }, 100);
+
       container.classList.remove('animating-out');
       container.classList.add('animating-in');
       void container.offsetWidth;
@@ -613,7 +634,7 @@ window.fosemApp = {
       }, 550);
     }
   }
-};
+});
 
 // Intercept Clicks, Sidebar Navigation and Back to Home
 document.addEventListener('DOMContentLoaded', () => {
