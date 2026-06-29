@@ -1008,9 +1008,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // active Ripples (waves expanding on laser impact)
     const activeRipples = [];
     
-    // Bouncing Beams (6 active laser travelers constantly bouncing between connected nodes)
+    // Bouncing Beams (45 active laser travelers constantly bouncing between connected nodes)
     const activeBeams = [];
-    const beamCount = 6;
+    const beamCount = 45;
     
     for (let i = 0; i < beamCount; i++) {
       // Pick a random starting node
@@ -1032,8 +1032,9 @@ document.addEventListener('DOMContentLoaded', () => {
         currentNode: startNode,
         targetNode: targetNode,
         link: activeLink,
+        lastNodeId: startNode.id,
         progress: Math.random(),
-        speed: 0.01 + Math.random() * 0.008
+        speed: 0.016 + Math.random() * 0.016
       });
     }
     
@@ -1187,15 +1188,27 @@ document.addEventListener('DOMContentLoaded', () => {
             y: beam.targetNode.y,
             z: beam.targetNode.z,
             progress: 0,
-            speed: 0.05
+            speed: 0.08 // Faster, more punchy impact ripple
           });
           
-          // Instantly bounce off to a connected neighbor
+          const prevId = beam.lastNodeId;
+          beam.lastNodeId = beam.currentNode.id;
           beam.currentNode = beam.targetNode;
-          const connected = data.links.filter(l => l.id1 === beam.currentNode.id || l.id2 === beam.currentNode.id);
           
-          if (connected.length > 0) {
-            beam.link = connected[Math.floor(Math.random() * connected.length)];
+          // Find neighbors
+          const connected = data.links.filter(l => l.id1 === beam.currentNode.id || l.id2 === beam.currentNode.id);
+          // Exclude previous link to keep traveling forward to new nodes
+          let choices = connected.filter(l => {
+            const destId = l.id1 === beam.currentNode.id ? l.id2 : l.id1;
+            return destId !== prevId;
+          });
+          
+          if (choices.length === 0 && connected.length > 0) {
+            choices = connected; // Fallback to any choice if blocked
+          }
+          
+          if (choices.length > 0) {
+            beam.link = choices[Math.floor(Math.random() * choices.length)];
             const nextId = beam.link.id1 === beam.currentNode.id ? beam.link.id2 : beam.link.id1;
             beam.targetNode = data.nodes.find(n => n.id === nextId);
           } else {
@@ -1204,7 +1217,7 @@ document.addEventListener('DOMContentLoaded', () => {
           }
           
           beam.progress = 0;
-          beam.speed = 0.012 + Math.random() * 0.012; // Dynamic speed for bouncing pacing
+          beam.speed = 0.02 + Math.random() * 0.022; // Aggressive, snappy speed range
         }
         
         const n1 = beam.currentNode;
@@ -1231,9 +1244,18 @@ document.addEventListener('DOMContentLoaded', () => {
           if (alpha < 0) alpha = 0;
           if (alpha > 1) alpha = 1;
           
-          // Draw the active link as a BOLD, clean light arc line (NO neon shadow glow)
+          // Draw active link with high-contrast dual strokes to create a bold, clean lighted arc
+          // Base thicker blue path
           ctx.strokeStyle = `rgba(160, 225, 255, ${alpha * 0.85})`;
-          ctx.lineWidth = 1.4 * scale;
+          ctx.lineWidth = 1.6 * scale;
+          ctx.beginPath();
+          ctx.moveTo(pt1.px * scale, pt1.py * scale);
+          ctx.quadraticCurveTo(ptCtrl.px * scale, ptCtrl.py * scale, pt2.px * scale, pt2.py * scale);
+          ctx.stroke();
+          
+          // Top thinner white hot core path
+          ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.95})`;
+          ctx.lineWidth = 0.7 * scale;
           ctx.beginPath();
           ctx.moveTo(pt1.px * scale, pt1.py * scale);
           ctx.quadraticCurveTo(ptCtrl.px * scale, ptCtrl.py * scale, pt2.px * scale, pt2.py * scale);
@@ -1250,13 +1272,13 @@ document.addEventListener('DOMContentLoaded', () => {
           // Bold solid white head dot
           ctx.fillStyle = '#ffffff';
           ctx.beginPath();
-          ctx.arc(ptHead.px * scale, ptHead.py * scale, 2.2 * scale, 0, 2 * Math.PI);
+          ctx.arc(ptHead.px * scale, ptHead.py * scale, 2.5 * scale, 0, 2 * Math.PI);
           ctx.fill();
           
-          // Faint trail core
+          // Outer semi-transparent glow ring
           ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.45})`;
           ctx.beginPath();
-          ctx.arc(ptHead.px * scale, ptHead.py * scale, 3.5 * scale, 0, 2 * Math.PI);
+          ctx.arc(ptHead.px * scale, ptHead.py * scale, 4.2 * scale, 0, 2 * Math.PI);
           ctx.fill();
         }
       });
