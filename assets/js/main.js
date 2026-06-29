@@ -645,12 +645,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const isAlreadyOnSolutions = !solView.classList.contains('view-hidden');
             window.fosemApp.loadSolution(slug);
 
-            if (isAlreadyOnSolutions) {
-              window.fosemApp.scrollToAndFocus('solutions-content');
-            } else {
-              // Transitioning from home view
+            if (!isAlreadyOnSolutions) {
+              // Transitioning from home view: scroll window to the top of solutions view (no highlights)
               setTimeout(() => {
-                window.fosemApp.scrollToAndFocus('solutions-view');
+                const rect = solView.getBoundingClientRect();
+                const navbar = document.querySelector('.site-header');
+                const navHeight = navbar ? navbar.offsetHeight : 80;
+                const targetOffset = rect.top + window.pageYOffset - navHeight - 16;
+                window.scrollTo({
+                  top: targetOffset,
+                  behavior: 'smooth'
+                });
               }, 350);
             }
           }
