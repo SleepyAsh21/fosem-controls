@@ -694,31 +694,58 @@ Object.assign(window.fosemApp, {
     }, 2300);
   },
 
+  scrollTargetIntoSafeView: function(targetCard, dropdownPanel, header) {
+    if (!targetCard) return;
+
+    // Measure bounding rectangles
+    const cardRect = targetCard.getBoundingClientRect();
+    const headerRect = header ? header.getBoundingClientRect() : { bottom: 80 };
+    
+    // Determine the active dropdown bottom boundary in viewport coordinates
+    let dropdownBottom = headerRect.bottom;
+    if (dropdownPanel) {
+      const dropdownRect = dropdownPanel.getBoundingClientRect();
+      if (dropdownRect.height > 0) {
+        dropdownBottom = dropdownRect.bottom;
+      }
+    }
+
+    const safeOffset = dropdownBottom + 32; // 32px safety clearance below the dropdown panel
+
+    // Check if the card is already fully visible in the viewport and not blocked by the dropdown/header
+    const isBelowDropdown = cardRect.top >= safeOffset;
+    const isAboveViewportBottom = cardRect.bottom <= window.innerHeight;
+    const isAlreadyFullyVisible = isBelowDropdown && isAboveViewportBottom;
+
+    const slug = targetCard.id;
+
+    if (isAlreadyFullyVisible) {
+      // Already perfectly visible: trigger focus animation after a short wait (150ms)
+      setTimeout(() => {
+        this.triggerCardFocus(slug);
+      }, 150);
+    } else {
+      // Scroll to position the top of the card exactly at safeOffset
+      const cardDocTop = cardRect.top + window.pageYOffset;
+      const targetScrollY = cardDocTop - safeOffset;
+
+      window.scrollTo({
+        top: targetScrollY,
+        behavior: 'smooth'
+      });
+
+      // Wait for smooth scroll to finish (approx 650ms) then trigger focus pop
+      setTimeout(() => {
+        this.triggerCardFocus(slug);
+      }, 650);
+    }
+  },
+
   scrollToAndFocus: function(targetId) {
     const targetEl = document.getElementById(targetId);
     if (!targetEl) return;
-
-    const rect = targetEl.getBoundingClientRect();
-    const navbar = document.querySelector('.site-header');
-    const navHeight = navbar ? navbar.offsetHeight : 80;
-    const targetOffset = rect.top + window.pageYOffset - navHeight - 16;
-
-    // Check visibility
-    const visibleHeight = Math.max(0, Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0));
-    const visibleWidth = Math.max(0, Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0));
-    const is60Visible = (visibleHeight * visibleWidth) / (rect.height * rect.width) >= 0.60;
-
-    if (is60Visible) {
-      this.triggerCardFocus(targetId);
-    } else {
-      window.scrollTo({
-        top: targetOffset,
-        behavior: 'smooth'
-      });
-      setTimeout(() => {
-        this.triggerCardFocus(targetId);
-      }, 650);
-    }
+    const header = document.querySelector('.site-header');
+    this.scrollTargetIntoSafeView(targetEl, null, header);
   }
 });
 
@@ -830,38 +857,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const targetEl = document.getElementById(slug);
                 if (!targetEl) return;
 
-                const rect = targetEl.getBoundingClientRect();
-                const navbar = document.querySelector('.site-header');
-                const navHeight = navbar ? navbar.offsetHeight : 80;
-                
-                // Retrieve the actual de-emphasized dropdown height if active
-                const deEmphasizedMenu = document.querySelector('.dropdown-menu.de-emphasized');
-                const dropdownHeight = deEmphasizedMenu ? deEmphasizedMenu.offsetHeight : 0;
-                
-                const targetOffset = rect.top + window.pageYOffset - navHeight - dropdownHeight - 24;
-
-                // Check if card is already fully visible in viewport
-                const visibleHeight = Math.max(0, Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0));
-                const visibleWidth = Math.max(0, Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0));
-                const isAlreadyVisible = (visibleHeight * visibleWidth) / (rect.height * rect.width) >= 0.60;
-
-                if (isAlreadyVisible) {
-                  // If already visible, wait 150ms after dropdown begins fading, then nudge
-                  setTimeout(() => {
-                    window.fosemApp.triggerCardFocus(slug);
-                  }, 150);
-                } else {
-                  // Scroll smoothly to target card
-                  window.scrollTo({
-                    top: targetOffset,
-                    behavior: 'smooth'
-                  });
-
-                  // Trigger focus pop only after scroll finishes (650ms)
-                  setTimeout(() => {
-                    window.fosemApp.triggerCardFocus(slug);
-                  }, 650);
-                }
+                const header = document.querySelector('.site-header');
+                window.fosemApp.scrollTargetIntoSafeView(targetEl, parentMenu, header);
               }, 150);
             };
 
