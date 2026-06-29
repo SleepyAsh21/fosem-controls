@@ -1148,32 +1148,49 @@ document.addEventListener('DOMContentLoaded', () => {
         const n2 = data.nodes.find(n => n.id === link.id2);
         if (!n1 || !n2) return;
         
-        const pt1 = project(n1.x, n1.y, n1.z);
-        const pt2 = project(n2.x, n2.y, n2.z);
+        const xm = (n1.x + n2.x) / 2;
+        const ym = (n1.y + n2.y) / 2;
+        const zm = (n1.z + n2.z) / 2;
+        let length_mid = Math.sqrt(xm*xm + ym*ym + zm*zm);
+        if (length_mid < 1) length_mid = 1;
         
-        if (pt1.z3d >= -15 && pt2.z3d >= -15) {
-          const xm = (n1.x + n2.x) / 2;
-          const ym = (n1.y + n2.y) / 2;
-          const zm = (n1.z + n2.z) / 2;
-          let length_mid = Math.sqrt(xm*xm + ym*ym + zm*zm);
-          if (length_mid < 1) length_mid = 1;
-          
-          const factor = (199 / length_mid) - 1;
-          const xc = xm + xm * factor;
-          const yc = ym + ym * factor;
-          const zc = zm + zm * factor;
-          
-          const ptCtrl = project(xc, yc, zc);
-          
-          let alpha = Math.min(pt1.z3d, pt2.z3d) / R;
-          if (alpha < 0) alpha = 0;
-          if (alpha > 1) alpha = 1;
-          
+        const factor = (199 / length_mid) - 1;
+        const xc = xm + xm * factor;
+        const yc = ym + ym * factor;
+        const zc = zm + zm * factor;
+        
+        const ptCtrl = project(xc, yc, zc);
+        
+        // Midpoint depth visibility determines base opacity
+        let alpha = (ptCtrl.z3d + R) / (2 * R);
+        if (alpha < 0) alpha = 0;
+        if (alpha > 1) alpha = 1;
+        
+        if (alpha > 0.05) {
           ctx.strokeStyle = `rgba(142, 216, 255, ${alpha * 0.12})`;
           ctx.lineWidth = 0.5 * scale;
           ctx.beginPath();
-          ctx.moveTo(pt1.px * scale, pt1.py * scale);
-          ctx.quadraticCurveTo(ptCtrl.px * scale, ptCtrl.py * scale, pt2.px * scale, pt2.py * scale);
+          
+          const steps = 15;
+          let first = true;
+          for (let k = 0; k <= steps; k++) {
+            const t = k / steps;
+            const x_t = (1-t)*(1-t)*n1.x + 2*(1-t)*t*xc + t*t*n2.x;
+            const y_t = (1-t)*(1-t)*n1.y + 2*(1-t)*t*yc + t*t*n2.y;
+            const z_t = (1-t)*(1-t)*n1.z + 2*(1-t)*t*zc + t*t*n2.z;
+            
+            const pt = project(x_t, y_t, z_t);
+            if (pt.z3d >= -15) { // Visible threshold slightly behind horizon
+              if (first) {
+                ctx.moveTo(pt.px * scale, pt.py * scale);
+                first = false;
+              } else {
+                ctx.lineTo(pt.px * scale, pt.py * scale);
+              }
+            } else {
+              first = true; // Break path when it goes behind the globe
+            }
+          }
           ctx.stroke();
         }
       });
@@ -1252,16 +1269,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const yc = ym + ym * factor;
         const zc = zm + zm * factor;
         
-        const pt1 = project(n1.x, n1.y, n1.z);
-        const pt2 = project(n2.x, n2.y, n2.z);
         const ptCtrl = project(xc, yc, zc);
         
-        // If both nodes are visible on the front of the sphere
-        if (pt1.z3d >= -15 && pt2.z3d >= -15) {
-          let alpha = Math.min(pt1.z3d, pt2.z3d) / R;
-          if (alpha < 0) alpha = 0;
-          if (alpha > 1) alpha = 1;
-          
+        // Midpoint depth visibility determines base opacity
+        let alpha = (ptCtrl.z3d + R) / (2 * R);
+        if (alpha < 0) alpha = 0;
+        if (alpha > 1) alpha = 1;
+        
+        if (alpha > 0.05) {
           // Draw the flowing arc line smoothly with no glow, just a solid clean bold colored segment (5x longer)
           const steps = 25; // More steps for smooth long curve
           const startT = Math.max(0, beam.progress - 0.72); // 5x longer flowing path (72% of link length)
@@ -1276,13 +1291,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const z_t = (1-t)*(1-t)*n1.z + 2*(1-t)*t*zc + t*t*n2.z;
             
             const pt = project(x_t, y_t, z_t);
-            if (pt.z3d >= -10) {
+            if (pt.z3d >= -15) {
               if (first) {
                 ctx.moveTo(pt.px * scale, pt.py * scale);
                 first = false;
               } else {
                 ctx.lineTo(pt.px * scale, pt.py * scale);
               }
+            } else {
+              first = true; // Break path when it goes behind the globe
             }
           }
           ctx.strokeStyle = `rgba(160, 225, 255, ${alpha * 0.95})`;
@@ -1300,13 +1317,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const z_t = (1-t)*(1-t)*n1.z + 2*(1-t)*t*zc + t*t*n2.z;
             
             const pt = project(x_t, y_t, z_t);
-            if (pt.z3d >= -10) {
+            if (pt.z3d >= -15) {
               if (first) {
                 ctx.moveTo(pt.px * scale, pt.py * scale);
                 first = false;
               } else {
                 ctx.lineTo(pt.px * scale, pt.py * scale);
               }
+            } else {
+              first = true; // Break path when it goes behind the globe
             }
           }
           ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.95})`;
