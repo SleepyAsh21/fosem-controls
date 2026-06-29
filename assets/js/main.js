@@ -731,12 +731,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
-  // Reset force-closed state when mouse leaves any nav-item
+  // Reset force-closed and de-emphasized state when mouse leaves any nav-item
   document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('mouseleave', () => {
       const menu = item.querySelector('.dropdown-menu');
       if (menu) {
-        menu.classList.remove('force-closed');
+        menu.classList.remove('force-closed', 'de-emphasized');
       }
     });
   });
@@ -767,10 +767,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const homeView = document.getElementById('home-view');
         const solView = document.getElementById('solutions-view');
 
-        // Find parent dropdown menu and force close it instantly on click
+        // Find parent dropdown menu and de-emphasize it instantly on click
         const parentMenu = link.closest('.dropdown-menu');
         if (parentMenu) {
-          parentMenu.classList.add('force-closed');
+          parentMenu.classList.remove('force-closed');
+          parentMenu.classList.add('de-emphasized');
+          // Restore dropdown after the scroll and card focus animations are completely finished
+          setTimeout(() => {
+            parentMenu.classList.remove('de-emphasized');
+          }, 2950);
         }
 
         // Case A: Products & Solutions key
@@ -801,7 +806,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   top: targetOffset,
                   behavior: 'smooth'
                 });
-              }, 150); // Wait 150ms for dropdown to close first
+              }, 150); // Wait 150ms for dropdown to begin fading first
             }
           }
         }
@@ -815,7 +820,7 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => { isNavigating = false; }, 400);
 
             const performScrollAndFocus = () => {
-              // Wait 150ms for dropdown to close/fade out before starting scroll
+              // Wait 150ms for dropdown to begin fading before starting scroll
               setTimeout(() => {
                 const targetEl = document.getElementById(slug);
                 if (!targetEl) return;
@@ -831,7 +836,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const isAlreadyVisible = (visibleHeight * visibleWidth) / (rect.height * rect.width) >= 0.60;
 
                 if (isAlreadyVisible) {
-                  // If already visible, wait 150ms after dropdown closes, then nudge
+                  // If already visible, wait 150ms after dropdown begins fading, then nudge
                   setTimeout(() => {
                     window.fosemApp.triggerCardFocus(slug);
                   }, 150);
