@@ -76,15 +76,15 @@
           <div class="dropdown-menu mega-menu">
             <div class="mega-menu-header">Services &amp; Support</div>
             <div class="mega-menu-grid">
-              <a href="index.html#services">System Design</a>
-              <a href="index.html#services">Procurement</a>
-              <a href="index.html#services">Installation</a>
-              <a href="index.html#services">Programming &amp; Config</a>
-              <a href="index.html#services">Project Commissioning</a>
-              <a href="index.html#services">Systems Integration</a>
-              <a href="index.html#services">Project Management</a>
-              <a href="index.html#services">Maintenance</a>
-              <a href="index.html#services">Consulting</a>
+              <a href="index.html#service-design">System Design</a>
+              <a href="index.html#service-procurement">Procurement</a>
+              <a href="index.html#service-installation">Installation</a>
+              <a href="index.html#service-programming">Programming &amp; Config</a>
+              <a href="index.html#service-commissioning">Project Commissioning</a>
+              <a href="index.html#service-integration">Systems Integration</a>
+              <a href="index.html#service-management">Project Management</a>
+              <a href="index.html#service-maintenance">Maintenance</a>
+              <a href="index.html#service-consulting">Consulting</a>
             </div>
           </div>
         </div>
@@ -361,7 +361,7 @@
       <div class="services-new-grid" role="grid">
 
         <!-- CARD 1 -->
-        <div class="service-new-card fade-up" style="--stagger: 100ms" role="gridcell">
+        <div id="service-design" class="service-new-card fade-up" style="--stagger: 100ms" role="gridcell">
           <div class="service-card-image-wrapper">
             <img src="assets/images/service-design.webp?v=2" alt="End-to-End System Design" loading="lazy" width="800" height="450">
           </div>
@@ -372,7 +372,7 @@
         </div>
 
         <!-- CARD 2 -->
-        <div class="service-new-card fade-up" style="--stagger: 200ms" role="gridcell">
+        <div id="service-procurement" class="service-new-card fade-up" style="--stagger: 200ms" role="gridcell">
           <div class="service-card-image-wrapper">
             <img src="assets/images/service-procurement.webp?v=2" alt="Procurement" loading="lazy" width="800" height="450">
           </div>
@@ -383,7 +383,7 @@
         </div>
 
         <!-- CARD 3 -->
-        <div class="service-new-card fade-up" style="--stagger: 300ms" role="gridcell">
+        <div id="service-installation" class="service-new-card fade-up" style="--stagger: 300ms" role="gridcell">
           <div class="service-card-image-wrapper">
             <img src="assets/images/service-installation.webp?v=2" alt="Installation" loading="lazy" width="800" height="450">
           </div>
@@ -394,7 +394,7 @@
         </div>
 
         <!-- CARD 4 -->
-        <div class="service-new-card fade-up" style="--stagger: 100ms" role="gridcell">
+        <div id="service-programming" class="service-new-card fade-up" style="--stagger: 100ms" role="gridcell">
           <div class="service-card-image-wrapper">
             <img src="assets/images/service-programming.webp?v=2" alt="Programming & Configuration" loading="lazy" width="800" height="450">
           </div>
@@ -405,7 +405,7 @@
         </div>
 
         <!-- CARD 5 -->
-        <div class="service-new-card fade-up" style="--stagger: 200ms" role="gridcell">
+        <div id="service-commissioning" class="service-new-card fade-up" style="--stagger: 200ms" role="gridcell">
           <div class="service-card-image-wrapper">
             <img src="assets/images/service-commissioning.webp?v=2" alt="Project Commissioning" loading="lazy" width="800" height="450">
           </div>
@@ -416,7 +416,7 @@
         </div>
 
         <!-- CARD 6 -->
-        <div class="service-new-card fade-up" style="--stagger: 300ms" role="gridcell">
+        <div id="service-integration" class="service-new-card fade-up" style="--stagger: 300ms" role="gridcell">
           <div class="service-card-image-wrapper">
             <img src="assets/images/service-integration.webp?v=2" alt="Systems Integration" loading="lazy" width="800" height="450">
           </div>
@@ -427,7 +427,7 @@
         </div>
 
         <!-- CARD 7 -->
-        <div class="service-new-card fade-up" style="--stagger: 100ms" role="gridcell">
+        <div id="service-management" class="service-new-card fade-up" style="--stagger: 100ms" role="gridcell">
           <div class="service-card-image-wrapper">
             <img src="assets/images/service-management.webp?v=2" alt="Project Management & Oversight" loading="lazy" width="800" height="450">
           </div>
@@ -438,7 +438,7 @@
         </div>
 
         <!-- CARD 8 -->
-        <div class="service-new-card fade-up" style="--stagger: 200ms" role="gridcell">
+        <div id="service-maintenance" class="service-new-card fade-up" style="--stagger: 200ms" role="gridcell">
           <div class="service-card-image-wrapper">
             <img src="assets/images/service-maintenance.webp?v=2" alt="Maintenance" loading="lazy" width="800" height="450">
           </div>
@@ -449,7 +449,7 @@
         </div>
 
         <!-- CARD 9 -->
-        <div class="service-new-card fade-up" style="--stagger: 300ms" role="gridcell">
+        <div id="service-consulting" class="service-new-card fade-up" style="--stagger: 300ms" role="gridcell">
           <div class="service-card-image-wrapper">
             <img src="assets/images/service-consulting.webp?v=2" alt="Consulting" loading="lazy" width="800" height="450">
           </div>
@@ -798,22 +798,25 @@
             <form class="enquiry-form" id="footer-enquiry-form">
               <div class="enquiry-grid-row">
                 <div class="form-group">
-                  <input type="text" name="name" placeholder="Name" required>
+                  <label class="form-label" for="footer-name">NAME</label>
+                  <input type="text" id="footer-name" name="name" placeholder="Name" required>
                 </div>
                 <div class="form-group">
-                  <input type="email" name="email" placeholder="Email" required>
-                </div>
-              </div>
-              <div class="enquiry-grid-row">
-                <div class="form-group">
-                  <input type="tel" name="phone" placeholder="Phone" required>
-                </div>
-                <div class="form-group">
-                  <input type="text" name="company" placeholder="Company" required>
+                  <label class="form-label" for="footer-phone">PHONE</label>
+                  <input type="tel" id="footer-phone" name="phone" placeholder="Phone" required>
                 </div>
               </div>
               <div class="form-group">
-                <textarea name="message" placeholder="Message" required></textarea>
+                <label class="form-label" for="footer-email">EMAIL</label>
+                <input type="email" id="footer-email" name="email" placeholder="Email" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="footer-company">COMPANY</label>
+                <input type="text" id="footer-company" name="company" placeholder="Company" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="footer-message">MESSAGE</label>
+                <textarea id="footer-message" name="message" placeholder="Message" required></textarea>
               </div>
               <button type="submit" class="enquiry-submit-btn">Submit Enquiry</button>
             </form>

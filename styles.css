@@ -3137,7 +3137,7 @@ ul {
 }
 
 .enquiry-card {
-  background: #111827; /* dark navy, matching footer background or slightly lighter slate */
+  background: #111827; /* dark navy, matching footer background */
   border: 1px solid rgba(255, 255, 255, 0.05); /* very subtle low-contrast border */
   border-radius: 12px; /* modest border radius */
   padding: 20px;
@@ -3167,7 +3167,7 @@ ul {
 
 .enquiry-grid-row {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* side-by-side on desktop */
+  grid-template-columns: 1fr 1fr; /* Name and Phone side-by-side */
   gap: 12px;
   width: 100%;
 }
@@ -3179,19 +3179,32 @@ ul {
 }
 
 .enquiry-form .form-group {
+  display: flex;
+  flex-direction: column;
   width: 100%;
+}
+
+.enquiry-form .form-label {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #94a3b8; /* subtle uppercase labels */
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+  line-height: 1;
 }
 
 .enquiry-form input,
 .enquiry-form textarea {
   width: 100%;
-  background: #ffffff !important; /* white or soft off-white textboxes */
+  background: #f8fafc !important; /* soft off-white textboxes */
   color: #0f172a !important; /* dark navy text inside inputs */
   border: 1px solid #cbd5e1; /* subtle grey borders */
   border-radius: 6px; /* border radius 6px to 8px */
-  padding: 10px 12px;
+  padding: 8px 12px;
   font-family: var(--font-body);
-  font-size: 0.85rem;
+  font-size: 0.9rem; /* professional 14px-15px equivalent */
   transition: border-color var(--transition-fast);
   box-sizing: border-box;
 }
@@ -3201,14 +3214,14 @@ ul {
 }
 
 .enquiry-form textarea {
-  height: 76px; /* message height 72px to 84px */
+  height: 80px; /* message height 76px to 88px */
   resize: none;
 }
 
 .enquiry-form input::placeholder,
 .enquiry-form textarea::placeholder {
   color: #94a3b8 !important; /* muted grey placeholder text */
-  opacity: 1;
+  opacity: 0.7;
 }
 
 .enquiry-form input:focus,
@@ -3230,9 +3243,99 @@ ul {
   cursor: pointer;
   transition: background var(--transition-fast) !important;
   width: 100% !important;
+  margin-top: 4px;
   box-shadow: none !important;
 }
 
 .enquiry-submit-btn:hover {
   background: var(--cta-hover) !important; /* slightly darker blue */
+}
+
+/* ============================================
+   CARD FOCUS / HIGHLIGHT ANIMATIONS
+   ============================================ */
+.focus-highlight-pop {
+  animation: focusPopAnim 2.3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.focus-highlight-nudge {
+  animation: focusNudgeAnim 2.3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.service-new-card,
+.solutions-content {
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+@keyframes focusPopAnim {
+  0% {
+    transform: translateY(0) scale(1);
+    border-color: rgba(14, 165, 233, 0.15);
+    box-shadow: none;
+  }
+  15% {
+    transform: translateY(-6px) scale(1.015);
+    border-color: var(--primary-light);
+    box-shadow: 0 12px 24px -10px rgba(14, 165, 233, 0.3);
+  }
+  85% {
+    transform: translateY(-6px) scale(1.015);
+    border-color: var(--primary-light);
+    box-shadow: 0 12px 24px -10px rgba(14, 165, 233, 0.3);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    border-color: rgba(14, 165, 233, 0.15);
+    box-shadow: none;
+  }
+}
+
+@keyframes focusNudgeAnim {
+  0% {
+    transform: translateX(0) translateY(0);
+    border-color: rgba(14, 165, 233, 0.15);
+    box-shadow: none;
+  }
+  2% { transform: translateX(-3px); }
+  5% { transform: translateX(3px); }
+  8% { transform: translateX(-2px); }
+  11% { transform: translateX(2px); }
+  15% {
+    transform: translateX(0) translateY(-2px);
+    border-color: var(--primary-light);
+    box-shadow: 0 8px 16px -8px rgba(14, 165, 233, 0.2);
+  }
+  85% {
+    transform: translateX(0) translateY(-2px);
+    border-color: var(--primary-light);
+    box-shadow: 0 8px 16px -8px rgba(14, 165, 233, 0.2);
+  }
+  100% {
+    transform: translateY(0);
+    border-color: rgba(14, 165, 233, 0.15);
+    box-shadow: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .focus-highlight-pop,
+  .focus-highlight-nudge {
+    animation: focusReducedAnim 2.3s ease-in-out forwards !important;
+    transform: none !important;
+  }
+}
+
+@keyframes focusReducedAnim {
+  0% {
+    border-color: rgba(14, 165, 233, 0.15);
+  }
+  15% {
+    border-color: var(--primary-light);
+  }
+  85% {
+    border-color: var(--primary-light);
+  }
+  100% {
+    border-color: rgba(14, 165, 233, 0.15);
+  }
 }

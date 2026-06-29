@@ -558,24 +558,117 @@ window.fosemApp = {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }, 300);
     }
+  },
+
+  scrollToAndFocus: function(targetId) {
+    const targetEl = document.getElementById(targetId);
+    if (!targetEl) return;
+
+    // Remove focus highlights from any existing elements first
+    document.querySelectorAll('.focus-highlight-pop, .focus-highlight-nudge').forEach(el => {
+      el.classList.remove('focus-highlight-pop', 'focus-highlight-nudge');
+    });
+
+    const isPrefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Check if element is already 60% visible in the viewport
+    const rect = targetEl.getBoundingClientRect();
+    const elemHeight = rect.height;
+    const elemWidth = rect.width;
+    const visibleHeight = Math.max(0, Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0));
+    const visibleWidth = Math.max(0, Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0));
+    const visibleArea = visibleHeight * visibleWidth;
+    const totalArea = elemHeight * elemWidth;
+    const is60Visible = totalArea > 0 && (visibleArea / totalArea) >= 0.60;
+
+    if (is60Visible) {
+      // Target is already visible: Subtle nudge animation
+      if (isPrefersReduced) {
+        targetEl.classList.add('focus-highlight-pop');
+      } else {
+        targetEl.classList.add('focus-highlight-nudge');
+      }
+      
+      // Clean up after 2.3s
+      setTimeout(() => {
+        targetEl.classList.remove('focus-highlight-pop', 'focus-highlight-nudge');
+      }, 2300);
+    } else {
+      // Target is not visible: Smooth scroll + Focus Pop animation
+      const navbar = document.querySelector('.site-header');
+      const navHeight = navbar ? navbar.offsetHeight : 80;
+      const targetOffset = rect.top + window.pageYOffset - navHeight - 16;
+
+      window.scrollTo({
+        top: targetOffset,
+        behavior: 'smooth'
+      });
+
+      // Wait for smooth scroll to complete (around 550ms) before animating
+      setTimeout(() => {
+        targetEl.classList.add('focus-highlight-pop');
+        setTimeout(() => {
+          targetEl.classList.remove('focus-highlight-pop', 'focus-highlight-nudge');
+        }, 2300);
+      }, 550);
+    }
   }
 };
 
 // Intercept Clicks, Sidebar Navigation and Back to Home
 document.addEventListener('DOMContentLoaded', () => {
-  // Navigation Dropdown Clicks (for solutions and other links)
+  // Handle click on any dropdown link with smooth scroll, debouncing and highlights
   const dropdownLinks = document.querySelectorAll('.nav-item .dropdown-menu a');
+  let clickCooldown = false;
+
   dropdownLinks.forEach(link => {
     link.addEventListener('click', (e) => {
+      // Debounce clicks within 800ms
+      if (clickCooldown) {
+        e.preventDefault();
+        return;
+      }
+      clickCooldown = true;
+      setTimeout(() => { clickCooldown = false; }, 800);
+
       const href = link.getAttribute('href');
       if (href && href.includes('#')) {
         const slug = href.split('#')[1];
+        const homeView = document.getElementById('home-view');
+        const solView = document.getElementById('solutions-view');
+
+        // Case A: Products & Solutions key
         if (solutionsData[slug]) {
-          const homeView = document.getElementById('home-view');
-          const solView = document.getElementById('solutions-view');
           if (homeView && solView) {
             e.preventDefault();
+
+            const isAlreadyOnSolutions = !solView.classList.contains('view-hidden');
             window.fosemApp.loadSolution(slug);
+
+            if (isAlreadyOnSolutions) {
+              window.fosemApp.scrollToAndFocus('solutions-content');
+            } else {
+              // Transitioning from home view
+              setTimeout(() => {
+                window.fosemApp.scrollToAndFocus('solutions-view');
+              }, 350);
+            }
+          }
+        }
+        // Case B: Services & Support key
+        else if (slug.startsWith('service-')) {
+          if (homeView && solView) {
+            e.preventDefault();
+
+            // Transition from solutions view back to home first
+            if (!solView.classList.contains('view-hidden')) {
+              window.fosemApp.goHome();
+              setTimeout(() => {
+                window.fosemApp.scrollToAndFocus(slug);
+              }, 350);
+            } else {
+              window.fosemApp.scrollToAndFocus(slug);
+            }
           }
         }
       }
@@ -588,10 +681,10 @@ document.addEventListener('DOMContentLoaded', () => {
     link.addEventListener('click', (e) => {
       const href = link.getAttribute('href');
       
-      // If this is a solution slug, let the dropdown handler handle it
+      // Exempt solution and service detail links from normal page redirects
       if (href && href.includes('#')) {
         const slug = href.split('#')[1];
-        if (solutionsData[slug]) {
+        if (solutionsData[slug] || slug.startsWith('service-')) {
           return;
         }
       }
@@ -630,13 +723,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Deep linking: load solution if hash is present on load
+  // Deep linking: load solution or scroll to service if hash is present on load
   const loadHashSolution = () => {
     const hash = window.location.hash;
     if (hash) {
       const solutionKey = hash.substring(1);
       if (solutionsData[solutionKey]) {
         window.fosemApp.loadSolution(solutionKey);
+      } else if (solutionKey.startsWith('service-')) {
+        setTimeout(() => {
+          window.fosemApp.scrollToAndFocus(solutionKey);
+        }, 300);
       }
     }
   };
@@ -650,6 +747,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const solutionKey = hash.substring(1);
       if (solutionsData[solutionKey]) {
         window.fosemApp.loadSolution(solutionKey);
+      } else if (solutionKey.startsWith('service-')) {
+        window.fosemApp.scrollToAndFocus(solutionKey);
       }
     } else {
       window.fosemApp.goHome();

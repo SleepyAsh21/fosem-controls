@@ -76,15 +76,15 @@
           <div class="dropdown-menu mega-menu">
             <div class="mega-menu-header">Services &amp; Support</div>
             <div class="mega-menu-grid">
-              <a href="index.html#services">System Design</a>
-              <a href="index.html#services">Procurement</a>
-              <a href="index.html#services">Installation</a>
-              <a href="index.html#services">Programming &amp; Config</a>
-              <a href="index.html#services">Project Commissioning</a>
-              <a href="index.html#services">Systems Integration</a>
-              <a href="index.html#services">Project Management</a>
-              <a href="index.html#services">Maintenance</a>
-              <a href="index.html#services">Consulting</a>
+              <a href="index.html#service-design">System Design</a>
+              <a href="index.html#service-procurement">Procurement</a>
+              <a href="index.html#service-installation">Installation</a>
+              <a href="index.html#service-programming">Programming &amp; Config</a>
+              <a href="index.html#service-commissioning">Project Commissioning</a>
+              <a href="index.html#service-integration">Systems Integration</a>
+              <a href="index.html#service-management">Project Management</a>
+              <a href="index.html#service-maintenance">Maintenance</a>
+              <a href="index.html#service-consulting">Consulting</a>
             </div>
           </div>
         </div>
@@ -304,22 +304,25 @@
             <form class="enquiry-form" id="footer-enquiry-form">
               <div class="enquiry-grid-row">
                 <div class="form-group">
-                  <input type="text" name="name" placeholder="Name" required>
+                  <label class="form-label" for="footer-name">NAME</label>
+                  <input type="text" id="footer-name" name="name" placeholder="Name" required>
                 </div>
                 <div class="form-group">
-                  <input type="email" name="email" placeholder="Email" required>
-                </div>
-              </div>
-              <div class="enquiry-grid-row">
-                <div class="form-group">
-                  <input type="tel" name="phone" placeholder="Phone" required>
-                </div>
-                <div class="form-group">
-                  <input type="text" name="company" placeholder="Company" required>
+                  <label class="form-label" for="footer-phone">PHONE</label>
+                  <input type="tel" id="footer-phone" name="phone" placeholder="Phone" required>
                 </div>
               </div>
               <div class="form-group">
-                <textarea name="message" placeholder="Message" required></textarea>
+                <label class="form-label" for="footer-email">EMAIL</label>
+                <input type="email" id="footer-email" name="email" placeholder="Email" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="footer-company">COMPANY</label>
+                <input type="text" id="footer-company" name="company" placeholder="Company" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="footer-message">MESSAGE</label>
+                <textarea id="footer-message" name="message" placeholder="Message" required></textarea>
               </div>
               <button type="submit" class="enquiry-submit-btn">Submit Enquiry</button>
             </form>
