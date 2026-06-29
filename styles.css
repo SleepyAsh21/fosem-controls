@@ -3446,3 +3446,149 @@ ul {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
   }
 }
+
+/* ============================================
+   FOSEM DIGITAL GLOBE STYLING
+   ============================================ */
+.fosem-globe-wrapper {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  max-width: 240px;
+  user-select: none;
+  pointer-events: none;
+}
+
+.globe-container {
+  width: 220px;
+  height: 220px;
+  position: relative;
+  background: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.digital-globe {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.globe-caption-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 8px;
+}
+
+.globe-caption-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--primary-light);
+  display: inline-block;
+  box-shadow: 0 0 8px var(--primary-light);
+  animation: captionPulse 2s infinite ease-in-out;
+}
+
+.globe-caption-text {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+/* Animations */
+@keyframes globeSlowRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes satelliteOrbit {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes nodeFadePulse {
+  0% { transform: scale(0.9); opacity: 0.5; }
+  50% { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.5; }
+}
+
+@keyframes satelliteRingPulse {
+  0% { transform: scale(0.8); opacity: 0.2; }
+  50% { transform: scale(1.6); opacity: 0.8; }
+  100% { transform: scale(0.8); opacity: 0.2; }
+}
+
+@keyframes captionPulse {
+  0% { opacity: 0.4; }
+  50% { opacity: 1; }
+  100% { opacity: 0.4; }
+}
+
+/* Rotate the entire grid + continents + arcs */
+.digital-globe .globe-grid {
+  transform-origin: 100px 100px;
+  animation: globeSlowRotate 45s linear infinite;
+}
+
+/* Rotate the satellite along the orbit */
+.digital-globe .satellite {
+  animation: satelliteOrbit 18s linear infinite;
+}
+
+/* Pulse nodes */
+.digital-globe .pulse-node {
+  transform-origin: center;
+  animation: nodeFadePulse 3s ease-in-out infinite;
+}
+
+/* Satellite indicator pulse ring */
+.digital-globe .satellite-ring {
+  transform-origin: 188px 100px;
+  animation: satelliteRingPulse 2.5s ease-in-out infinite;
+}
+
+/* Responsive constraints */
+@media (max-width: 900px) {
+  .fosem-globe-wrapper {
+    margin: 40px auto 0;
+    align-items: center;
+  }
+  .globe-caption-box {
+    padding-left: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .fosem-globe-wrapper {
+    margin-top: 32px;
+  }
+  .globe-container {
+    width: 180px;
+    height: 180px;
+  }
+}
+
+/* Accessibility: respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .digital-globe .globe-grid,
+  .digital-globe .satellite,
+  .digital-globe .pulse-node,
+  .digital-globe .satellite-ring,
+  .globe-caption-dot {
+    animation: none !important;
+  }
+  .digital-globe .pulse-node {
+    opacity: 0.8 !important;
+  }
+  .digital-globe .satellite-ring {
+    opacity: 0.4 !important;
+  }
+}

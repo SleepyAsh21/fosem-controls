@@ -281,6 +281,141 @@
           </div>
         </div>
 
+        <!-- Small Premium Digital Globe Graphic -->
+        <div class="fosem-globe-wrapper fade-up" style="--stagger: 450ms">
+          <div class="globe-container">
+            <svg class="digital-globe" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="globe-glow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="rgba(14, 165, 233, 0.18)"/>
+                  <stop offset="70%" stop-color="rgba(14, 165, 233, 0.03)"/>
+                  <stop offset="100%" stop-color="transparent"/>
+                </radialGradient>
+              </defs>
+              
+              <!-- Subtle background glow -->
+              <circle cx="100" cy="100" r="80" fill="url(#globe-glow)" />
+
+              <!-- Rotating sphere contents -->
+              <g class="globe-grid">
+                <!-- Latitude/Longitude Grid Lines -->
+                <g stroke="rgba(14, 165, 233, 0.15)" stroke-width="0.4" fill="none">
+                  <!-- Outer boundary -->
+                  <circle cx="100" cy="100" r="75" stroke="rgba(14, 165, 233, 0.22)" stroke-width="0.6" />
+                  
+                  <!-- Longitudes -->
+                  <ellipse cx="100" cy="100" rx="60" ry="75" />
+                  <ellipse cx="100" cy="100" rx="40" ry="75" />
+                  <ellipse cx="100" cy="100" rx="20" ry="75" />
+                  <line x1="100" y1="25" x2="100" y2="175" stroke="rgba(14, 165, 233, 0.2)" />
+                  
+                  <!-- Latitudes -->
+                  <ellipse cx="100" cy="100" rx="75" ry="18" />
+                  <ellipse cx="100" cy="100" rx="75" ry="36" />
+                  <ellipse cx="100" cy="100" rx="75" ry="54" />
+                  <line x1="25" y1="100" x2="175" y2="100" stroke="rgba(14, 165, 233, 0.2)" />
+                </g>
+
+                <!-- Stylized dotted continents (Africa/EMEA) -->
+                <g class="continents" fill="rgba(14, 165, 233, 0.2)" stroke="none">
+                  <!-- Europe cluster -->
+                  <circle cx="90" cy="62" r="1.2" />
+                  <circle cx="94" cy="60" r="1" />
+                  <circle cx="98" cy="58" r="0.8" />
+                  <circle cx="102" cy="62" r="1.2" />
+                  <circle cx="106" cy="65" r="1" />
+                  <circle cx="96" cy="67" r="1.2" />
+                  <circle cx="101" cy="70" r="1" />
+                  <circle cx="105" cy="73" r="0.8" />
+                  
+                  <!-- North Africa cluster -->
+                  <circle cx="86" cy="85" r="1.2" />
+                  <circle cx="90" cy="82" r="1" />
+                  <circle cx="95" cy="84" r="1.2" />
+                  <circle cx="100" cy="83" r="1" />
+                  <circle cx="105" cy="85" r="1.2" />
+                  <circle cx="110" cy="87" r="1" />
+                  <circle cx="115" cy="89" r="0.8" />
+                  
+                  <!-- West Africa bulge cluster -->
+                  <circle cx="78" cy="94" r="1" />
+                  <circle cx="82" cy="97" r="1.2" />
+                  <circle cx="86" cy="99" r="1" />
+                  <circle cx="90" cy="95" r="1.2" />
+                  <circle cx="94" cy="92" r="1" />
+                  
+                  <!-- Central Africa cluster -->
+                  <circle cx="90" cy="104" r="1.2" />
+                  <circle cx="94" cy="106" r="1" />
+                  <circle cx="98" cy="108" r="1.2" />
+                  <circle cx="102" cy="111" r="1" />
+                  <circle cx="106" cy="108" r="1.2" />
+                  <circle cx="110" cy="105" r="1" />
+                  
+                  <!-- East Africa / Horn cluster -->
+                  <circle cx="110" cy="114" r="1.2" />
+                  <circle cx="114" cy="112" r="1" />
+                  <circle cx="118" cy="110" r="1.2" />
+                  <circle cx="122" cy="113" r="1" />
+                  
+                  <!-- Southern Africa cluster -->
+                  <circle cx="98" cy="118" r="1" />
+                  <circle cx="102" cy="122" r="1.2" />
+                  <circle cx="105" cy="126" r="1" />
+                  <circle cx="107" cy="130" r="1.2" />
+                  <circle cx="109" cy="134" r="1" />
+                  <circle cx="107" cy="138" r="0.8" />
+                  
+                  <!-- Middle East cluster -->
+                  <circle cx="120" cy="82" r="1" />
+                  <circle cx="124" cy="85" r="1.2" />
+                  <circle cx="128" cy="88" r="1" />
+                  <circle cx="132" cy="91" r="0.8" />
+                  <circle cx="122" cy="92" r="1.2" />
+                  <circle cx="126" cy="95" r="1" />
+                </g>
+
+                <!-- High-tech network connection nodes (glowing points) -->
+                <g class="globe-nodes" fill="var(--primary-light)" stroke="none">
+                  <circle cx="98" cy="105" r="1.8" class="pulse-node" style="animation-delay: 0s;" />
+                  <circle cx="92" cy="115" r="1.2" />
+                  <circle cx="102" cy="125" r="1.8" class="pulse-node" style="animation-delay: 1.5s;" />
+                  <circle cx="108" cy="138" r="1.2" />
+                  <circle cx="82" cy="108" r="1.4" />
+                  <circle cx="114" cy="114" r="1.4" />
+                  <circle cx="94" cy="85" r="1.8" class="pulse-node" style="animation-delay: 0.8s;" />
+                  <circle cx="104" cy="82" r="1.2" />
+                  <circle cx="112" cy="74" r="1.8" class="pulse-node" style="animation-delay: 2.2s;" />
+                  <circle cx="122" cy="94" r="1.4" />
+                </g>
+
+                <!-- Glowing connection arcs -->
+                <g stroke="rgba(14, 165, 233, 0.35)" stroke-width="0.5" fill="none">
+                  <path d="M 82 108 Q 98 100 114 114" />
+                  <path d="M 94 85 Q 105 110 108 138" />
+                  <path d="M 82 108 Q 80 92 112 74" />
+                  <path d="M 114 114 Q 120 102 122 94" />
+                  <path d="M 112 74 Q 120 80 122 94" />
+                </g>
+              </g>
+
+              <!-- Circular outer orbit ring (Tilted, static path) -->
+              <g class="orbit-group" transform="rotate(-15 100 100)">
+                <circle cx="100" cy="100" r="88" stroke="rgba(14, 165, 233, 0.22)" stroke-width="0.5" fill="none" stroke-dasharray="3 3" />
+                
+                <!-- Satellite traversing the orbit path -->
+                <g class="satellite" style="transform-origin: 100px 100px;">
+                  <circle cx="188" cy="100" r="2.2" fill="var(--primary-light)" />
+                  <circle cx="188" cy="100" r="5" stroke="rgba(14, 165, 233, 0.4)" stroke-width="0.5" fill="none" class="satellite-ring" />
+                </g>
+              </g>
+            </svg>
+          </div>
+          <div class="globe-caption-box">
+            <span class="globe-caption-dot"></span>
+            <span class="globe-caption-text">Pan-African Operations Network</span>
+          </div>
+        </div>
 
       </div>
 
