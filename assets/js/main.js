@@ -1198,14 +1198,28 @@ document.addEventListener('DOMContentLoaded', () => {
           
           // Find neighbors
           const connected = data.links.filter(l => l.id1 === beam.currentNode.id || l.id2 === beam.currentNode.id);
-          // Exclude previous link to keep traveling forward to new nodes
+          
+          // Exclude backtrack path AND avoid traffic (links currently targeted by other active beams)
           let choices = connected.filter(l => {
             const destId = l.id1 === beam.currentNode.id ? l.id2 : l.id1;
-            return destId !== prevId;
+            if (destId === prevId) return false;
+            
+            // Avoid traffic: check if another beam is already heading to this target node
+            const isTargeted = activeBeams.some(b => b !== beam && b.targetNode && b.targetNode.id === destId);
+            return !isTargeted;
           });
           
+          // Fallback 1: If all paths are targeted, just exclude backtracking
+          if (choices.length === 0) {
+            choices = connected.filter(l => {
+              const destId = l.id1 === beam.currentNode.id ? l.id2 : l.id1;
+              return destId !== prevId;
+            });
+          }
+          
+          // Fallback 2: Choose any choice if blocked completely
           if (choices.length === 0 && connected.length > 0) {
-            choices = connected; // Fallback to any choice if blocked
+            choices = connected;
           }
           
           if (choices.length > 0) {
@@ -1213,12 +1227,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const nextId = beam.link.id1 === beam.currentNode.id ? beam.link.id2 : beam.link.id1;
             beam.targetNode = data.nodes.find(n => n.id === nextId);
           } else {
+            // Safe fallback to random land node
             beam.targetNode = data.nodes[Math.floor(Math.random() * data.nodes.length)];
             beam.link = null;
           }
           
           beam.progress = 0;
-          beam.speed = 0.005 + Math.random() * 0.005; // Graceful, smooth travel speed
+          beam.speed = 0.005 + Math.random() * 0.005; // Smooth travel speed
         }
         
         const n1 = beam.currentNode;
@@ -1271,7 +1286,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
           }
           ctx.strokeStyle = `rgba(160, 225, 255, ${alpha * 0.95})`;
-          ctx.lineWidth = 1.6 * scale;
+          ctx.lineWidth = 2.4 * scale; // Increased thickness (bolder visual presence)
           ctx.lineCap = 'round';
           ctx.stroke();
           
@@ -1295,7 +1310,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
           }
           ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.95})`;
-          ctx.lineWidth = 0.7 * scale;
+          ctx.lineWidth = 1.1 * scale; // Increased white core thickness
           ctx.stroke();
         }
       });
