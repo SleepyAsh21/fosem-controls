@@ -824,36 +824,31 @@ document.addEventListener('DOMContentLoaded', () => {
           if (homeView && solView) {
             e.preventDefault();
 
-            // If already viewing this specific solution, do nothing (prevents redundant reloading)
-            if (window.fosemApp.currentSolution === slug) {
-              return;
+            // Load solution if it's different from current
+            if (window.fosemApp.currentSolution !== slug) {
+              window.fosemApp.loadSolution(slug);
             }
 
-            const isAlreadyOnSolutions = !solView.classList.contains('view-hidden');
-            window.fosemApp.loadSolution(slug);
+            if (isNavigating) return;
+            isNavigating = true;
+            setTimeout(() => { isNavigating = false; }, 400);
 
-            if (!isAlreadyOnSolutions) {
-              if (isNavigating) return;
-              isNavigating = true;
-              setTimeout(() => { isNavigating = false; }, 400);
-
-              // Transitioning from home view: scroll window to the top of solutions view (no highlights)
-              setTimeout(() => {
-                const rect = solView.getBoundingClientRect();
-                const navbar = document.querySelector('.site-header');
-                const navHeight = navbar ? navbar.offsetHeight : 80;
-                
-                // Retrieve the actual de-emphasized dropdown height if active
-                const deEmphasizedMenu = document.querySelector('.dropdown-menu.de-emphasized');
-                const dropdownHeight = deEmphasizedMenu ? deEmphasizedMenu.offsetHeight : 0;
-                
-                const targetOffset = rect.top + window.pageYOffset - navHeight - dropdownHeight - 24;
-                window.scrollTo({
-                  top: targetOffset,
-                  behavior: 'smooth'
-                });
-              }, 150); // Wait 150ms for dropdown to begin fading first
-            }
+            // Always scroll window to the top of solutions view (no highlights)
+            setTimeout(() => {
+              const rect = solView.getBoundingClientRect();
+              const navbar = document.querySelector('.site-header');
+              const navHeight = navbar ? navbar.offsetHeight : 80;
+              
+              // Retrieve the actual de-emphasized dropdown height if active
+              const deEmphasizedMenu = document.querySelector('.dropdown-menu.de-emphasized');
+              const dropdownHeight = deEmphasizedMenu ? deEmphasizedMenu.offsetHeight : 0;
+              
+              const targetOffset = rect.top + window.pageYOffset - navHeight - dropdownHeight - 24;
+              window.scrollTo({
+                top: targetOffset,
+                behavior: 'smooth'
+              });
+            }, 150); // Wait 150ms for dropdown to begin fading first
           }
         }
         // Case B: Services & Support key
