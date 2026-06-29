@@ -975,13 +975,27 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* --- Digital Globe Node Brightening Animation --- */
-  setInterval(() => {
-    const nodes = document.querySelectorAll('.digital-globe .network-node');
+  const startNodeAnimation = () => {
+    const nodes = document.querySelectorAll('.digital-globe .network-node, .digital-globe .orbit-node');
     if (nodes.length === 0) return;
-    const randomNode = nodes[Math.floor(Math.random() * nodes.length)];
-    randomNode.classList.add('brightened');
+    const count = Math.random() < 0.5 ? 1 : 2;
+    for (let i = 0; i < count; i++) {
+      const randomNode = nodes[Math.floor(Math.random() * nodes.length)];
+      if (!randomNode.classList.contains('brightened')) {
+        randomNode.classList.add('brightened');
+        setTimeout(() => {
+          randomNode.classList.remove('brightened');
+        }, 800); // 250ms fade-in + active + 400ms fade-out
+      }
+    }
+  };
+
+  const scheduleNextNodeAnim = () => {
+    const delay = 3000 + Math.random() * 3000;
     setTimeout(() => {
-      randomNode.classList.remove('brightened');
-    }, 250);
-  }, 4000);
+      startNodeAnimation();
+      scheduleNextNodeAnim();
+    }, delay);
+  };
+  scheduleNextNodeAnim();
 });

@@ -3450,8 +3450,11 @@ ul {
 /* ============================================
    FOSEM DIGITAL GLOBE STYLING
    ============================================ */
+/* ============================================
+   FOSEM DIGITAL GLOBE STYLING
+   ============================================ */
 .fosem-globe-wrapper {
-  margin: 56px auto 48px; /* 56px above, 48px below, centered horizontally */
+  margin: 56px auto 40px; /* 56px above, 40px below, centered horizontally */
   display: flex;
   flex-direction: column;
   align-items: center; /* Center horizontally */
@@ -3506,9 +3509,19 @@ ul {
 
 /* Animations */
 @keyframes earthOscillate {
-  0% { transform: rotate(-5deg); }
-  50% { transform: rotate(5deg); }
-  100% { transform: rotate(-5deg); }
+  0% { transform: rotate(-9deg); }
+  15% { transform: rotate(-9deg); } /* Pause at left */
+  50% { transform: rotate(9deg); }
+  65% { transform: rotate(9deg); }  /* Pause at right */
+  100% { transform: rotate(-9deg); }
+}
+
+@keyframes orbitParallax {
+  0% { transform: translate(-1.5px, 0); }
+  15% { transform: translate(-1.5px, 0); }
+  50% { transform: translate(1.5px, 0); }
+  65% { transform: translate(1.5px, 0); }
+  100% { transform: translate(-1.5px, 0); }
 }
 
 @keyframes orbitCW_1 {
@@ -3522,8 +3535,19 @@ ul {
 }
 
 @keyframes orbitCW_3 {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from { transform: rotate(12deg); }
+  to { transform: rotate(372deg); }
+}
+
+@keyframes orbitCW_4 {
+  from { transform: rotate(-12deg); }
+  to { transform: rotate(348deg); }
+}
+
+@keyframes glowBreathe {
+  0% { stroke: rgba(142, 216, 255, 0.08); }
+  50% { stroke: rgba(142, 216, 255, 0.11); }
+  100% { stroke: rgba(142, 216, 255, 0.08); }
 }
 
 @keyframes captionPulse {
@@ -3532,41 +3556,87 @@ ul {
   100% { opacity: 0.4; }
 }
 
-/* Rotate the entire earth sphere (grid + continents + nodes + links) in linear oscillation (6-10 degrees) */
-.digital-globe .earth-sphere {
-  transform-origin: 100px 100px;
-  animation: earthOscillate 45s ease-in-out infinite;
+@keyframes travelPath_1 {
+  0% { offset-distance: 0%; opacity: 0; }
+  15% { opacity: 0.8; }
+  85% { opacity: 0.8; }
+  100% { offset-distance: 100%; opacity: 0; }
 }
 
-/* Independent slow orbit ring rotations */
+@keyframes travelPath_2 {
+  0% { offset-distance: 0%; opacity: 0; }
+  15% { opacity: 0.8; }
+  85% { opacity: 0.8; }
+  100% { offset-distance: 100%; opacity: 0; }
+}
+
+/* Atmosphere Glow Breathing */
+.digital-globe .atmosphere-glow {
+  animation: glowBreathe 9s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Earth Sphere Oscillation */
+.digital-globe .earth-sphere {
+  transform-origin: 100px 100px;
+  animation: earthOscillate 22s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+
+/* Orbits Parallax Translation */
+.digital-globe .orbits-back-parallax,
+.digital-globe .orbits-front-parallax {
+  animation: orbitParallax 22s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+
+/* Orbits Rotations */
 .digital-globe .orbit-ring-1 {
   transform-origin: 100px 100px;
-  animation: orbitCW_1 60s linear infinite;
+  animation: orbitCW_1 42s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
 }
 
 .digital-globe .orbit-ring-2 {
   transform-origin: 100px 100px;
-  animation: orbitCCW_2 80s linear infinite;
+  animation: orbitCCW_2 61s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
 }
 
 .digital-globe .orbit-ring-3 {
   transform-origin: 100px 100px;
-  animation: orbitCW_3 240s linear infinite; /* nearly stationary */
+  animation: orbitCW_3 74s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
 }
 
-/* Node flash transition */
-.digital-globe .network-node {
-  transition: fill 0.25s ease, opacity 0.25s ease;
+.digital-globe .orbit-ring-4 {
+  transform-origin: 100px 100px;
+  animation: orbitCW_4 95s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
 }
-.digital-globe .network-node.brightened {
+
+/* Node Styling & Transitions */
+.digital-globe .network-node,
+.digital-globe .orbit-node {
+  transition: fill 400ms cubic-bezier(0.4, 0, 0.2, 1), opacity 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.digital-globe .network-node.brightened,
+.digital-globe .orbit-node.brightened {
   fill: #ffffff !important;
   opacity: 1 !important;
+  transition: fill 250ms cubic-bezier(0.4, 0, 0.2, 1), opacity 250ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Data Flow Packets along Bezier Paths */
+.digital-globe .data-packet-1 {
+  offset-path: path("M 87.13 102.76 Q 101.79 102.95 114.13 95.03");
+  animation: travelPath_1 10s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.digital-globe .data-packet-2 {
+  offset-path: path("M 114.13 95.03 Q 127.82 88.94 135.90 76.33");
+  animation: travelPath_2 12s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation-delay: 3.5s;
 }
 
 /* Responsive constraints */
 @media (max-width: 900px) {
   .fosem-globe-wrapper {
-    margin: 56px auto 48px;
+    margin: 56px auto 40px;
     align-items: center;
   }
 }
@@ -3584,9 +3654,14 @@ ul {
 /* Accessibility: respect prefers-reduced-motion */
 @media (prefers-reduced-motion: reduce) {
   .digital-globe .earth-sphere,
+  .digital-globe .orbits-back-parallax,
+  .digital-globe .orbits-front-parallax,
   .digital-globe .orbit-ring-1,
   .digital-globe .orbit-ring-2,
   .digital-globe .orbit-ring-3,
+  .digital-globe .orbit-ring-4,
+  .digital-globe .atmosphere-glow,
+  .digital-globe .data-packet,
   .globe-caption-dot {
     animation: none !important;
   }
