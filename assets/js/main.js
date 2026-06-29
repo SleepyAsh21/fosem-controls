@@ -1154,7 +1154,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let length_mid = Math.sqrt(xm*xm + ym*ym + zm*zm);
         if (length_mid < 1) length_mid = 1;
         
-        const factor = (199 / length_mid) - 1;
+        const factor = (156 / length_mid) - 1;
         const xc = xm + xm * factor;
         const yc = ym + ym * factor;
         const zc = zm + zm * factor;
@@ -1264,7 +1264,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let length_mid = Math.sqrt(xm*xm + ym*ym + zm*zm);
         if (length_mid < 1) length_mid = 1;
         
-        const factor = (199 / length_mid) - 1;
+        const factor = (156 / length_mid) - 1;
         const xc = xm + xm * factor;
         const yc = ym + ym * factor;
         const zc = zm + zm * factor;
