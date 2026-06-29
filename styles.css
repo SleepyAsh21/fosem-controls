@@ -272,6 +272,9 @@ ul {
 }
 
 .dropdown-menu.de-emphasized {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0) !important;
   background-color: rgba(255, 255, 255, 0.20) !important;
   border-color: rgba(226, 232, 240, 0.25) !important;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01) !important;

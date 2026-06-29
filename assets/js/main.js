@@ -801,7 +801,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const rect = solView.getBoundingClientRect();
                 const navbar = document.querySelector('.site-header');
                 const navHeight = navbar ? navbar.offsetHeight : 80;
-                const targetOffset = rect.top + window.pageYOffset - navHeight - 16;
+                
+                // Retrieve the actual de-emphasized dropdown height if active
+                const deEmphasizedMenu = document.querySelector('.dropdown-menu.de-emphasized');
+                const dropdownHeight = deEmphasizedMenu ? deEmphasizedMenu.offsetHeight : 0;
+                
+                const targetOffset = rect.top + window.pageYOffset - navHeight - dropdownHeight - 24;
                 window.scrollTo({
                   top: targetOffset,
                   behavior: 'smooth'
@@ -828,7 +833,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const rect = targetEl.getBoundingClientRect();
                 const navbar = document.querySelector('.site-header');
                 const navHeight = navbar ? navbar.offsetHeight : 80;
-                const targetOffset = rect.top + window.pageYOffset - navHeight - 16;
+                
+                // Retrieve the actual de-emphasized dropdown height if active
+                const deEmphasizedMenu = document.querySelector('.dropdown-menu.de-emphasized');
+                const dropdownHeight = deEmphasizedMenu ? deEmphasizedMenu.offsetHeight : 0;
+                
+                const targetOffset = rect.top + window.pageYOffset - navHeight - dropdownHeight - 24;
 
                 // Check if card is already fully visible in viewport
                 const visibleHeight = Math.max(0, Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0));
