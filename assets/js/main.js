@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             rowCards.forEach((c, indexInRow) => {
               const positionInOrder = staggerOrder.indexOf(indexInRow);
-              const delay = positionInOrder * 150; // 150ms delay between cards
+              const delay = positionInOrder * 220; // 220ms delay between cards
               
               // Set delay via transitionDelay style property
               c.style.transitionDelay = `${delay}ms`;
@@ -215,7 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
               // Clean up inline delay after animation finishes so hover has no delay
               setTimeout(() => {
                 c.style.transitionDelay = '';
-              }, delay + 800);
+              }, delay + 1100);
 
               rowObserver.unobserve(c);
             });
@@ -223,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     }, {
-      threshold: 0.25, // trigger when ~25% visible
+      threshold: 0.20, // trigger when ~20% visible
       rootMargin: '0px 0px -40px 0px'
     });
 
@@ -243,12 +243,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const staggerOrder = isEvenRow ? [2, 1, 0] : [0, 1, 2];
             rowCards.forEach((c, indexInRow) => {
               const positionInOrder = staggerOrder.indexOf(indexInRow);
-              const delay = positionInOrder * 150;
+              const delay = positionInOrder * 220;
               c.style.transitionDelay = `${delay}ms`;
               c.classList.add('animate-in');
               setTimeout(() => {
                 c.style.transitionDelay = '';
-              }, delay + 800);
+              }, delay + 1100);
               rowObserver.unobserve(c);
             });
           }
