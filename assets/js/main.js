@@ -666,6 +666,12 @@ Object.assign(window.fosemApp, {
     const targetEl = document.getElementById(targetId);
     if (!targetEl) return;
 
+    // Clear any active focus cleanup timeout to prevent interruption conflicts
+    if (window.fosemApp.focusTimeoutId) {
+      clearTimeout(window.fosemApp.focusTimeoutId);
+      window.fosemApp.focusTimeoutId = null;
+    }
+
     // Remove focus highlights from any existing elements first
     document.querySelectorAll('.focus-highlight-pop, .focus-highlight-nudge').forEach(el => {
       el.classList.remove('focus-highlight-pop', 'focus-highlight-nudge');
@@ -682,16 +688,24 @@ Object.assign(window.fosemApp, {
     const visibleWidth = Math.max(0, Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0));
     const isAlreadyVisible = (visibleHeight * visibleWidth) / (elemHeight * elemWidth) >= 0.60;
 
+    let animClass = '';
+    let duration = 0;
+
     if (isAlreadyVisible) {
-      targetEl.classList.add('focus-highlight-nudge');
+      animClass = 'focus-highlight-nudge';
+      duration = 1000;
     } else {
-      targetEl.classList.add('focus-highlight-pop');
+      animClass = 'focus-highlight-pop';
+      duration = 1200;
     }
+
+    targetEl.classList.add(animClass);
     
-    // Clean up after 2.3s
-    setTimeout(() => {
+    // Store the timeout ID so we can cancel it if another card is focused
+    window.fosemApp.focusTimeoutId = setTimeout(() => {
       targetEl.classList.remove('focus-highlight-pop', 'focus-highlight-nudge');
-    }, 2300);
+      window.fosemApp.focusTimeoutId = null;
+    }, duration);
   },
 
   scrollTargetIntoSafeView: function(targetCard, dropdownPanel, header) {
@@ -802,7 +816,7 @@ document.addEventListener('DOMContentLoaded', () => {
           // Restore dropdown after the scroll and card focus animations are completely finished
           setTimeout(() => {
             parentMenu.classList.remove('de-emphasized');
-          }, 2950);
+          }, 1850);
         }
 
         // Case A: Products & Solutions key
