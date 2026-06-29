@@ -1155,12 +1155,13 @@ document.addEventListener('DOMContentLoaded', () => {
           const xm = (n1.x + n2.x) / 2;
           const ym = (n1.y + n2.y) / 2;
           const zm = (n1.z + n2.z) / 2;
-          const length_mid = Math.sqrt(xm*xm + ym*ym + zm*zm);
+          let length_mid = Math.sqrt(xm*xm + ym*ym + zm*zm);
+          if (length_mid < 1) length_mid = 1;
           
-          const arcH = 26; // High, aggressive 3D Bezier curve
-          const xc = xm + (xm / length_mid) * arcH;
-          const yc = ym + (ym / length_mid) * arcH;
-          const zc = zm + (zm / length_mid) * arcH;
+          const factor = (199 / length_mid) - 1;
+          const xc = xm + xm * factor;
+          const yc = ym + ym * factor;
+          const zc = zm + zm * factor;
           
           const ptCtrl = project(xc, yc, zc);
           
@@ -1224,15 +1225,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const n2 = beam.targetNode;
         if (!n1 || !n2) return;
         
-        // Calculate control point for 3D Arc
+        // Calculate control point for 3D Arc (peaks strictly hover outside the globe body)
         const xm = (n1.x + n2.x) / 2;
         const ym = (n1.y + n2.y) / 2;
         const zm = (n1.z + n2.z) / 2;
-        const length_mid = Math.sqrt(xm*xm + ym*ym + zm*zm);
-        const arcH = 26; // High, aggressive 3D Bezier curve
-        const xc = xm + (xm / length_mid) * arcH;
-        const yc = ym + (ym / length_mid) * arcH;
-        const zc = zm + (zm / length_mid) * arcH;
+        let length_mid = Math.sqrt(xm*xm + ym*ym + zm*zm);
+        if (length_mid < 1) length_mid = 1;
+        
+        const factor = (199 / length_mid) - 1;
+        const xc = xm + xm * factor;
+        const yc = ym + ym * factor;
+        const zc = zm + zm * factor;
         
         const pt1 = project(n1.x, n1.y, n1.z);
         const pt2 = project(n2.x, n2.y, n2.z);
