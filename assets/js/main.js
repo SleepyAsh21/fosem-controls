@@ -973,4 +973,15 @@ document.addEventListener('DOMContentLoaded', () => {
       footerEnquiryForm.reset();
     });
   }
+
+  /* --- Digital Globe Node Brightening Animation --- */
+  setInterval(() => {
+    const nodes = document.querySelectorAll('.digital-globe .network-node');
+    if (nodes.length === 0) return;
+    const randomNode = nodes[Math.floor(Math.random() * nodes.length)];
+    randomNode.classList.add('brightened');
+    setTimeout(() => {
+      randomNode.classList.remove('brightened');
+    }, 250);
+  }, 4000);
 });
