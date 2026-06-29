@@ -266,6 +266,13 @@ ul {
   z-index: 1100;
 }
 
+.dropdown-menu.force-closed {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transform: translateY(-8px) !important;
+  pointer-events: none !important;
+}
+
 .nav-item:hover .dropdown-menu {
   opacity: 1;
   visibility: visible;

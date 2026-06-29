@@ -662,7 +662,7 @@ Object.assign(window.fosemApp, {
     }
   },
 
-  scrollToAndFocus: function(targetId) {
+  triggerCardFocus: function(targetId) {
     const targetEl = document.getElementById(targetId);
     if (!targetEl) return;
 
@@ -672,6 +672,7 @@ Object.assign(window.fosemApp, {
     });
 
     const isPrefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (isPrefersReduced) return;
 
     // Check if element is already 60% visible in the viewport
     const rect = targetEl.getBoundingClientRect();
@@ -679,46 +680,81 @@ Object.assign(window.fosemApp, {
     const elemWidth = rect.width;
     const visibleHeight = Math.max(0, Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0));
     const visibleWidth = Math.max(0, Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0));
-    const visibleArea = visibleHeight * visibleWidth;
-    const totalArea = elemHeight * elemWidth;
-    const is60Visible = totalArea > 0 && (visibleArea / totalArea) >= 0.60;
+    const isAlreadyVisible = (visibleHeight * visibleWidth) / (elemHeight * elemWidth) >= 0.60;
+
+    if (isAlreadyVisible) {
+      targetEl.classList.add('focus-highlight-nudge');
+    } else {
+      targetEl.classList.add('focus-highlight-pop');
+    }
+    
+    // Clean up after 2.3s
+    setTimeout(() => {
+      targetEl.classList.remove('focus-highlight-pop', 'focus-highlight-nudge');
+    }, 2300);
+  },
+
+  scrollToAndFocus: function(targetId) {
+    const targetEl = document.getElementById(targetId);
+    if (!targetEl) return;
+
+    const rect = targetEl.getBoundingClientRect();
+    const navbar = document.querySelector('.site-header');
+    const navHeight = navbar ? navbar.offsetHeight : 80;
+    const targetOffset = rect.top + window.pageYOffset - navHeight - 16;
+
+    // Check visibility
+    const visibleHeight = Math.max(0, Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0));
+    const visibleWidth = Math.max(0, Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0));
+    const is60Visible = (visibleHeight * visibleWidth) / (rect.height * rect.width) >= 0.60;
 
     if (is60Visible) {
-      // Target is already visible: Subtle nudge animation
-      if (isPrefersReduced) {
-        targetEl.classList.add('focus-highlight-pop');
-      } else {
-        targetEl.classList.add('focus-highlight-nudge');
-      }
-      
-      // Clean up after 2.3s
-      setTimeout(() => {
-        targetEl.classList.remove('focus-highlight-pop', 'focus-highlight-nudge');
-      }, 2300);
+      this.triggerCardFocus(targetId);
     } else {
-      // Target is not visible: Smooth scroll + Focus Pop animation
-      const navbar = document.querySelector('.site-header');
-      const navHeight = navbar ? navbar.offsetHeight : 80;
-      const targetOffset = rect.top + window.pageYOffset - navHeight - 16;
-
       window.scrollTo({
         top: targetOffset,
         behavior: 'smooth'
       });
-
-      // Wait for smooth scroll to complete (around 550ms) before animating
       setTimeout(() => {
-        targetEl.classList.add('focus-highlight-pop');
-        setTimeout(() => {
-          targetEl.classList.remove('focus-highlight-pop', 'focus-highlight-nudge');
-        }, 2300);
-      }, 550);
+        this.triggerCardFocus(targetId);
+      }, 650);
     }
   }
 });
 
 // Intercept Clicks, Sidebar Navigation and Back to Home
 document.addEventListener('DOMContentLoaded', () => {
+  // Close all dropdowns helper
+  const closeAllDropdowns = () => {
+    document.querySelectorAll('.dropdown-menu').forEach(menu => {
+      menu.classList.add('force-closed');
+    });
+  };
+
+  // Reset force-closed state when mouse leaves any nav-item
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('mouseleave', () => {
+      const menu = item.querySelector('.dropdown-menu');
+      if (menu) {
+        menu.classList.remove('force-closed');
+      }
+    });
+  });
+
+  // Close menus on Escape press
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeAllDropdowns();
+    }
+  });
+
+  // Close menus on click outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.nav-item')) {
+      closeAllDropdowns();
+    }
+  });
+
   // Handle click on any dropdown link with smooth scroll and zero-lag tab switching
   const dropdownLinks = document.querySelectorAll('.nav-item .dropdown-menu a');
   let isNavigating = false;
@@ -730,6 +766,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const slug = href.split('#')[1];
         const homeView = document.getElementById('home-view');
         const solView = document.getElementById('solutions-view');
+
+        // Find parent dropdown menu and force close it instantly on click
+        const parentMenu = link.closest('.dropdown-menu');
+        if (parentMenu) {
+          parentMenu.classList.add('force-closed');
+        }
 
         // Case A: Products & Solutions key
         if (solutionsData[slug]) {
@@ -759,7 +801,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   top: targetOffset,
                   behavior: 'smooth'
                 });
-              }, 350);
+              }, 150); // Wait 150ms for dropdown to close first
             }
           }
         }
@@ -772,14 +814,48 @@ document.addEventListener('DOMContentLoaded', () => {
             isNavigating = true;
             setTimeout(() => { isNavigating = false; }, 400);
 
+            const performScrollAndFocus = () => {
+              // Wait 150ms for dropdown to close/fade out before starting scroll
+              setTimeout(() => {
+                const targetEl = document.getElementById(slug);
+                if (!targetEl) return;
+
+                const rect = targetEl.getBoundingClientRect();
+                const navbar = document.querySelector('.site-header');
+                const navHeight = navbar ? navbar.offsetHeight : 80;
+                const targetOffset = rect.top + window.pageYOffset - navHeight - 16;
+
+                // Check if card is already fully visible in viewport
+                const visibleHeight = Math.max(0, Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0));
+                const visibleWidth = Math.max(0, Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0));
+                const isAlreadyVisible = (visibleHeight * visibleWidth) / (rect.height * rect.width) >= 0.60;
+
+                if (isAlreadyVisible) {
+                  // If already visible, wait 150ms after dropdown closes, then nudge
+                  setTimeout(() => {
+                    window.fosemApp.triggerCardFocus(slug);
+                  }, 150);
+                } else {
+                  // Scroll smoothly to target card
+                  window.scrollTo({
+                    top: targetOffset,
+                    behavior: 'smooth'
+                  });
+
+                  // Trigger focus pop only after scroll finishes (650ms)
+                  setTimeout(() => {
+                    window.fosemApp.triggerCardFocus(slug);
+                  }, 650);
+                }
+              }, 150);
+            };
+
             // Transition from solutions view back to home first
             if (!solView.classList.contains('view-hidden')) {
               window.fosemApp.goHome();
-              setTimeout(() => {
-                window.fosemApp.scrollToAndFocus(slug);
-              }, 350);
+              setTimeout(performScrollAndFocus, 350);
             } else {
-              window.fosemApp.scrollToAndFocus(slug);
+              performScrollAndFocus();
             }
           }
         }
