@@ -974,28 +974,298 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  /* --- Digital Globe Node Brightening Animation --- */
-  const startNodeAnimation = () => {
-    const nodes = document.querySelectorAll('.digital-globe .network-node, .digital-globe .orbit-node');
-    if (nodes.length === 0) return;
-    const count = Math.random() < 0.5 ? 1 : 2;
-    for (let i = 0; i < count; i++) {
-      const randomNode = nodes[Math.floor(Math.random() * nodes.length)];
-      if (!randomNode.classList.contains('brightened')) {
-        randomNode.classList.add('brightened');
-        setTimeout(() => {
-          randomNode.classList.remove('brightened');
-        }, 800); // 250ms fade-in + active + 400ms fade-out
-      }
+  /* --- 3D Rotating Earth Canvas Loop --- */
+  const initGlobeCanvas = () => {
+    const canvas = document.querySelector('.globe-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    
+    // Scale for high-DPI Retina screens
+    const width = 220;
+    const height = 220;
+    canvas.width = width * 2;
+    canvas.height = height * 2;
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    
+    const scale = 2;
+    const cx = 100;
+    const cy = 100;
+    const R = 92;
+    
+    // Camera settings (tilted by 8 degrees)
+    const phi_0 = 8 * Math.PI / 180;
+    const cosP = Math.cos(phi_0);
+    const sinP = Math.sin(phi_0);
+    
+    // Reference database
+    const data = window.fosemGlobeData;
+    if (!data) return;
+    
+    // Rotation state
+    let theta = 0;
+    
+    // Node flash state
+    const activeFlashes = {};
+    
+    // Beams (6 active beams bouncing simultaneously across the globe)
+    const activeBeams = [];
+    const beamCount = 6;
+    for (let i = 0; i < beamCount; i++) {
+      activeBeams.push({
+        link: data.links[Math.floor(Math.random() * data.links.length)],
+        progress: Math.random(),
+        speed: 0.006 + Math.random() * 0.008
+      });
     }
+    
+    // Node flash trigger (every 3 to 6 seconds)
+    const triggerNodeFlash = () => {
+      const count = Math.random() < 0.5 ? 1 : 2;
+      for (let i = 0; i < count; i++) {
+        const node = data.nodes[Math.floor(Math.random() * data.nodes.length)];
+        const nodeId = node.id;
+        activeFlashes[nodeId] = {
+          startTime: Date.now(),
+          duration: 800 // 250ms fade-in + active + 400ms fade-out
+        };
+      }
+      setTimeout(triggerNodeFlash, 3000 + Math.random() * 3000);
+    };
+    triggerNodeFlash();
+    
+    // 3D coordinate rotation & projection helper
+    const project = (x_l, y_l, z_l) => {
+      // Y-axis rotation (spin)
+      const xRot = x_l * Math.cos(theta) - z_l * Math.sin(theta);
+      const zRot = x_l * Math.sin(theta) + z_l * Math.cos(theta);
+      const y_temp = y_l;
+      
+      // X-axis tilt (pitch)
+      const y3d = cosP * y_temp - sinP * zRot;
+      const z3d = sinP * y_temp + cosP * zRot;
+      
+      const px = cx + xRot;
+      const py = cy - y3d;
+      return { px, py, z3d };
+    };
+    
+    // Render loop
+    const render = () => {
+      // Increment rotation
+      theta += 0.0022;
+      if (theta > 2 * Math.PI) theta -= 2 * Math.PI;
+      
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // 1. Draw Latitudes (14 curves)
+      ctx.strokeStyle = 'rgba(120, 200, 255, 0.18)';
+      ctx.lineWidth = 0.8 * scale;
+      const latitudes = [-72, -60, -48, -36, -24, -12, 0, 12, 24, 36, 48, 60, 72];
+      latitudes.forEach(latDeg => {
+        const lat = latDeg * Math.PI / 180;
+        const r_lat = R * Math.cos(lat);
+        const y_lat = R * Math.sin(lat);
+        
+        ctx.beginPath();
+        let first = true;
+        for (let deg = 0; deg <= 360; deg += 6) {
+          const theta_pt = deg * Math.PI / 180;
+          const x_l = r_lat * Math.sin(theta_pt);
+          const z_l = r_lat * Math.cos(theta_pt);
+          
+          const pt = project(x_l, y_lat, z_l);
+          if (pt.z3d >= -10) {
+            if (first) {
+              ctx.moveTo(pt.px * scale, pt.py * scale);
+              first = false;
+            } else {
+              ctx.lineTo(pt.px * scale, pt.py * scale);
+            }
+          } else {
+            first = true;
+          }
+        }
+        ctx.stroke();
+      });
+      
+      // 2. Draw Longitudes (20 curves)
+      for (let i = 0; i < 20; i++) {
+        const lonDeg = (i * 18);
+        const lon = lonDeg * Math.PI / 180;
+        
+        ctx.beginPath();
+        let first = true;
+        for (let latDeg = -85; latDeg <= 85; latDeg += 5) {
+          const lat = latDeg * Math.PI / 180;
+          const x_l = R * Math.cos(lat) * Math.sin(lon);
+          const y_l = R * Math.sin(lat);
+          const z_l = R * Math.cos(lat) * Math.cos(lon);
+          
+          const pt = project(x_l, y_l, z_l);
+          if (pt.z3d >= -10) {
+            if (first) {
+              ctx.moveTo(pt.px * scale, pt.py * scale);
+              first = false;
+            } else {
+              ctx.lineTo(pt.px * scale, pt.py * scale);
+            }
+          } else {
+            first = true;
+          }
+        }
+        ctx.stroke();
+      }
+      
+      // 3. Draw Continent Particles
+      data.particles.forEach(p => {
+        const pt = project(p.x, p.y, p.z);
+        if (pt.z3d >= -5) {
+          let alpha = pt.z3d / R;
+          if (alpha < 0) alpha = 0;
+          if (alpha > 1) alpha = 1;
+          alpha = alpha * alpha * (3 - 2 * alpha); // smoothstep
+          
+          ctx.fillStyle = `rgba(142, 216, 255, ${alpha * 0.85})`;
+          ctx.beginPath();
+          ctx.arc(pt.px * scale, pt.py * scale, 0.65 * scale, 0, 2 * Math.PI);
+          ctx.fill();
+        }
+      });
+      
+      // 4. Draw Connection Links
+      data.links.forEach(link => {
+        const n1 = data.nodes.find(n => n.id === link.id1);
+        const n2 = data.nodes.find(n => n.id === link.id2);
+        if (!n1 || !n2) return;
+        
+        const pt1 = project(n1.x, n1.y, n1.z);
+        const pt2 = project(n2.x, n2.y, n2.z);
+        
+        if (pt1.z3d >= -15 && pt2.z3d >= -15) {
+          const xm = (n1.x + n2.x) / 2;
+          const ym = (n1.y + n2.y) / 2;
+          const zm = (n1.z + n2.z) / 2;
+          const len = Math.sqrt(xm*xm + ym*ym + zm*zm);
+          
+          const arcH = link.type === 'global' ? 16 : 10;
+          const xc = xm + (xm / len) * arcH;
+          const yc = ym + (ym / len) * arcH;
+          const zc = zm + (zm / len) * arcH;
+          
+          const ptCtrl = project(xc, yc, zc);
+          
+          let alpha = Math.min(pt1.z3d, pt2.z3d) / R;
+          if (alpha < 0) alpha = 0;
+          if (alpha > 1) alpha = 1;
+          
+          ctx.strokeStyle = `rgba(142, 216, 255, ${alpha * 0.18})`;
+          ctx.lineWidth = 0.8 * scale;
+          ctx.beginPath();
+          ctx.moveTo(pt1.px * scale, pt1.py * scale);
+          ctx.quadraticCurveTo(ptCtrl.px * scale, ptCtrl.py * scale, pt2.px * scale, pt2.py * scale);
+          ctx.stroke();
+        }
+      });
+      
+      // 5. Draw Connection Beams (Lasers)
+      activeBeams.forEach(beam => {
+        beam.progress += beam.speed;
+        if (beam.progress >= 1.0) {
+          beam.link = data.links[Math.floor(Math.random() * data.links.length)];
+          beam.progress = 0;
+          beam.speed = 0.006 + Math.random() * 0.008;
+        }
+        
+        const n1 = data.nodes.find(n => n.id === beam.link.id1);
+        const n2 = data.nodes.find(n => n.id === beam.link.id2);
+        if (!n1 || !n2) return;
+        
+        const trailLength = 5;
+        for (let k = 0; k < trailLength; k++) {
+          const t = Math.max(0, beam.progress - k * 0.025);
+          if (t <= 0) continue;
+          
+          let x3d = (1 - t) * n1.x + t * n2.x;
+          let y3d = (1 - t) * n1.y + t * n2.y;
+          let z3d = (1 - t) * n1.z + t * n2.z;
+          
+          const len = Math.sqrt(x3d*x3d + y3d*y3d + z3d*z3d);
+          const arcH = beam.link.type === 'global' ? 16 : 10;
+          const height = arcH * Math.sin(Math.PI * t);
+          x3d += (x3d / len) * height;
+          y3d += (y3d / len) * height;
+          z3d += (z3d / len) * height;
+          
+          const pt = project(x3d, y3d, z3d);
+          if (pt.z3d >= -10) {
+            let dAlpha = pt.z3d / R;
+            if (dAlpha < 0) dAlpha = 0;
+            const trailAlpha = (1.0 - k / trailLength) * dAlpha;
+            
+            ctx.fillStyle = k === 0 ? '#ffffff' : `rgba(142, 216, 255, ${trailAlpha * 0.9})`;
+            ctx.beginPath();
+            const radius = k === 0 ? 1.6 : 1.2 * (1.0 - k / trailLength);
+            ctx.arc(pt.px * scale, pt.py * scale, radius * scale, 0, 2 * Math.PI);
+            ctx.fill();
+          }
+        }
+      });
+      
+      // 6. Draw Nodes
+      data.nodes.forEach(node => {
+        const pt = project(node.x, node.y, node.z);
+        if (pt.z3d >= 0) {
+          let alpha = pt.z3d / R;
+          if (alpha < 0) alpha = 0;
+          
+          const flash = activeFlashes[node.id];
+          let isBright = false;
+          let flashAlpha = 0;
+          
+          if (flash) {
+            const elapsed = Date.now() - flash.startTime;
+            if (elapsed < flash.duration) {
+              isBright = true;
+              if (elapsed < 250) {
+                flashAlpha = elapsed / 250;
+              } else {
+                flashAlpha = 1.0 - (elapsed - 250) / (flash.duration - 250);
+              }
+            } else {
+              delete activeFlashes[node.id];
+            }
+          }
+          
+          if (isBright) {
+            ctx.shadowColor = '#8ED8FF';
+            ctx.shadowBlur = 8 * scale;
+            ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+            ctx.beginPath();
+            ctx.arc(pt.px * scale, pt.py * scale, 2.2 * scale, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            ctx.strokeStyle = `rgba(142, 216, 255, ${flashAlpha * alpha * 0.6})`;
+            ctx.lineWidth = 1 * scale;
+            ctx.beginPath();
+            ctx.arc(pt.px * scale, pt.py * scale, 4.5 * scale, 0, 2 * Math.PI);
+            ctx.stroke();
+            
+            ctx.shadowBlur = 0;
+          } else {
+            ctx.fillStyle = `rgba(142, 216, 255, ${alpha * 0.85})`;
+            ctx.beginPath();
+            ctx.arc(pt.px * scale, pt.py * scale, 1.25 * scale, 0, 2 * Math.PI);
+            ctx.fill();
+          }
+        }
+      });
+      
+      requestAnimationFrame(render);
+    };
+    
+    requestAnimationFrame(render);
   };
-
-  const scheduleNextNodeAnim = () => {
-    const delay = 3000 + Math.random() * 3000;
-    setTimeout(() => {
-      startNodeAnimation();
-      scheduleNextNodeAnim();
-    }, delay);
-  };
-  scheduleNextNodeAnim();
+  
+  initGlobeCanvas();
 });
