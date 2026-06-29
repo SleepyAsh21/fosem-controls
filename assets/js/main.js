@@ -1000,39 +1000,42 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Reference database
     const data = window.fosemGlobeData;
-    if (!data) return;
+    if (!data || !data.particles || !data.nodes) return;
     
     // Rotation state
     let theta = 0;
     
-    // Node flash state
-    const activeFlashes = {};
+    // active Ripples (waves expanding on laser impact)
+    const activeRipples = [];
     
-    // Beams (6 active beams bouncing simultaneously across the globe)
+    // Bouncing Beams (6 active laser travelers constantly bouncing between connected nodes)
     const activeBeams = [];
     const beamCount = 6;
+    
     for (let i = 0; i < beamCount; i++) {
+      // Pick a random starting node
+      const startNode = data.nodes[Math.floor(Math.random() * data.nodes.length)];
+      // Find neighbors
+      const connected = data.links.filter(l => l.id1 === startNode.id || l.id2 === startNode.id);
+      let targetNode = null;
+      let activeLink = null;
+      
+      if (connected.length > 0) {
+        activeLink = connected[Math.floor(Math.random() * connected.length)];
+        const nextId = activeLink.id1 === startNode.id ? activeLink.id2 : activeLink.id1;
+        targetNode = data.nodes.find(n => n.id === nextId);
+      } else {
+        targetNode = data.nodes[Math.floor(Math.random() * data.nodes.length)];
+      }
+      
       activeBeams.push({
-        link: data.links[Math.floor(Math.random() * data.links.length)],
+        currentNode: startNode,
+        targetNode: targetNode,
+        link: activeLink,
         progress: Math.random(),
-        speed: 0.006 + Math.random() * 0.008
+        speed: 0.01 + Math.random() * 0.008
       });
     }
-    
-    // Node flash trigger (every 3 to 6 seconds)
-    const triggerNodeFlash = () => {
-      const count = Math.random() < 0.5 ? 1 : 2;
-      for (let i = 0; i < count; i++) {
-        const node = data.nodes[Math.floor(Math.random() * data.nodes.length)];
-        const nodeId = node.id;
-        activeFlashes[nodeId] = {
-          startTime: Date.now(),
-          duration: 800 // 250ms fade-in + active + 400ms fade-out
-        };
-      }
-      setTimeout(triggerNodeFlash, 3000 + Math.random() * 3000);
-    };
-    triggerNodeFlash();
     
     // 3D coordinate rotation & projection helper
     const project = (x_l, y_l, z_l) => {
@@ -1059,7 +1062,7 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
       // 1. Draw Latitudes (14 curves)
-      ctx.strokeStyle = 'rgba(120, 200, 255, 0.18)';
+      ctx.strokeStyle = 'rgba(120, 200, 255, 0.16)';
       ctx.lineWidth = 0.8 * scale;
       const latitudes = [-72, -60, -48, -36, -24, -12, 0, 12, 24, 36, 48, 60, 72];
       latitudes.forEach(latDeg => {
@@ -1117,23 +1120,28 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.stroke();
       }
       
-      // 3. Draw Continent Particles
-      data.particles.forEach(p => {
-        const pt = project(p.x, p.y, p.z);
+      // 3. Draw Continent Particles (32,896 coordinates rendered at 60fps using rects)
+      const len = data.particles.length;
+      for (let i = 0; i < len; i += 3) {
+        const px_val = data.particles[i];
+        const py_val = data.particles[i+1];
+        const pz_val = data.particles[i+2];
+        
+        const pt = project(px_val, py_val, pz_val);
         if (pt.z3d >= -5) {
+          // Sharp spherical contrast depth-fade
           let alpha = pt.z3d / R;
           if (alpha < 0) alpha = 0;
           if (alpha > 1) alpha = 1;
-          alpha = alpha * alpha * (3 - 2 * alpha); // smoothstep
+          alpha = Math.pow(alpha, 3); // cubic falloff for deep volumetric feel
           
           ctx.fillStyle = `rgba(142, 216, 255, ${alpha * 0.85})`;
-          ctx.beginPath();
-          ctx.arc(pt.px * scale, pt.py * scale, 0.65 * scale, 0, 2 * Math.PI);
-          ctx.fill();
+          // Draw rect for maximum raw drawing performance at 60fps
+          ctx.fillRect(pt.px * scale - 0.45 * scale, pt.py * scale - 0.45 * scale, 0.9 * scale, 0.9 * scale);
         }
-      });
+      }
       
-      // 4. Draw Connection Links
+      // 4. Draw Connection Links (Subtle background paths)
       data.links.forEach(link => {
         const n1 = data.nodes.find(n => n.id === link.id1);
         const n2 = data.nodes.find(n => n.id === link.id2);
@@ -1146,12 +1154,12 @@ document.addEventListener('DOMContentLoaded', () => {
           const xm = (n1.x + n2.x) / 2;
           const ym = (n1.y + n2.y) / 2;
           const zm = (n1.z + n2.z) / 2;
-          const len = Math.sqrt(xm*xm + ym*ym + zm*zm);
+          const length_mid = Math.sqrt(xm*xm + ym*ym + zm*zm);
           
           const arcH = link.type === 'global' ? 16 : 10;
-          const xc = xm + (xm / len) * arcH;
-          const yc = ym + (ym / len) * arcH;
-          const zc = zm + (zm / len) * arcH;
+          const xc = xm + (xm / length_mid) * arcH;
+          const yc = ym + (ym / len_mid === undefined ? length_mid : length_mid) * arcH;
+          const zc = zm + (zm / length_mid) * arcH;
           
           const ptCtrl = project(xc, yc, zc);
           
@@ -1159,7 +1167,7 @@ document.addEventListener('DOMContentLoaded', () => {
           if (alpha < 0) alpha = 0;
           if (alpha > 1) alpha = 1;
           
-          ctx.strokeStyle = `rgba(142, 216, 255, ${alpha * 0.18})`;
+          ctx.strokeStyle = `rgba(142, 216, 255, ${alpha * 0.15})`;
           ctx.lineWidth = 0.8 * scale;
           ctx.beginPath();
           ctx.moveTo(pt1.px * scale, pt1.py * scale);
@@ -1168,30 +1176,55 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
       
-      // 5. Draw Connection Beams (Lasers)
+      // 5. Draw Active Bouncing Beams (Lasers)
       activeBeams.forEach(beam => {
+        // Increment progress
         beam.progress += beam.speed;
         if (beam.progress >= 1.0) {
-          beam.link = data.links[Math.floor(Math.random() * data.links.length)];
+          // Landing node reached! Trigger ripple
+          activeRipples.push({
+            x: beam.targetNode.x,
+            y: beam.targetNode.y,
+            z: beam.targetNode.z,
+            progress: 0,
+            speed: 0.05
+          });
+          
+          // Instantly bounce off to a connected neighbor
+          beam.currentNode = beam.targetNode;
+          const connected = data.links.filter(l => l.id1 === beam.currentNode.id || l.id2 === beam.currentNode.id);
+          
+          if (connected.length > 0) {
+            beam.link = connected[Math.floor(Math.random() * connected.length)];
+            const nextId = beam.link.id1 === beam.currentNode.id ? beam.link.id2 : beam.link.id1;
+            beam.targetNode = data.nodes.find(n => n.id === nextId);
+          } else {
+            // Pick random target node if no links exist
+            beam.targetNode = data.nodes[Math.floor(Math.random() * data.nodes.length)];
+            beam.link = null;
+          }
+          
           beam.progress = 0;
-          beam.speed = 0.006 + Math.random() * 0.008;
+          beam.speed = 0.01 + Math.random() * 0.008; // Reset speed
         }
         
-        const n1 = data.nodes.find(n => n.id === beam.link.id1);
-        const n2 = data.nodes.find(n => n.id === beam.link.id2);
+        const n1 = beam.currentNode;
+        const n2 = beam.targetNode;
         if (!n1 || !n2) return;
         
-        const trailLength = 5;
+        // Draw laser comet head & glowing trail
+        const trailLength = 6;
         for (let k = 0; k < trailLength; k++) {
           const t = Math.max(0, beam.progress - k * 0.025);
           if (t <= 0) continue;
           
+          // Interpolate 3D position
           let x3d = (1 - t) * n1.x + t * n2.x;
           let y3d = (1 - t) * n1.y + t * n2.y;
           let z3d = (1 - t) * n1.z + t * n2.z;
           
           const len = Math.sqrt(x3d*x3d + y3d*y3d + z3d*z3d);
-          const arcH = beam.link.type === 'global' ? 16 : 10;
+          const arcH = (beam.link && beam.link.type === 'global') ? 16 : 10;
           const height = arcH * Math.sin(Math.PI * t);
           x3d += (x3d / len) * height;
           y3d += (y3d / len) * height;
@@ -1203,61 +1236,73 @@ document.addEventListener('DOMContentLoaded', () => {
             if (dAlpha < 0) dAlpha = 0;
             const trailAlpha = (1.0 - k / trailLength) * dAlpha;
             
-            ctx.fillStyle = k === 0 ? '#ffffff' : `rgba(142, 216, 255, ${trailAlpha * 0.9})`;
-            ctx.beginPath();
-            const radius = k === 0 ? 1.6 : 1.2 * (1.0 - k / trailLength);
-            ctx.arc(pt.px * scale, pt.py * scale, radius * scale, 0, 2 * Math.PI);
-            ctx.fill();
+            // Draw dual layers for extreme neon laser glow!
+            if (k === 0) {
+              // Outer bright core glow
+              ctx.fillStyle = 'rgba(142, 216, 255, 0.4)';
+              ctx.beginPath();
+              ctx.arc(pt.px * scale, pt.py * scale, 3.5 * scale, 0, 2 * Math.PI);
+              ctx.fill();
+              
+              // Inner hot-white core
+              ctx.fillStyle = '#ffffff';
+              ctx.beginPath();
+              ctx.arc(pt.px * scale, pt.py * scale, 1.5 * scale, 0, 2 * Math.PI);
+              ctx.fill();
+            } else {
+              // Fading comet trail tail
+              ctx.fillStyle = `rgba(142, 216, 255, ${trailAlpha * 0.85})`;
+              ctx.beginPath();
+              ctx.arc(pt.px * scale, pt.py * scale, 1.2 * (1.0 - k / trailLength) * scale, 0, 2 * Math.PI);
+              ctx.fill();
+            }
           }
         }
       });
       
-      // 6. Draw Nodes
+      // 6. Draw active expanding ripples (impact rings)
+      for (let i = activeRipples.length - 1; i >= 0; i--) {
+        const rip = activeRipples[i];
+        rip.progress += rip.speed;
+        if (rip.progress >= 1.0) {
+          activeRipples.splice(i, 1);
+          continue;
+        }
+        
+        const pt = project(rip.x, rip.y, rip.z);
+        if (pt.z3d >= 0) {
+          let alpha = pt.z3d / R;
+          if (alpha < 0) alpha = 0;
+          const opacity = (1.0 - rip.progress) * alpha;
+          const radius = (2 + rip.progress * 12) * scale;
+          
+          ctx.strokeStyle = `rgba(142, 216, 255, ${opacity * 0.7})`;
+          ctx.lineWidth = 1 * scale;
+          ctx.beginPath();
+          ctx.arc(pt.px * scale, pt.py * scale, radius, 0, 2 * Math.PI);
+          ctx.stroke();
+        }
+      }
+      
+      // 7. Draw Nodes (slight circles that serve as the landing base)
       data.nodes.forEach(node => {
         const pt = project(node.x, node.y, node.z);
         if (pt.z3d >= 0) {
           let alpha = pt.z3d / R;
           if (alpha < 0) alpha = 0;
           
-          const flash = activeFlashes[node.id];
-          let isBright = false;
-          let flashAlpha = 0;
+          // Draw base landing ring
+          ctx.strokeStyle = `rgba(142, 216, 255, ${alpha * 0.4})`;
+          ctx.lineWidth = 0.8 * scale;
+          ctx.beginPath();
+          ctx.arc(pt.px * scale, pt.py * scale, 2.5 * scale, 0, 2 * Math.PI);
+          ctx.stroke();
           
-          if (flash) {
-            const elapsed = Date.now() - flash.startTime;
-            if (elapsed < flash.duration) {
-              isBright = true;
-              if (elapsed < 250) {
-                flashAlpha = elapsed / 250;
-              } else {
-                flashAlpha = 1.0 - (elapsed - 250) / (flash.duration - 250);
-              }
-            } else {
-              delete activeFlashes[node.id];
-            }
-          }
-          
-          if (isBright) {
-            ctx.shadowColor = '#8ED8FF';
-            ctx.shadowBlur = 8 * scale;
-            ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
-            ctx.beginPath();
-            ctx.arc(pt.px * scale, pt.py * scale, 2.2 * scale, 0, 2 * Math.PI);
-            ctx.fill();
-            
-            ctx.strokeStyle = `rgba(142, 216, 255, ${flashAlpha * alpha * 0.6})`;
-            ctx.lineWidth = 1 * scale;
-            ctx.beginPath();
-            ctx.arc(pt.px * scale, pt.py * scale, 4.5 * scale, 0, 2 * Math.PI);
-            ctx.stroke();
-            
-            ctx.shadowBlur = 0;
-          } else {
-            ctx.fillStyle = `rgba(142, 216, 255, ${alpha * 0.85})`;
-            ctx.beginPath();
-            ctx.arc(pt.px * scale, pt.py * scale, 1.25 * scale, 0, 2 * Math.PI);
-            ctx.fill();
-          }
+          // Draw inner center dot
+          ctx.fillStyle = `rgba(142, 216, 255, ${alpha * 0.8})`;
+          ctx.beginPath();
+          ctx.arc(pt.px * scale, pt.py * scale, 1 * scale, 0, 2 * Math.PI);
+          ctx.fill();
         }
       });
       
