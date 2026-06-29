@@ -1158,7 +1158,7 @@ document.addEventListener('DOMContentLoaded', () => {
           
           const arcH = link.type === 'global' ? 16 : 10;
           const xc = xm + (xm / length_mid) * arcH;
-          const yc = ym + (ym / len_mid === undefined ? length_mid : length_mid) * arcH;
+          const yc = ym + (ym / length_mid) * arcH;
           const zc = zm + (zm / length_mid) * arcH;
           
           const ptCtrl = project(xc, yc, zc);
@@ -1167,8 +1167,8 @@ document.addEventListener('DOMContentLoaded', () => {
           if (alpha < 0) alpha = 0;
           if (alpha > 1) alpha = 1;
           
-          ctx.strokeStyle = `rgba(142, 216, 255, ${alpha * 0.15})`;
-          ctx.lineWidth = 0.8 * scale;
+          ctx.strokeStyle = `rgba(142, 216, 255, ${alpha * 0.12})`;
+          ctx.lineWidth = 0.5 * scale;
           ctx.beginPath();
           ctx.moveTo(pt1.px * scale, pt1.py * scale);
           ctx.quadraticCurveTo(ptCtrl.px * scale, ptCtrl.py * scale, pt2.px * scale, pt2.py * scale);
@@ -1199,64 +1199,65 @@ document.addEventListener('DOMContentLoaded', () => {
             const nextId = beam.link.id1 === beam.currentNode.id ? beam.link.id2 : beam.link.id1;
             beam.targetNode = data.nodes.find(n => n.id === nextId);
           } else {
-            // Pick random target node if no links exist
             beam.targetNode = data.nodes[Math.floor(Math.random() * data.nodes.length)];
             beam.link = null;
           }
           
           beam.progress = 0;
-          beam.speed = 0.01 + Math.random() * 0.008; // Reset speed
+          beam.speed = 0.012 + Math.random() * 0.012; // Dynamic speed for bouncing pacing
         }
         
         const n1 = beam.currentNode;
         const n2 = beam.targetNode;
         if (!n1 || !n2) return;
         
-        // Draw laser comet head & glowing trail
-        const trailLength = 6;
-        for (let k = 0; k < trailLength; k++) {
-          const t = Math.max(0, beam.progress - k * 0.025);
-          if (t <= 0) continue;
+        // Calculate control point for 3D Arc
+        const xm = (n1.x + n2.x) / 2;
+        const ym = (n1.y + n2.y) / 2;
+        const zm = (n1.z + n2.z) / 2;
+        const length_mid = Math.sqrt(xm*xm + ym*ym + zm*zm);
+        const arcH = (beam.link && beam.link.type === 'global') ? 16 : 10;
+        const xc = xm + (xm / length_mid) * arcH;
+        const yc = ym + (ym / length_mid) * arcH;
+        const zc = zm + (zm / length_mid) * arcH;
+        
+        const pt1 = project(n1.x, n1.y, n1.z);
+        const pt2 = project(n2.x, n2.y, n2.z);
+        const ptCtrl = project(xc, yc, zc);
+        
+        // If both nodes are visible on the front of the sphere
+        if (pt1.z3d >= -15 && pt2.z3d >= -15) {
+          let alpha = Math.min(pt1.z3d, pt2.z3d) / R;
+          if (alpha < 0) alpha = 0;
+          if (alpha > 1) alpha = 1;
           
-          // Interpolate 3D position
-          let x3d = (1 - t) * n1.x + t * n2.x;
-          let y3d = (1 - t) * n1.y + t * n2.y;
-          let z3d = (1 - t) * n1.z + t * n2.z;
+          // Draw the active link as a BOLD, clean light arc line (NO neon shadow glow)
+          ctx.strokeStyle = `rgba(160, 225, 255, ${alpha * 0.85})`;
+          ctx.lineWidth = 1.4 * scale;
+          ctx.beginPath();
+          ctx.moveTo(pt1.px * scale, pt1.py * scale);
+          ctx.quadraticCurveTo(ptCtrl.px * scale, ptCtrl.py * scale, pt2.px * scale, pt2.py * scale);
+          ctx.stroke();
           
-          const len = Math.sqrt(x3d*x3d + y3d*y3d + z3d*z3d);
-          const arcH = (beam.link && beam.link.type === 'global') ? 16 : 10;
-          const height = arcH * Math.sin(Math.PI * t);
-          x3d += (x3d / len) * height;
-          y3d += (y3d / len) * height;
-          z3d += (z3d / len) * height;
+          // Draw the traveling head (comet) along the arc
+          const t = beam.progress;
+          const x_t = (1-t)*(1-t)*n1.x + 2*(1-t)*t*xc + t*t*n2.x;
+          const y_t = (1-t)*(1-t)*n1.y + 2*(1-t)*t*yc + t*t*n2.y;
+          const z_t = (1-t)*(1-t)*n1.z + 2*(1-t)*t*zc + t*t*n2.z;
           
-          const pt = project(x3d, y3d, z3d);
-          if (pt.z3d >= -10) {
-            let dAlpha = pt.z3d / R;
-            if (dAlpha < 0) dAlpha = 0;
-            const trailAlpha = (1.0 - k / trailLength) * dAlpha;
-            
-            // Draw dual layers for extreme neon laser glow!
-            if (k === 0) {
-              // Outer bright core glow
-              ctx.fillStyle = 'rgba(142, 216, 255, 0.4)';
-              ctx.beginPath();
-              ctx.arc(pt.px * scale, pt.py * scale, 3.5 * scale, 0, 2 * Math.PI);
-              ctx.fill();
-              
-              // Inner hot-white core
-              ctx.fillStyle = '#ffffff';
-              ctx.beginPath();
-              ctx.arc(pt.px * scale, pt.py * scale, 1.5 * scale, 0, 2 * Math.PI);
-              ctx.fill();
-            } else {
-              // Fading comet trail tail
-              ctx.fillStyle = `rgba(142, 216, 255, ${trailAlpha * 0.85})`;
-              ctx.beginPath();
-              ctx.arc(pt.px * scale, pt.py * scale, 1.2 * (1.0 - k / trailLength) * scale, 0, 2 * Math.PI);
-              ctx.fill();
-            }
-          }
+          const ptHead = project(x_t, y_t, z_t);
+          
+          // Bold solid white head dot
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(ptHead.px * scale, ptHead.py * scale, 2.2 * scale, 0, 2 * Math.PI);
+          ctx.fill();
+          
+          // Faint trail core
+          ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.45})`;
+          ctx.beginPath();
+          ctx.arc(ptHead.px * scale, ptHead.py * scale, 3.5 * scale, 0, 2 * Math.PI);
+          ctx.fill();
         }
       });
       
@@ -1276,32 +1277,33 @@ document.addEventListener('DOMContentLoaded', () => {
           const opacity = (1.0 - rip.progress) * alpha;
           const radius = (2 + rip.progress * 12) * scale;
           
-          ctx.strokeStyle = `rgba(142, 216, 255, ${opacity * 0.7})`;
-          ctx.lineWidth = 1 * scale;
+          ctx.strokeStyle = `rgba(160, 225, 255, ${opacity * 0.6})`;
+          ctx.lineWidth = 0.8 * scale;
           ctx.beginPath();
           ctx.arc(pt.px * scale, pt.py * scale, radius, 0, 2 * Math.PI);
           ctx.stroke();
         }
       }
       
-      // 7. Draw Nodes (slight circles that serve as the landing base)
+      // 7. Draw Nodes (Tiny ring dots ON the globe)
       data.nodes.forEach(node => {
         const pt = project(node.x, node.y, node.z);
-        if (pt.z3d >= 0) {
+        if (pt.z3d >= -5) {
           let alpha = pt.z3d / R;
           if (alpha < 0) alpha = 0;
+          if (alpha > 1) alpha = 1;
           
           // Draw base landing ring
-          ctx.strokeStyle = `rgba(142, 216, 255, ${alpha * 0.4})`;
+          ctx.strokeStyle = `rgba(160, 225, 255, ${alpha * 0.75})`;
           ctx.lineWidth = 0.8 * scale;
           ctx.beginPath();
-          ctx.arc(pt.px * scale, pt.py * scale, 2.5 * scale, 0, 2 * Math.PI);
+          ctx.arc(pt.px * scale, pt.py * scale, 2.2 * scale, 0, 2 * Math.PI);
           ctx.stroke();
           
           // Draw inner center dot
-          ctx.fillStyle = `rgba(142, 216, 255, ${alpha * 0.8})`;
+          ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.9})`;
           ctx.beginPath();
-          ctx.arc(pt.px * scale, pt.py * scale, 1 * scale, 0, 2 * Math.PI);
+          ctx.arc(pt.px * scale, pt.py * scale, 0.8 * scale, 0, 2 * Math.PI);
           ctx.fill();
         }
       });
