@@ -1157,7 +1157,7 @@ document.addEventListener('DOMContentLoaded', () => {
           const zm = (n1.z + n2.z) / 2;
           const length_mid = Math.sqrt(xm*xm + ym*ym + zm*zm);
           
-          const arcH = link.type === 'global' ? 16 : 10;
+          const arcH = 26; // High, aggressive 3D Bezier curve
           const xc = xm + (xm / length_mid) * arcH;
           const yc = ym + (ym / length_mid) * arcH;
           const zc = zm + (zm / length_mid) * arcH;
@@ -1217,7 +1217,7 @@ document.addEventListener('DOMContentLoaded', () => {
           }
           
           beam.progress = 0;
-          beam.speed = 0.007 + Math.random() * 0.007; // Smooth travel speed
+          beam.speed = 0.005 + Math.random() * 0.005; // Graceful, smooth travel speed
         }
         
         const n1 = beam.currentNode;
@@ -1229,7 +1229,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const ym = (n1.y + n2.y) / 2;
         const zm = (n1.z + n2.z) / 2;
         const length_mid = Math.sqrt(xm*xm + ym*ym + zm*zm);
-        const arcH = (beam.link && beam.link.type === 'global') ? 16 : 10;
+        const arcH = 26; // High, aggressive 3D Bezier curve
         const xc = xm + (xm / length_mid) * arcH;
         const yc = ym + (ym / length_mid) * arcH;
         const zc = zm + (zm / length_mid) * arcH;
@@ -1244,9 +1244,9 @@ document.addEventListener('DOMContentLoaded', () => {
           if (alpha < 0) alpha = 0;
           if (alpha > 1) alpha = 1;
           
-          // Draw the flowing arc line smoothly with no glow, just a solid clean bold colored segment
-          const steps = 14;
-          const startT = Math.max(0, beam.progress - 0.26);
+          // Draw the flowing arc line smoothly with no glow, just a solid clean bold colored segment (5x longer)
+          const steps = 25; // More steps for smooth long curve
+          const startT = Math.max(0, beam.progress - 0.72); // 5x longer flowing path (72% of link length)
           const endT = Math.min(1.0, beam.progress);
           
           ctx.beginPath();
@@ -1275,7 +1275,7 @@ document.addEventListener('DOMContentLoaded', () => {
           // Add a subtle white hot-core segment on top of it for visual punch!
           ctx.beginPath();
           first = true;
-          for (let k = 2; k <= steps - 2; k++) {
+          for (let k = 3; k <= steps - 3; k++) { // tapered white core
             const t = startT + (endT - startT) * (k / steps);
             const x_t = (1-t)*(1-t)*n1.x + 2*(1-t)*t*xc + t*t*n2.x;
             const y_t = (1-t)*(1-t)*n1.y + 2*(1-t)*t*yc + t*t*n2.y;
