@@ -1145,8 +1145,8 @@ ul {
 
 .service-new-card:hover {
   transform: translateY(-6px);
-  border-color: rgba(14, 165, 233, 0.3);
-  box-shadow: 0 16px 36px rgba(14, 165, 233, 0.05), 
+  border-color: #cbd5e1;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.08), 
               0 4px 12px rgba(0, 0, 0, 0.02);
 }
 
@@ -3270,22 +3270,22 @@ ul {
 @keyframes focusPopAnim {
   0% {
     transform: translateY(0) scale(1);
-    border-color: rgba(14, 165, 233, 0.15);
+    border-color: var(--border-light);
     box-shadow: none;
   }
   15% {
-    transform: translateY(-6px) scale(1.015);
-    border-color: var(--primary-light);
-    box-shadow: 0 12px 24px -10px rgba(14, 165, 233, 0.3);
+    transform: translateY(-12px) scale(1.03);
+    border-color: #334155;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   }
   85% {
-    transform: translateY(-6px) scale(1.015);
-    border-color: var(--primary-light);
-    box-shadow: 0 12px 24px -10px rgba(14, 165, 233, 0.3);
+    transform: translateY(-12px) scale(1.03);
+    border-color: #334155;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   }
   100% {
     transform: translateY(0) scale(1);
-    border-color: rgba(14, 165, 233, 0.15);
+    border-color: var(--border-light);
     box-shadow: none;
   }
 }
@@ -3293,26 +3293,26 @@ ul {
 @keyframes focusNudgeAnim {
   0% {
     transform: translateX(0) translateY(0);
-    border-color: rgba(14, 165, 233, 0.15);
+    border-color: var(--border-light);
     box-shadow: none;
   }
-  2% { transform: translateX(-3px); }
-  5% { transform: translateX(3px); }
-  8% { transform: translateX(-2px); }
-  11% { transform: translateX(2px); }
+  2% { transform: translateX(-6px); }
+  5% { transform: translateX(6px); }
+  8% { transform: translateX(-4px); }
+  11% { transform: translateX(4px); }
   15% {
-    transform: translateX(0) translateY(-2px);
-    border-color: var(--primary-light);
-    box-shadow: 0 8px 16px -8px rgba(14, 165, 233, 0.2);
+    transform: translateY(-6px) scale(1.02);
+    border-color: #334155;
+    box-shadow: 0 15px 30px -8px rgba(0, 0, 0, 0.18);
   }
   85% {
-    transform: translateX(0) translateY(-2px);
-    border-color: var(--primary-light);
-    box-shadow: 0 8px 16px -8px rgba(14, 165, 233, 0.2);
+    transform: translateY(-6px) scale(1.02);
+    border-color: #334155;
+    box-shadow: 0 15px 30px -8px rgba(0, 0, 0, 0.18);
   }
   100% {
     transform: translateY(0);
-    border-color: rgba(14, 165, 233, 0.15);
+    border-color: var(--border-light);
     box-shadow: none;
   }
 }
@@ -3327,15 +3327,15 @@ ul {
 
 @keyframes focusReducedAnim {
   0% {
-    border-color: rgba(14, 165, 233, 0.15);
+    border-color: var(--border-light);
   }
   15% {
-    border-color: var(--primary-light);
+    border-color: #334155;
   }
   85% {
-    border-color: var(--primary-light);
+    border-color: #334155;
   }
   100% {
-    border-color: rgba(14, 165, 233, 0.15);
+    border-color: var(--border-light);
   }
 }
