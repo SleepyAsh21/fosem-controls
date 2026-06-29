@@ -402,7 +402,7 @@ const solutionsData = {
     ]
   },
   'mep': {
-    title: 'MEP (Mechanical, Electrical & Plumbing)',
+    title: 'MEP',
     desc: 'Professional MEP systems covering mechanical, electrical, and plumbing needs for commercial and institutional facilities.',
     heroImage: 'assets/images/engineering_airport.webp',
     how: 'We provide end-to-end mechanical, electrical, and plumbing engineering. Our certified teams design, install, and integrate complex HVAC, electrical power grids, and sanitation networks. From initial load planning to system commissioning, we ensure compliance with international construction standards and optimal facility utility performance.',
