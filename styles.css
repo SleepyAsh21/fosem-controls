@@ -3255,87 +3255,81 @@ ul {
    CARD FOCUS / HIGHLIGHT ANIMATIONS
    ============================================ */
 .focus-highlight-pop {
-  animation: focusPopAnim 2.3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation: focusPopAnim 2.5s cubic-bezier(0.25, 1.25, 0.45, 1) forwards;
 }
 
 .focus-highlight-nudge {
-  animation: focusNudgeAnim 2.3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation: focusNudgeAnim 2.5s cubic-bezier(0.25, 1.25, 0.45, 1) forwards;
 }
 
 .service-new-card,
 .solutions-content {
-  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), 
+              border-color 0.4s ease, 
+              box-shadow 0.4s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 @keyframes focusPopAnim {
   0% {
     transform: translateY(0) scale(1);
-    border-color: var(--border-light);
-    box-shadow: none;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
   }
   15% {
-    transform: translateY(-12px) scale(1.03);
-    border-color: #334155;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    transform: translateY(-16px) scale(1.035);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12), 
+                0 12px 24px rgba(0, 0, 0, 0.06), 
+                0 0 0 1px rgba(0, 0, 0, 0.02);
   }
-  85% {
-    transform: translateY(-12px) scale(1.03);
-    border-color: #334155;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  22%, 82% {
+    transform: translateY(-12px) scale(1.025);
+    box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1), 
+                0 10px 20px rgba(0, 0, 0, 0.05), 
+                0 0 0 1px rgba(0, 0, 0, 0.02);
   }
   100% {
     transform: translateY(0) scale(1);
-    border-color: var(--border-light);
-    box-shadow: none;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
   }
 }
 
 @keyframes focusNudgeAnim {
   0% {
     transform: translateX(0) translateY(0);
-    border-color: var(--border-light);
-    box-shadow: none;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
   }
-  2% { transform: translateX(-6px); }
-  5% { transform: translateX(6px); }
-  8% { transform: translateX(-4px); }
-  11% { transform: translateX(4px); }
-  15% {
-    transform: translateY(-6px) scale(1.02);
-    border-color: #334155;
-    box-shadow: 0 15px 30px -8px rgba(0, 0, 0, 0.18);
-  }
-  85% {
-    transform: translateY(-6px) scale(1.02);
-    border-color: #334155;
-    box-shadow: 0 15px 30px -8px rgba(0, 0, 0, 0.18);
+  3% { transform: scale(1.015) rotate(0.4deg); }
+  6% { transform: scale(1.015) rotate(-0.4deg); }
+  9% { transform: scale(1.015) rotate(0.2deg); }
+  12% { transform: scale(1.015) rotate(0); }
+  18%, 82% {
+    transform: translateY(-8px) scale(1.025);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.09), 
+                0 8px 16px rgba(0, 0, 0, 0.04), 
+                0 0 0 1px rgba(0, 0, 0, 0.01);
   }
   100% {
-    transform: translateY(0);
-    border-color: var(--border-light);
-    box-shadow: none;
+    transform: translateY(0) scale(1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .focus-highlight-pop,
   .focus-highlight-nudge {
-    animation: focusReducedAnim 2.3s ease-in-out forwards !important;
+    animation: focusReducedAnim 2.5s ease-in-out forwards !important;
     transform: none !important;
   }
 }
 
 @keyframes focusReducedAnim {
   0% {
-    border-color: var(--border-light);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
   }
-  15% {
-    border-color: #334155;
-  }
-  85% {
-    border-color: #334155;
+  15%, 85% {
+    box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1), 
+                0 10px 20px rgba(0, 0, 0, 0.05);
   }
   100% {
-    border-color: var(--border-light);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
   }
 }
