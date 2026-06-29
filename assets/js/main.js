@@ -520,6 +520,7 @@ Object.assign(window.fosemApp, {
   loadSolution: function(solutionKey) {
     const data = solutionsData[solutionKey];
     if (!data) return;
+    this.currentSolution = solutionKey;
 
     const homeView = document.getElementById('home-view');
     const solView = document.getElementById('solutions-view');
@@ -638,20 +639,12 @@ Object.assign(window.fosemApp, {
 
 // Intercept Clicks, Sidebar Navigation and Back to Home
 document.addEventListener('DOMContentLoaded', () => {
-  // Handle click on any dropdown link with smooth scroll, debouncing and highlights
+  // Handle click on any dropdown link with smooth scroll and zero-lag tab switching
   const dropdownLinks = document.querySelectorAll('.nav-item .dropdown-menu a');
-  let clickCooldown = false;
+  let isNavigating = false;
 
   dropdownLinks.forEach(link => {
     link.addEventListener('click', (e) => {
-      // Debounce clicks within 800ms
-      if (clickCooldown) {
-        e.preventDefault();
-        return;
-      }
-      clickCooldown = true;
-      setTimeout(() => { clickCooldown = false; }, 800);
-
       const href = link.getAttribute('href');
       if (href && href.includes('#')) {
         const slug = href.split('#')[1];
@@ -663,10 +656,19 @@ document.addEventListener('DOMContentLoaded', () => {
           if (homeView && solView) {
             e.preventDefault();
 
+            // If already viewing this specific solution, do nothing (prevents redundant reloading)
+            if (window.fosemApp.currentSolution === slug) {
+              return;
+            }
+
             const isAlreadyOnSolutions = !solView.classList.contains('view-hidden');
             window.fosemApp.loadSolution(slug);
 
             if (!isAlreadyOnSolutions) {
+              if (isNavigating) return;
+              isNavigating = true;
+              setTimeout(() => { isNavigating = false; }, 400);
+
               // Transitioning from home view: scroll window to the top of solutions view (no highlights)
               setTimeout(() => {
                 const rect = solView.getBoundingClientRect();
@@ -685,6 +687,10 @@ document.addEventListener('DOMContentLoaded', () => {
         else if (slug.startsWith('service-')) {
           if (homeView && solView) {
             e.preventDefault();
+
+            if (isNavigating) return;
+            isNavigating = true;
+            setTimeout(() => { isNavigating = false; }, 400);
 
             // Transition from solutions view back to home first
             if (!solView.classList.contains('view-hidden')) {
