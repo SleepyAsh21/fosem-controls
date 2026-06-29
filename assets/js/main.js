@@ -1034,7 +1034,7 @@ document.addEventListener('DOMContentLoaded', () => {
         link: activeLink,
         lastNodeId: startNode.id,
         progress: Math.random(),
-        speed: 0.016 + Math.random() * 0.016
+        speed: 0.007 + Math.random() * 0.007
       });
     }
     
@@ -1217,7 +1217,7 @@ document.addEventListener('DOMContentLoaded', () => {
           }
           
           beam.progress = 0;
-          beam.speed = 0.02 + Math.random() * 0.022; // Aggressive, snappy speed range
+          beam.speed = 0.007 + Math.random() * 0.007; // Smooth travel speed
         }
         
         const n1 = beam.currentNode;
@@ -1244,42 +1244,56 @@ document.addEventListener('DOMContentLoaded', () => {
           if (alpha < 0) alpha = 0;
           if (alpha > 1) alpha = 1;
           
-          // Draw active link with high-contrast dual strokes to create a bold, clean lighted arc
-          // Base thicker blue path
-          ctx.strokeStyle = `rgba(160, 225, 255, ${alpha * 0.85})`;
-          ctx.lineWidth = 1.6 * scale;
+          // Draw the flowing arc line smoothly with no glow, just a solid clean bold colored segment
+          const steps = 14;
+          const startT = Math.max(0, beam.progress - 0.26);
+          const endT = Math.min(1.0, beam.progress);
+          
           ctx.beginPath();
-          ctx.moveTo(pt1.px * scale, pt1.py * scale);
-          ctx.quadraticCurveTo(ptCtrl.px * scale, ptCtrl.py * scale, pt2.px * scale, pt2.py * scale);
+          let first = true;
+          for (let k = 0; k <= steps; k++) {
+            const t = startT + (endT - startT) * (k / steps);
+            const x_t = (1-t)*(1-t)*n1.x + 2*(1-t)*t*xc + t*t*n2.x;
+            const y_t = (1-t)*(1-t)*n1.y + 2*(1-t)*t*yc + t*t*n2.y;
+            const z_t = (1-t)*(1-t)*n1.z + 2*(1-t)*t*zc + t*t*n2.z;
+            
+            const pt = project(x_t, y_t, z_t);
+            if (pt.z3d >= -10) {
+              if (first) {
+                ctx.moveTo(pt.px * scale, pt.py * scale);
+                first = false;
+              } else {
+                ctx.lineTo(pt.px * scale, pt.py * scale);
+              }
+            }
+          }
+          ctx.strokeStyle = `rgba(160, 225, 255, ${alpha * 0.95})`;
+          ctx.lineWidth = 1.6 * scale;
+          ctx.lineCap = 'round';
           ctx.stroke();
           
-          // Top thinner white hot core path
+          // Add a subtle white hot-core segment on top of it for visual punch!
+          ctx.beginPath();
+          first = true;
+          for (let k = 2; k <= steps - 2; k++) {
+            const t = startT + (endT - startT) * (k / steps);
+            const x_t = (1-t)*(1-t)*n1.x + 2*(1-t)*t*xc + t*t*n2.x;
+            const y_t = (1-t)*(1-t)*n1.y + 2*(1-t)*t*yc + t*t*n2.y;
+            const z_t = (1-t)*(1-t)*n1.z + 2*(1-t)*t*zc + t*t*n2.z;
+            
+            const pt = project(x_t, y_t, z_t);
+            if (pt.z3d >= -10) {
+              if (first) {
+                ctx.moveTo(pt.px * scale, pt.py * scale);
+                first = false;
+              } else {
+                ctx.lineTo(pt.px * scale, pt.py * scale);
+              }
+            }
+          }
           ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.95})`;
           ctx.lineWidth = 0.7 * scale;
-          ctx.beginPath();
-          ctx.moveTo(pt1.px * scale, pt1.py * scale);
-          ctx.quadraticCurveTo(ptCtrl.px * scale, ptCtrl.py * scale, pt2.px * scale, pt2.py * scale);
           ctx.stroke();
-          
-          // Draw the traveling head (comet) along the arc
-          const t = beam.progress;
-          const x_t = (1-t)*(1-t)*n1.x + 2*(1-t)*t*xc + t*t*n2.x;
-          const y_t = (1-t)*(1-t)*n1.y + 2*(1-t)*t*yc + t*t*n2.y;
-          const z_t = (1-t)*(1-t)*n1.z + 2*(1-t)*t*zc + t*t*n2.z;
-          
-          const ptHead = project(x_t, y_t, z_t);
-          
-          // Bold solid white head dot
-          ctx.fillStyle = '#ffffff';
-          ctx.beginPath();
-          ctx.arc(ptHead.px * scale, ptHead.py * scale, 2.5 * scale, 0, 2 * Math.PI);
-          ctx.fill();
-          
-          // Outer semi-transparent glow ring
-          ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.45})`;
-          ctx.beginPath();
-          ctx.arc(ptHead.px * scale, ptHead.py * scale, 4.2 * scale, 0, 2 * Math.PI);
-          ctx.fill();
         }
       });
       
