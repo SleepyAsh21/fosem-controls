@@ -177,6 +177,86 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }, 100);
 
+  /* --- Services Row Reveal Observer --- */
+  const serviceCards = Array.from(document.querySelectorAll('.services-new-grid .service-new-card'));
+  if (serviceCards.length > 0) {
+    const rows = [];
+    for (let i = 0; i < serviceCards.length; i += 3) {
+      rows.push(serviceCards.slice(i, i + 3));
+    }
+
+    const rowAnimated = Array(rows.length).fill(false);
+
+    const rowObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const card = entry.target;
+          const rowIndex = rows.findIndex(row => row.includes(card));
+          if (rowIndex !== -1 && !rowAnimated[rowIndex]) {
+            rowAnimated[rowIndex] = true;
+            const rowCards = rows[rowIndex];
+            const isEvenRow = rowIndex % 2 === 1; // 0-indexed: Row 0 Odd (L-to-R), Row 1 Even (R-to-L)
+
+            let staggerOrder;
+            if (isEvenRow) {
+              staggerOrder = [2, 1, 0]; // Right card first (index 2), Middle second (index 1), Left third (index 0)
+            } else {
+              staggerOrder = [0, 1, 2]; // Left card first (index 0), Middle second (index 1), Right third (index 2)
+            }
+
+            rowCards.forEach((c, indexInRow) => {
+              const positionInOrder = staggerOrder.indexOf(indexInRow);
+              const delay = positionInOrder * 150; // 150ms delay between cards
+              
+              // Set delay via transitionDelay style property
+              c.style.transitionDelay = `${delay}ms`;
+              c.classList.add('animate-in');
+              
+              // Clean up inline delay after animation finishes so hover has no delay
+              setTimeout(() => {
+                c.style.transitionDelay = '';
+              }, delay + 800);
+
+              rowObserver.unobserve(c);
+            });
+          }
+        }
+      });
+    }, {
+      threshold: 0.25, // trigger when ~25% visible
+      rootMargin: '0px 0px -40px 0px'
+    });
+
+    serviceCards.forEach(card => {
+      rowObserver.observe(card);
+    });
+
+    // Fallback: immediately trigger animation for rows visible on page load
+    setTimeout(() => {
+      rows.forEach((rowCards, rowIndex) => {
+        if (!rowAnimated[rowIndex]) {
+          const firstCard = rowCards[0];
+          const rect = firstCard.getBoundingClientRect();
+          if (rect.top < window.innerHeight && rect.bottom > 0) {
+            rowAnimated[rowIndex] = true;
+            const isEvenRow = rowIndex % 2 === 1;
+            const staggerOrder = isEvenRow ? [2, 1, 0] : [0, 1, 2];
+            rowCards.forEach((c, indexInRow) => {
+              const positionInOrder = staggerOrder.indexOf(indexInRow);
+              const delay = positionInOrder * 150;
+              c.style.transitionDelay = `${delay}ms`;
+              c.classList.add('animate-in');
+              setTimeout(() => {
+                c.style.transitionDelay = '';
+              }, delay + 800);
+              rowObserver.unobserve(c);
+            });
+          }
+        }
+      });
+    }, 150);
+  }
+
   /* --- Stat Counter Observer --- */
   const statNumbers = document.querySelectorAll('.mv-stat-number');
   let statsStarted = false;

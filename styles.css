@@ -1207,6 +1207,63 @@ ul {
   margin: 0;
 }
 
+/* --- Services scroll reveal classes --- */
+.service-new-card.reveal-left {
+  opacity: 0;
+  transform: translateY(36px) translateX(-18px);
+  transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+              transform 700ms cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 300ms cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.service-new-card.reveal-middle {
+  opacity: 0;
+  transform: translateY(36px) translateX(0);
+  transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+              transform 700ms cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 300ms cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.service-new-card.reveal-right {
+  opacity: 0;
+  transform: translateY(36px) translateX(18px);
+  transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+              transform 700ms cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 300ms cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.service-new-card.reveal-left.animate-in,
+.service-new-card.reveal-middle.animate-in,
+.service-new-card.reveal-right.animate-in {
+  opacity: 1;
+  transform: translateY(0) translateX(0);
+}
+
+.service-new-card.animate-in:hover {
+  transform: translateY(-7px) scale(1.008) !important; /* Override reveal state transform */
+  border-color: rgba(0, 174, 239, 0.22);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08), 
+              0 20px 45px rgba(15, 23, 42, 0.10), 
+              0 35px 70px rgba(15, 23, 42, 0.06);
+  transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 300ms cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 300ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: 0ms !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .service-new-card.reveal-left,
+  .service-new-card.reveal-middle,
+  .service-new-card.reveal-right {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
 /* ============================================
    SCROLL ANIMATIONS
    ============================================ */
