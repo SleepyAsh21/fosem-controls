@@ -2508,7 +2508,7 @@ ul {
   }
 
   .logo-img {
-    height: 46px; /* Scaled down logo to prevent wrapping */
+    height: 60px; /* Logo scaled up based on feedback */
   }
 
   .main-nav {
@@ -3900,7 +3900,7 @@ ul {
 .why-us-section,
 .site-footer,
 #solutions-view {
-  content-visibility: auto;
+  content-visibility: visible;
   contain-intrinsic-size: auto 800px;
 }
 
@@ -5134,7 +5134,7 @@ h4.industry-highlight-active {
     min-height: 60vh !important;
     height: auto !important;
   }
-  .hero-carousel {
+  .carousel-wrapper {
     height: 60vh !important;
   }
   .carousel-slide img {
