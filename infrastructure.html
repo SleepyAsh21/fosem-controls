@@ -21,8 +21,10 @@
   <link rel="preload" href="assets/images/new-logo-fixed.webp" as="image">
   <link rel="preload" href="assets/images/engineering_datacenter.webp" as="image">
   
+  <!-- Floating UI Dependency -->
+  <script src="https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.6.12/dist/floating-ui.dom.umd.min.js" defer></script>
   <!-- Deferred Scripts -->
-  <script src="assets/js/main.js?v=5.0" defer></script>
+  <script src="assets/js/main.js?v=6.0" defer></script>
 </head>
 <body>
 
@@ -97,8 +99,7 @@
             </div>
           </div>
         </div>
-
-        <!-- Industries -->
+              <!-- Industries (3-Column Expertise Mega Menu) -->
         <div class="nav-item">
           <span class="nav-link">
             Industries
@@ -106,12 +107,56 @@
               <polyline points="6 9 12 15 18 9"/>
             </svg>
           </span>
-          <div class="dropdown-menu">
-            <a href="index.html#services">Banking</a>
-            <a href="index.html#services">Oil &amp; Gas</a>
-            <a href="index.html#services">Hospitality</a>
-            <a href="index.html#services">Airport / Port</a>
-            <a href="index.html#services">Commercial Property</a>
+          <div class="dropdown-menu mega-menu mega-menu--industries">
+            <div class="mega-menu-header">Industries We Serve</div>
+            <div class="mega-menu-columns">
+
+              <!-- Column 1: Critical & Energy Infrastructure -->
+              <div class="mega-col">
+                <div class="mega-col-header">
+                  <svg class="mega-col-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                  <h5 class="mega-col-title">Critical &amp; Energy</h5>
+                </div>
+                <div class="mega-col-items">
+                  <a href="index.html#expertise">Oil &amp; Gas</a>
+                  <a href="index.html#expertise">Airports &amp; Ports</a>
+                  <a href="index.html#expertise">Data Centers</a>
+                  <a href="index.html#expertise">Network Security &amp; Power</a>
+                </div>
+              </div>
+
+              <!-- Column 2: Commercial & Real Estate -->
+              <div class="mega-col">
+                <div class="mega-col-header">
+                  <svg class="mega-col-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="9" y1="6" x2="9.01" y2="6"></line><line x1="15" y1="6" x2="15.01" y2="6"></line><line x1="9" y1="10" x2="9.01" y2="10"></line><line x1="15" y1="10" x2="15.01" y2="10"></line><line x1="9" y1="14" x2="9.01" y2="14"></line><line x1="15" y1="14" x2="15.01" y2="14"></line><line x1="9" y1="18" x2="9.01" y2="18"></line><line x1="15" y1="18" x2="15.01" y2="18"></line></svg>
+                  <h5 class="mega-col-title">Commercial &amp; Real Estate</h5>
+                </div>
+                <div class="mega-col-items">
+                  <a href="index.html#expertise">Banking</a>
+                  <a href="index.html#expertise">Commercial Properties</a>
+                  <a href="index.html#expertise">High-Rise Developments</a>
+                  <a href="index.html#expertise">Retail</a>
+                  <a href="index.html#expertise">Internet Services</a>
+                  <a href="index.html#expertise">Software</a>
+                  <a href="index.html#expertise">Telecom</a>
+                </div>
+              </div>
+
+              <!-- Column 3: Urban & Civil Infrastructure -->
+              <div class="mega-col">
+                <div class="mega-col-header">
+                  <svg class="mega-col-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                  <h5 class="mega-col-title">Urban &amp; Civil</h5>
+                </div>
+                <div class="mega-col-items">
+                  <a href="index.html#expertise">Urban Surveillance</a>
+                  <a href="index.html#expertise">Traffic &amp; Smart Cities</a>
+                  <a href="index.html#expertise">Civil Infrastructure</a>
+                  <a href="index.html#expertise">Residential Hubs</a>
+                </div>
+              </div>
+
+            </div>
           </div>
         </div>
 

@@ -34,14 +34,58 @@ document.addEventListener('DOMContentLoaded', () => {
     mobileMenuBtn.addEventListener('click', mobileBtnCallback);
   }
 
-  // Mobile dropdown toggles
-  if (window.innerWidth <= 768) {
-    document.querySelectorAll('.nav-item .nav-link').forEach(link => {
-      link.addEventListener('click', () => {
+  // Mobile dropdown toggles (resize-proof)
+  document.querySelectorAll('.nav-item .nav-link').forEach(link => {
+    link.addEventListener('click', () => {
+      if (window.innerWidth <= 1024) {
         link.parentElement.classList.toggle('active');
-      });
+        // Reset any open drill-downs inside this nav-item
+        const drilldown = link.parentElement.querySelector('.drilldown-container');
+        if (drilldown) {
+          drilldown.classList.remove('show-level-2');
+          drilldown.querySelectorAll('.drilldown-level-2').forEach(p => p.classList.remove('active-panel'));
+        }
+      }
     });
-  }
+  });
+
+  // Mobile Drill-Down Logic
+  document.querySelectorAll('.drilldown-item-toggle').forEach(toggle => {
+    toggle.addEventListener('click', (e) => {
+      if (window.innerWidth <= 1024) {
+        e.preventDefault();
+        const targetId = toggle.getAttribute('data-target');
+        const container = toggle.closest('.drilldown-container');
+        const targetPanel = container.querySelector('#' + targetId);
+        
+        container.querySelectorAll('.drilldown-level-2').forEach(panel => {
+          panel.classList.remove('active-panel');
+        });
+        
+        if (targetPanel) {
+          targetPanel.classList.add('active-panel');
+          container.classList.add('show-level-2');
+        }
+      }
+    });
+  });
+
+  document.querySelectorAll('.drilldown-back').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      if (window.innerWidth <= 1024) {
+        e.preventDefault();
+        const container = btn.closest('.drilldown-container');
+        container.classList.remove('show-level-2');
+        setTimeout(() => {
+          if (!container.classList.contains('show-level-2')) {
+            container.querySelectorAll('.drilldown-level-2').forEach(panel => {
+              panel.classList.remove('active-panel');
+            });
+          }
+        }, 300);
+      }
+    });
+  });
 
   // Logo tagline toggle & goHome
   if (logoContainer) {

@@ -1,25 +1,120 @@
-plugins = []
-headers = []
-redirects = []
-
-[functions]
-
-[functions."*"]
+# ============================================
+# FOSEM CONTROLS — Netlify Configuration
+# Maximum Performance & Security Headers
+# ============================================
 
 [build]
-publish = "."
-publishOrigin = "default"
+  publish = "."
+  command = ""
 
-[build.environment]
-
+# ============================================
+# ASSET OPTIMIZATION (Netlify Post-Processing)
+# ============================================
 [build.processing]
+  skip_processing = false
 
 [build.processing.css]
-
-[build.processing.html]
-
-[build.processing.images]
+  bundle = true
+  minify = true
 
 [build.processing.js]
+  bundle = true
+  minify = true
 
-[build.services]
+[build.processing.html]
+  pretty_urls = true
+
+[build.processing.images]
+  compress = true
+
+# ============================================
+# GLOBAL HEADERS — Performance & Security
+# ============================================
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Security Headers
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https://images.unsplash.com data:; connect-src 'self'; frame-ancestors 'self'"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+
+# ============================================
+# IMMUTABLE ASSET CACHING (Images, Fonts, Icons)
+# ============================================
+[[headers]]
+  for = "/assets/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/assets/*.webp"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/assets/*.svg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/assets/*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/assets/*.jpg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# ============================================
+# LONG-LIVED CACHING FOR CSS & JS (versioned via query strings)
+# ============================================
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=2592000, stale-while-revalidate=86400"
+
+[[headers]]
+  for = "/assets/js/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=2592000, stale-while-revalidate=86400"
+
+# ============================================
+# HTML — Short Cache with Revalidation
+# ============================================
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=300, stale-while-revalidate=3600"
+
+[[headers]]
+  for = "/"
+  [headers.values]
+    Cache-Control = "public, max-age=300, stale-while-revalidate=3600"
+
+# ============================================
+# REDIRECTS — Vercel → Netlify Migration
+# ============================================
+[[redirects]]
+  from = "https://fosem-controls.vercel.app/*"
+  to = "https://fosem-controls.netlify.app/:splat"
+  status = 301
+  force = true
+
+# ============================================
+# SPA FALLBACK (for hash-based routing)
+# ============================================
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# ============================================
+# FILE EXCLUSIONS (don't deploy dev-only files)
+# ============================================
+[build.environment]
+  NODE_VERSION = "20"

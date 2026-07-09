@@ -1,0 +1,31 @@
+# Exclude CLI tools, CSV databases, Python scripts, and docs from deployment
+*.csv
+*.py
+*.ts
+*.lock
+package.json
+tsconfig.json
+project.json
+*.md
+*.txt
+.DS_Store
+.git
+.github
+.vercel
+.vercelignore
+tmp/
+node_modules/
+bun.lock
+.agent/
+.agents/
+
+# Exclude unused stylesheets and test scripts
+style.css
+assets/js/test_globe.js
+assets/js/test_globe.cjs
+assets/js/generate_large_data.cjs
+
+# Exclude old/unused assets
+assets/main.js
+
+# Only index.html, styles.css, netlify.toml and the assets/ directory will be deployed

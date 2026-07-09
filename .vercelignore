@@ -1,0 +1,24 @@
+# Exclude all CLI tools, CSV databases, python scripts and documentation from Vercel deployment
+*.csv
+*.py
+*.ts
+*.lock
+package.json
+tsconfig.json
+project.json
+*.md
+*.txt
+.DS_Store
+.git
+.github
+tmp/
+node_modules/
+
+# Exclude unused style sheets and test scripts
+style.css
+assets/js/test_globe.js
+assets/js/test_globe.cjs
+assets/js/generate_large_data.cjs
+
+# Allow only necessary static assets
+# Vercel will still include index.html, styles.css, netlify.toml and the assets/ directory

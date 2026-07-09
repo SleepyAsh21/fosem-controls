@@ -59,18 +59,111 @@
               <polyline points="6 9 12 15 18 9"/>
             </svg>
           </span>
-          <div class="dropdown-menu mega-menu">
-            <div class="mega-menu-header">Products &amp; Solutions</div>
-            <div class="mega-menu-grid">
-              <a href="index.html#security-solutions">Security Solutions</a>
-              <a href="index.html#building-systems">Building Systems</a>
-              <a href="index.html#infrastructure">Infrastructure</a>
-              <a href="index.html#energy">Energy</a>
-              <a href="index.html#mep">MEP</a>
-              <a href="index.html#access-control">Access Control</a>
-              <a href="index.html#fire-safety">Fire Safety</a>
-              <a href="index.html#automation-systems">Automation Systems</a>
-              <a href="index.html#cctv-surveillance">CCTV &amp; Surveillance</a>
+          <div class="dropdown-menu mega-menu drilldown-container">
+            <div class="drilldown-level-1">
+              <div class="mega-menu-header">Products &amp; Solutions</div>
+              <div class="mega-menu-grid">
+                <a href="index.html#security-solutions" class="drilldown-item-toggle" data-target="panel-security">Security Solutions <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a>
+                <a href="index.html#building-systems" class="drilldown-item-toggle" data-target="panel-building">Building Systems <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a>
+                <a href="index.html#infrastructure" class="drilldown-item-toggle" data-target="panel-infrastructure">Infrastructure <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a>
+                <a href="index.html#energy" class="drilldown-item-toggle" data-target="panel-energy">Energy <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a>
+                <a href="index.html#mep" class="drilldown-item-toggle" data-target="panel-mep">MEP <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a>
+                <a href="index.html#access-control" class="drilldown-item-toggle" data-target="panel-access">Access Control <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a>
+                <a href="index.html#fire-safety" class="drilldown-item-toggle" data-target="panel-fire">Fire Safety <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a>
+                <a href="index.html#automation-systems" class="drilldown-item-toggle" data-target="panel-automation">Automation Systems <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a>
+                <a href="index.html#cctv-surveillance" class="drilldown-item-toggle" data-target="panel-cctv">CCTV &amp; Surveillance <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a>
+              </div>
+            </div>
+
+            <!-- Level 2 Panels -->
+            <div class="drilldown-level-2" id="panel-security">
+              <button class="drilldown-back"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg> Back to Products</button>
+              <div class="mega-menu-header">Security Solutions</div>
+              <ul>
+                <li><a href="#">Intrusion Detection</a></li>
+                <li><a href="#">Perimeter Protection</a></li>
+                <li><a href="#">Command Center Integration</a></li>
+              </ul>
+            </div>
+
+            <div class="drilldown-level-2" id="panel-building">
+              <button class="drilldown-back"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg> Back to Products</button>
+              <div class="mega-menu-header">Building Systems</div>
+              <ul>
+                <li><a href="#">HVAC Controls</a></li>
+                <li><a href="#">Lighting Automation</a></li>
+                <li><a href="#">Smart Energy Metering</a></li>
+              </ul>
+            </div>
+
+            <div class="drilldown-level-2" id="panel-infrastructure">
+              <button class="drilldown-back"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg> Back to Products</button>
+              <div class="mega-menu-header">Infrastructure</div>
+              <ul>
+                <li><a href="#">Structured Cabling</a></li>
+                <li><a href="#">Data Center Solutions</a></li>
+                <li><a href="#">Network Hardware</a></li>
+              </ul>
+            </div>
+
+            <div class="drilldown-level-2" id="panel-energy">
+              <button class="drilldown-back"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg> Back to Products</button>
+              <div class="mega-menu-header">Energy</div>
+              <ul>
+                <li><a href="#">Solar Power Systems</a></li>
+                <li><a href="#">Battery Storage</a></li>
+                <li><a href="#">Power Quality Solutions</a></li>
+              </ul>
+            </div>
+
+            <div class="drilldown-level-2" id="panel-mep">
+              <button class="drilldown-back"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg> Back to Products</button>
+              <div class="mega-menu-header">MEP</div>
+              <ul>
+                <li><a href="#">Mechanical Systems</a></li>
+                <li><a href="#">Electrical Distribution</a></li>
+                <li><a href="#">Plumbing & Piping</a></li>
+              </ul>
+            </div>
+
+            <div class="drilldown-level-2" id="panel-access">
+              <button class="drilldown-back"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg> Back to Products</button>
+              <div class="mega-menu-header">Access Control</div>
+              <ul>
+                <li><a href="#">Biometric Systems</a></li>
+                <li><a href="#">Turnstiles & Barriers</a></li>
+                <li><a href="#">Visitor Management</a></li>
+              </ul>
+            </div>
+
+            <div class="drilldown-level-2" id="panel-fire">
+              <button class="drilldown-back"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg> Back to Products</button>
+              <div class="mega-menu-header">Fire Safety</div>
+              <ul>
+                <li><a href="#">Fire Alarms</a></li>
+                <li><a href="#">Suppression Systems</a></li>
+                <li><a href="#">Voice Evacuation</a></li>
+              </ul>
+            </div>
+
+            <div class="drilldown-level-2" id="panel-automation">
+              <button class="drilldown-back"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg> Back to Products</button>
+              <div class="mega-menu-header">Automation Systems</div>
+              <ul>
+                <li><a href="#">Industrial Automation</a></li>
+                <li><a href="#">PLC & SCADA</a></li>
+                <li><a href="#">IoT Integrations</a></li>
+              </ul>
+            </div>
+
+            <div class="drilldown-level-2" id="panel-cctv">
+              <button class="drilldown-back"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg> Back to Products</button>
+              <div class="mega-menu-header">CCTV &amp; Surveillance</div>
+              <ul>
+                <li><a href="#">IP Cameras</a></li>
+                <li><a href="#">Video Analytics</a></li>
+                <li><a href="#">NVR Storage Solutions</a></li>
+              </ul>
             </div>
           </div>
         </div>
@@ -382,101 +475,110 @@
       <div class="services-new-grid" role="grid">
 
         <!-- CARD 1 -->
-        <div id="service-design" class="service-new-card reveal-left" role="gridcell">
+        <div id="service-design" class="service-new-card reveal-left expandable-card" role="gridcell" onclick="this.classList.toggle('expanded')">
           <div class="service-card-image-wrapper">
             <img src="assets/images/service-design.webp?v=2" alt="End-to-End System Design" loading="lazy" width="800" height="450" decoding="async">
           </div>
           <div class="service-card-content">
             <h3 class="service-card-title">End-to-End System Design</h3>
-            <p class="service-card-desc">Integrated control solutions designed for seamless performance and long-term scalability. We engineer highly redundant systems for security, automation, and extra-low-voltage (ELV) requirements.</p>
+            <p class="service-card-desc line-clamp-3">Integrated control solutions designed for seamless performance and long-term scalability. We engineer highly redundant systems for security, automation, and extra-low-voltage (ELV) requirements.</p>
+            <div class="read-more-label">Tap to read more</div>
           </div>
         </div>
 
         <!-- CARD 2 -->
-        <div id="service-procurement" class="service-new-card reveal-middle" role="gridcell">
+        <div id="service-procurement" class="service-new-card reveal-middle expandable-card" role="gridcell" onclick="this.classList.toggle('expanded')">
           <div class="service-card-image-wrapper">
             <img src="assets/images/service-procurement.webp?v=2" alt="Procurement" loading="lazy" width="800" height="450" decoding="async">
           </div>
           <div class="service-card-content">
             <h3 class="service-card-title">Procurement</h3>
-            <p class="service-card-desc">Reliable sourcing of quality components aligned with project needs and timelines.</p>
+            <p class="service-card-desc line-clamp-3">Reliable sourcing of quality components aligned with project needs and timelines.</p>
+            <div class="read-more-label">Tap to read more</div>
           </div>
         </div>
 
         <!-- CARD 3 -->
-        <div id="service-installation" class="service-new-card reveal-right" role="gridcell">
+        <div id="service-installation" class="service-new-card reveal-right expandable-card" role="gridcell" onclick="this.classList.toggle('expanded')">
           <div class="service-card-image-wrapper">
             <img src="assets/images/service-installation.webp?v=2" alt="Installation" loading="lazy" width="800" height="450" decoding="async">
           </div>
           <div class="service-card-content">
             <h3 class="service-card-title">Installation</h3>
-            <p class="service-card-desc">Professional system installation carried out with precision, safety, and efficiency.</p>
+            <p class="service-card-desc line-clamp-3">Professional system installation carried out with precision, safety, and efficiency.</p>
+            <div class="read-more-label">Tap to read more</div>
           </div>
         </div>
 
         <!-- CARD 4 -->
-        <div id="service-programming" class="service-new-card reveal-left" role="gridcell">
+        <div id="service-programming" class="service-new-card reveal-left expandable-card" role="gridcell" onclick="this.classList.toggle('expanded')">
           <div class="service-card-image-wrapper">
             <img src="assets/images/service-programming.webp?v=2" alt="Programming & Configuration" loading="lazy" width="800" height="450" decoding="async">
           </div>
           <div class="service-card-content">
             <h3 class="service-card-title">Programming &amp; Configuration</h3>
-            <p class="service-card-desc">Customized programming and system setup optimized for smooth operation and control. We write code and configure devices for high-value building automation platforms (BMS), CCTV cameras, and biometrics control.</p>
+            <p class="service-card-desc line-clamp-3">Customized programming and system setup optimized for smooth operation and control. We write code and configure devices for high-value building automation platforms (BMS), CCTV cameras, and biometrics control.</p>
+            <div class="read-more-label">Tap to read more</div>
           </div>
         </div>
 
         <!-- CARD 5 -->
-        <div id="service-commissioning" class="service-new-card reveal-middle" role="gridcell">
+        <div id="service-commissioning" class="service-new-card reveal-middle expandable-card" role="gridcell" onclick="this.classList.toggle('expanded')">
           <div class="service-card-image-wrapper">
             <img src="assets/images/service-commissioning.webp?v=2" alt="Project Commissioning" loading="lazy" width="800" height="450" decoding="async">
           </div>
           <div class="service-card-content">
             <h3 class="service-card-title">Project Commissioning</h3>
-            <p class="service-card-desc">Detailed testing and system verification to ensure everything performs as intended.</p>
+            <p class="service-card-desc line-clamp-3">Detailed testing and system verification to ensure everything performs as intended.</p>
+            <div class="read-more-label">Tap to read more</div>
           </div>
         </div>
 
         <!-- CARD 6 -->
-        <div id="service-integration" class="service-new-card reveal-right" role="gridcell">
+        <div id="service-integration" class="service-new-card reveal-right expandable-card" role="gridcell" onclick="this.classList.toggle('expanded')">
           <div class="service-card-image-wrapper">
             <img src="assets/images/service-integration.webp?v=2" alt="Systems Integration" loading="lazy" width="800" height="450" decoding="async">
           </div>
           <div class="service-card-content">
             <h3 class="service-card-title">Systems Integration</h3>
-            <p class="service-card-desc">Connected technologies unified into one intelligent and efficient operating system.</p>
+            <p class="service-card-desc line-clamp-3">Connected technologies unified into one intelligent and efficient operating system.</p>
+            <div class="read-more-label">Tap to read more</div>
           </div>
         </div>
 
         <!-- CARD 7 -->
-        <div id="service-management" class="service-new-card reveal-left" role="gridcell">
+        <div id="service-management" class="service-new-card reveal-left expandable-card" role="gridcell" onclick="this.classList.toggle('expanded')">
           <div class="service-card-image-wrapper">
             <img src="assets/images/service-management.webp?v=2" alt="Project Management & Oversight" loading="lazy" width="800" height="450" decoding="async">
           </div>
           <div class="service-card-content">
             <h3 class="service-card-title">Project Management &amp; Oversight</h3>
-            <p class="service-card-desc">Coordinated execution and supervision to keep projects efficient and on schedule.</p>
+            <p class="service-card-desc line-clamp-3">Coordinated execution and supervision to keep projects efficient and on schedule.</p>
+            <div class="read-more-label">Tap to read more</div>
           </div>
         </div>
 
         <!-- CARD 8 -->
-        <div id="service-maintenance" class="service-new-card reveal-middle" role="gridcell">
+        <div id="service-maintenance" class="service-new-card reveal-middle expandable-card" role="gridcell" onclick="this.classList.toggle('expanded')">
           <div class="service-card-image-wrapper">
             <img src="assets/images/service-maintenance.webp?v=2" alt="Maintenance" loading="lazy" width="800" height="450" decoding="async">
           </div>
           <div class="service-card-content">
             <h3 class="service-card-title">Maintenance</h3>
-            <p class="service-card-desc">Ongoing technical support and servicing to maintain consistent system reliability.</p>
+            <p class="service-card-desc line-clamp-3">Ongoing technical support and servicing to maintain consistent system reliability.</p>
+            <div class="read-more-label">Tap to read more</div>
           </div>
         </div>
 
         <!-- CARD 9 -->
-        <div id="service-consulting" class="service-new-card reveal-right" role="gridcell">
+        <div id="service-consulting" class="service-new-card reveal-right expandable-card" role="gridcell" onclick="this.classList.toggle('expanded')">
           <div class="service-card-image-wrapper">
             <img src="assets/images/service-consulting.webp?v=2" alt="Consulting" loading="lazy" width="800" height="450" decoding="async">
           </div>
           <div class="service-card-content">
             <h3 class="service-card-title">Consulting</h3>
-            <p class="service-card-desc">Expert technical guidance focused on practical solutions and smarter planning.</p>
+            <p class="service-card-desc line-clamp-3">Expert technical guidance focused on practical solutions and smarter planning.</p>
+            <div class="read-more-label">Tap to read more</div>
           </div>
         </div>
 
