@@ -38,7 +38,38 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.nav-item .nav-link').forEach(link => {
     link.addEventListener('click', () => {
       if (window.innerWidth <= 1024) {
-        link.parentElement.classList.toggle('active');
+        if (link.textContent.includes('Products & Solutions')) {
+          const homeView = document.getElementById('home-view');
+          const solView = document.getElementById('solutions-view');
+          
+          if (homeView && solView) {
+            // Close mobile menu
+            document.getElementById('main-nav')?.classList.remove('active', 'open');
+            document.getElementById('mobile-menu-btn')?.classList.remove('active');
+            
+            // Navigate to solutions list (remove detail-active if present)
+            document.querySelector('.sol-layout-wrapper')?.classList.remove('detail-active');
+            
+            homeView.style.opacity = '0';
+            setTimeout(() => {
+              homeView.classList.add('view-hidden');
+              solView.classList.remove('view-hidden');
+              void solView.offsetWidth;
+              solView.style.opacity = '1';
+              
+              // Clear active selection in sidebar
+              document.querySelectorAll('.sol-nav-btn').forEach(btn => btn.classList.remove('active'));
+              window.fosemApp.currentSolution = null;
+            }, 300);
+            
+            // Update hash
+            window.history.pushState(null, '', '#solutions-list');
+          } else {
+            window.location.href = 'index.html#solutions-list';
+          }
+        } else {
+          link.parentElement.classList.toggle('active');
+        }
       }
     });
   });
@@ -637,6 +668,9 @@ Object.assign(window.fosemApp, {
     document.getElementById('main-nav')?.classList.remove('active');
     document.getElementById('main-nav')?.classList.remove('open');
     document.getElementById('mobile-menu-btn')?.classList.remove('active');
+    
+    // Add detail-active for mobile master-detail layout
+    document.querySelector('.sol-layout-wrapper')?.classList.add('detail-active');
   },
 
   goHome: function() {
@@ -647,6 +681,9 @@ Object.assign(window.fosemApp, {
     if (window.location.hash) {
       window.history.pushState(null, '', window.location.pathname + window.location.search);
     }
+    
+    // Reset mobile detail view state
+    document.querySelector('.sol-layout-wrapper')?.classList.remove('detail-active');
     
     if (solView && !solView.classList.contains('view-hidden')) {
       solView.style.opacity = '0';
@@ -941,12 +978,38 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Mobile Back to List button
+  const mobileBackBtn = document.getElementById('sol-mobile-back');
+  if (mobileBackBtn) {
+    mobileBackBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.querySelector('.sol-layout-wrapper')?.classList.remove('detail-active');
+      window.history.pushState(null, '', '#solutions-list');
+    });
+  }
+
   // Deep linking: load solution or scroll to service if hash is present on load
   const loadHashSolution = () => {
     const hash = window.location.hash;
     if (hash) {
       const solutionKey = hash.substring(1);
-      if (solutionsData[solutionKey]) {
+      if (solutionKey === 'solutions-list') {
+        const homeView = document.getElementById('home-view');
+        const solView = document.getElementById('solutions-view');
+        if (homeView && solView) {
+          homeView.style.opacity = '0';
+          setTimeout(() => {
+            homeView.classList.add('view-hidden');
+            solView.classList.remove('view-hidden');
+            void solView.offsetWidth;
+            solView.style.opacity = '1';
+            document.querySelector('.sol-layout-wrapper')?.classList.remove('detail-active');
+            // Close mobile menu if open
+            document.getElementById('main-nav')?.classList.remove('active', 'open');
+            document.getElementById('mobile-menu-btn')?.classList.remove('active');
+          }, 300);
+        }
+      } else if (solutionsData[solutionKey]) {
         window.fosemApp.loadSolution(solutionKey);
       } else if (solutionKey.startsWith('service-')) {
         setTimeout(() => {
@@ -963,7 +1026,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const hash = window.location.hash;
     if (hash) {
       const solutionKey = hash.substring(1);
-      if (solutionsData[solutionKey]) {
+      if (solutionKey === 'solutions-list') {
+        loadHashSolution(); // Reuse the same logic
+      } else if (solutionsData[solutionKey]) {
         window.fosemApp.loadSolution(solutionKey);
       } else if (solutionKey.startsWith('service-')) {
         window.fosemApp.scrollToAndFocus(solutionKey);

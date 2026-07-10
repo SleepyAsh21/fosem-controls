@@ -2657,8 +2657,8 @@ ul {
 
   .mega-menu-grid {
     display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 4px !important;
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
   }
 
   /* Industries mega menu — mobile stacking */
@@ -3962,6 +3962,7 @@ ul {
 
 /* Optimize default page scroll physics and add safe top offset */
 html {
+  scroll-padding-top: 80px;
 }
 
 .expertise-sub-item {
@@ -5137,16 +5138,16 @@ h4.industry-highlight-active {
 /* Fix Hero mobile height and image fit */
 @media (max-width: 1024px) {
   .hero-section {
-    min-height: 60vh !important;
+    min-height: 50vh !important;
     height: auto !important;
   }
   .carousel-wrapper {
-    height: 60vh !important;
+    height: 50vh !important;
   }
   .carousel-slide img {
-    height: 60vh !important;
+    height: 50vh !important;
     object-fit: cover !important;
-    object-position: 75% center !important;
+    object-position: center center !important;
   }
   /* Fix Mission Stats 3x3 layout */
   .mv-stats {
