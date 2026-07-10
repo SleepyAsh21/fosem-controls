@@ -68,6 +68,12 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = 'index.html#solutions-list';
           }
         } else {
+          // Close other open dropdowns
+          document.querySelectorAll('.nav-item').forEach(item => {
+            if (item !== link.parentElement) {
+              item.classList.remove('active');
+            }
+          });
           link.parentElement.classList.toggle('active');
         }
       }
@@ -854,6 +860,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (mobileMenuBtn) {
           mobileMenuBtn.classList.remove('active');
         }
+        document.querySelectorAll('.nav-item').forEach(item => {
+          item.classList.remove('active');
+        });
         
         const parentMenu = link.closest('.dropdown-menu');
         if (parentMenu) {
