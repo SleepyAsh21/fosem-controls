@@ -38,44 +38,13 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.nav-item .nav-link').forEach(link => {
     link.addEventListener('click', () => {
       if (window.innerWidth <= 1024) {
-        if (link.textContent.includes('Products & Solutions')) {
-          const homeView = document.getElementById('home-view');
-          const solView = document.getElementById('solutions-view');
-          
-          if (homeView && solView) {
-            // Close mobile menu
-            document.getElementById('main-nav')?.classList.remove('active', 'open');
-            document.getElementById('mobile-menu-btn')?.classList.remove('active');
-            
-            // Navigate to solutions list (remove detail-active if present)
-            document.querySelector('.sol-layout-wrapper')?.classList.remove('detail-active');
-            
-            homeView.style.opacity = '0';
-            setTimeout(() => {
-              homeView.classList.add('view-hidden');
-              solView.classList.remove('view-hidden');
-              void solView.offsetWidth;
-              solView.style.opacity = '1';
-              
-              // Clear active selection in sidebar
-              document.querySelectorAll('.sol-nav-btn').forEach(btn => btn.classList.remove('active'));
-              window.fosemApp.currentSolution = null;
-            }, 300);
-            
-            // Update hash
-            window.history.pushState(null, '', '#solutions-list');
-          } else {
-            window.location.href = 'index.html#solutions-list';
+        // Close other open dropdowns
+        document.querySelectorAll('.nav-item').forEach(item => {
+          if (item !== link.parentElement) {
+            item.classList.remove('active');
           }
-        } else {
-          // Close other open dropdowns
-          document.querySelectorAll('.nav-item').forEach(item => {
-            if (item !== link.parentElement) {
-              item.classList.remove('active');
-            }
-          });
-          link.parentElement.classList.toggle('active');
-        }
+        });
+        link.parentElement.classList.toggle('active');
       }
     });
   });
