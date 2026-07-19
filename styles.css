@@ -134,7 +134,7 @@ ul {
 }
 
 .logo-img {
-  height: 54px; /* Standard premium logo height */
+  height: 80px; /* Standard premium logo height */
   width: auto;
   display: block;
   transition: transform var(--transition-fast);
@@ -2518,7 +2518,7 @@ ul {
   }
 
   .logo-img {
-    height: 60px; /* Logo scaled up based on feedback */
+    height: 70px; /* Logo scaled up based on feedback */
   }
 
   .main-nav {
@@ -2574,7 +2574,7 @@ ul {
   .main-nav {
     display: none;
     position: fixed;
-    top: 64px; /* Fix gap below mobile header */
+    top: 80px; /* Fix gap below mobile header */
     left: 0;
     right: 0;
     transform: none;
@@ -2598,7 +2598,7 @@ ul {
   }
   
   .hero-section {
-    margin-top: 64px !important; /* Match mobile header height */
+    margin-top: 80px !important; /* Match mobile header height */
   }
 
   .header-actions {
@@ -2900,7 +2900,7 @@ ul {
   }
 
   .logo-img {
-    height: 44px;
+    height: 60px;
   }
 
   .carousel-wrapper {
@@ -4749,7 +4749,7 @@ h4.industry-highlight-active {
   }
 
   .logo-img {
-    height: 38px;
+    height: 50px;
   }
 
   /* Hero */
