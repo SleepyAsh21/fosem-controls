@@ -134,7 +134,7 @@ ul {
 }
 
 .logo-img {
-  height: 120px; /* Standard premium logo height */
+  height: 180px; /* Standard premium logo height */
   width: auto;
   display: block;
   transition: transform var(--transition-fast);
@@ -623,7 +623,7 @@ ul {
   background-image: url('assets/images/blueprint-bg.png');
   background-size: cover;
   background-position: center;
-  margin-top: 120px; /* Aligned exactly to typical desktop header height to prevent white gap */
+  margin-top: 180px; /* Aligned exactly to typical desktop header height to prevent white gap */
 }
 
 .carousel-wrapper {
@@ -3214,7 +3214,7 @@ ul {
   background-color: #ffffff;
   color: var(--text-body);
   /* The header is fixed, so add padding */
-  padding-top: 120px; 
+  padding-top: 180px; 
   min-height: 100vh;
 }
 
@@ -3887,7 +3887,7 @@ ul {
 
 /* Optimize default page scroll physics and add safe top offset */
 html {
-  scroll-padding-top: 120px;
+  scroll-padding-top: 180px;
 }
 
 .expertise-sub-item {
@@ -5087,26 +5087,15 @@ h4.industry-highlight-active {
 
 /* Desktop Dropdown positioning */
 @media (min-width: 1025px) {
+  .nav-item .dropdown-menu {
+    left: 50%;
+    transform: translateX(-50%) translateY(8px); /* Center align relative to the nav item */
+  }
   .nav-item:hover .dropdown-menu {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
-    transform: translateY(0);
-  }
-  .nav-item:nth-child(1) .dropdown-menu.mega-menu {
-    left: 0;
-  }
-  .nav-item:nth-child(2) .dropdown-menu.mega-menu {
-    left: 50%;
-    transform: translateX(-50%);
-  }
-  .nav-item:nth-child(3) .dropdown-menu {
-    right: 0;
-    left: auto;
-  }
-  .nav-item:nth-child(4) .dropdown-menu {
-    right: 0;
-    left: auto;
+    transform: translateX(-50%) translateY(0); /* Preserve centering on hover! */
   }
 }
 
