@@ -134,7 +134,7 @@ ul {
 }
 
 .logo-img {
-  height: 80px; /* Standard premium logo height */
+  height: 120px; /* Standard premium logo height */
   width: auto;
   display: block;
   transition: transform var(--transition-fast);
@@ -623,7 +623,7 @@ ul {
   background-image: url('assets/images/blueprint-bg.png');
   background-size: cover;
   background-position: center;
-  margin-top: 80px; /* Aligned exactly to typical desktop header height to prevent white gap */
+  margin-top: 120px; /* Aligned exactly to typical desktop header height to prevent white gap */
 }
 
 .carousel-wrapper {
@@ -2601,6 +2601,14 @@ ul {
     margin-top: 80px !important; /* Match mobile header height */
   }
 
+  #solutions-view {
+    padding-top: 80px !important;
+  }
+
+  html {
+    scroll-padding-top: 80px !important;
+  }
+
   .header-actions {
     display: none; /* Hide premium CTA on small screens if desired to clean up header, or show minimally */
   }
@@ -3206,7 +3214,7 @@ ul {
   background-color: #ffffff;
   color: var(--text-body);
   /* The header is fixed, so add padding */
-  padding-top: 80px; 
+  padding-top: 120px; 
   min-height: 100vh;
 }
 
@@ -3879,7 +3887,7 @@ ul {
 
 /* Optimize default page scroll physics and add safe top offset */
 html {
-  scroll-padding-top: 80px;
+  scroll-padding-top: 120px;
 }
 
 .expertise-sub-item {
