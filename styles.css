@@ -1487,6 +1487,10 @@ ul {
    Dropdown visibility is controlled by navigation.js. Keeping hover and
    focus-within out of the final state prevents a selected menu from lingering.
    ============================================ */
+.main-nav .dropdown-menu[hidden] {
+  display: none !important;
+}
+
 @media (min-width: 769px) {
   .main-nav .nav-item:not(.active):not(.is-open) > .dropdown-menu {
     opacity: 0 !important;

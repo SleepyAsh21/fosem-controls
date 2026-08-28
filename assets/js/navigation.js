@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const menuId = menu.id || `nav-menu-${index + 1}`;
     menu.id = menuId;
+    menu.hidden = true;
     trigger.setAttribute('aria-haspopup', 'true');
     trigger.setAttribute('aria-controls', menuId);
     trigger.setAttribute('aria-expanded', 'false');
@@ -40,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
     item.classList.toggle('is-open', open);
     trigger?.setAttribute('aria-expanded', String(open));
     menu?.classList.toggle('is-open', open);
+    if (menu) menu.hidden = !open;
   };
 
   const closeDropdowns = ({ focusTrigger = false } = {}) => {
