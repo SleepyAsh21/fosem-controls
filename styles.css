@@ -614,12 +614,7 @@ ul {
   padding: 48px 0;
   color: #fff;
   overflow: hidden;
-  background-color: #070C18; /* Solid fallback */
-  background-image: 
-    linear-gradient(rgba(7, 12, 24, 0.85), rgba(7, 12, 24, 0.95)),
-    url('assets/images/services-bg.jpg');
-  background-size: cover;
-  background-position: center;
+  background-color: #070C18;
 }
 
 .hero-section {
