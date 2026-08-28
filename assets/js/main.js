@@ -836,30 +836,11 @@ Object.assign(window.fosemApp, {
           </div>
         </section>
 
-        <!-- 3. What We Deliver -->
-        <section class="sol-section sol-section--deliverables fade-up">
-          <div class="sol-section-heading">
-            <h2 class="sol-section-title">What We Deliver</h2>
-            <p>Every component is engineered as part of one coordinated, maintainable solution.</p>
-          </div>
-          <div class="sol-deliverables-grid" role="list">
-            ${data.deliverables.map((d, index) => `
-              <article class="sol-deliverable fade-up" role="listitem" style="--stagger: ${(index % 3 + 1) * 100}ms">
-                <span class="sol-deliverable-icon" aria-hidden="true">${inlineSolutionIcon(d.title)}</span>
-                <div class="sol-deliverable-copy">
-                  <h3>${d.title}</h3>
-                  <p>${d.desc}</p>
-                </div>
-              </article>
-            `).join('')}
-          </div>
-        </section>
-
-        <!-- 4. Consultation -->
+        <!-- 3. Consultation -->
         <section class="sol-consultation fade-up">
           <div class="sol-consultation-copy">
             <h2 class="sol-consultation-title">Ready to discuss your project?</h2>
-            <p>Talk with our engineering team to design a solution tailored to your requirements.</p>
+            <p>Bring us your brief. Our engineering team will shape it into a coordinated solution tailored to your requirements.</p>
           </div>
           <div class="sol-consultation-actions">
             <a href="mailto:engineering@fosemcontrols.com" class="sol-btn-primary">Request Consultation<span class="sol-arrow-icon" aria-hidden="true">→</span></a>
