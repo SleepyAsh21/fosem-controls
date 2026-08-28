@@ -750,11 +750,11 @@ solutionsData['it-structural-cabling'] = {
 
 /* Curated solution photography gives each service a clear, real-world context. */
 const solutionHeroImages = {
-  'security-integrated-solutions': 'assets/images/integrated_security_ecosystem.webp',
-  'mep': 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1400&q=85',
+  'security-integrated-solutions': 'assets/images/security-integrated-solutions-2026.jpg',
+  'mep': 'assets/images/mep-2026.jpg',
   'renewable-energy': 'https://images.unsplash.com/photo-1514488034139-5905ab173d22?auto=format&fit=crop&w=1400&q=85',
-  'vehicles-management-system': 'https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=1400&q=85',
-  'it-structural-cabling': 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1400&q=85'
+  'vehicles-management-system': 'assets/images/vehicles-management-system-2026.jpg',
+  'it-structural-cabling': 'assets/images/it-structural-cabling-2026.jpg'
 };
 
 Object.entries(solutionHeroImages).forEach(([solutionKey, imageUrl]) => {
