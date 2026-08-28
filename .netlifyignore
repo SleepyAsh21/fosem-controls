@@ -18,6 +18,17 @@ node_modules/
 bun.lock
 .agent/
 .agents/
+test_env/
+
+# Local QA scripts and screenshots
+*.cjs
+test_dom.js
+fix_html.js
+desktop-home.png
+mobile-home.png
+mobile-menu-*.png
+mobile-view.png
+tmp_*.png
 
 # Exclude unused stylesheets and test scripts
 style.css
@@ -27,5 +38,17 @@ assets/js/generate_large_data.cjs
 
 # Exclude old/unused assets
 assets/main.js
+assets/js/main_backup.js
+assets/images/new-logo-fixed.png
+assets/images/service-installation.png
+assets/images/service-installation-field.jpg
+assets/images/slide7-fire-safety.jpg
+assets/images/slide8-smart-vehicle-management.jpg
+assets/icon_critical_infra.webp
+assets/icon_commercial_real_estate.webp
+assets/icon_urban_civil.webp
+assets/alcea-assa-abloy.png
+assets/control_room.webp
+assets/genetec.webp
 
 # Only index.html, styles.css, netlify.toml and the assets/ directory will be deployed

@@ -1,15 +1,17 @@
 const fs = require('fs');
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
-
 const html = fs.readFileSync('index.html', 'utf8');
-const dom = new JSDOM(html);
-const document = dom.window.document;
 
-const industriesSpan = Array.from(document.querySelectorAll('.nav-link')).find(el => el.textContent.includes('Industries'));
-if (!industriesSpan) {
-  console.log("Industries link not found");
-} else {
-  const dropdown = industriesSpan.nextElementSibling;
-  console.log("Industries dropdown classes:", dropdown ? dropdown.className : "No dropdown found");
-}
+const virtualConsole = new jsdom.VirtualConsole();
+virtualConsole.on("error", (e) => {
+  console.log("VirtualConsole Error:", e);
+});
+virtualConsole.on("jsdomError", (e) => {
+  console.log("JSDOM Error:", e.message, e.detail);
+});
+
+const dom = new JSDOM(html, { runScripts: "dangerously", resources: "usable", virtualConsole });
+setTimeout(() => {
+  console.log("Done checking with console!");
+}, 1000);

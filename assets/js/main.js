@@ -11,6 +11,26 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Upgrade the visual navigation labels to real, keyboard-operable controls.
+  document.querySelectorAll('.nav-item > .nav-link').forEach((trigger, index) => {
+    const menu = trigger.parentElement?.querySelector('.dropdown-menu');
+    if (!menu) return;
+
+    let control = trigger;
+    if (trigger.tagName !== 'BUTTON') {
+      control = document.createElement('button');
+      control.type = 'button';
+      control.className = trigger.className;
+      control.innerHTML = trigger.innerHTML;
+      trigger.replaceWith(control);
+    }
+
+    const menuId = menu.id || `nav-menu-${index + 1}`;
+    menu.id = menuId;
+    control.setAttribute('aria-haspopup', 'true');
+    control.setAttribute('aria-controls', menuId);
+    control.setAttribute('aria-expanded', 'false');
+  });
   
   /* --- Navigation & Header --- */
   const header = document.getElementById('site-header');
@@ -19,6 +39,26 @@ document.addEventListener('DOMContentLoaded', () => {
   const logoContainer = document.getElementById('logo-container');
   const logoTagline = document.getElementById('logo-tagline');
 
+  const setMobileMenuOpen = (isOpen, { returnFocus = false } = {}) => {
+    if (!mainNav || !mobileMenuBtn) return;
+    mainNav.classList.toggle('active', isOpen);
+    mainNav.classList.toggle('open', isOpen);
+    mobileMenuBtn.classList.toggle('active', isOpen);
+    mobileMenuBtn.setAttribute('aria-expanded', String(isOpen));
+    mobileMenuBtn.setAttribute('aria-label', isOpen ? 'Close navigation menu' : 'Open navigation menu');
+    document.body.classList.toggle('nav-open', isOpen && window.innerWidth <= 768);
+    if (returnFocus) mobileMenuBtn.focus();
+  };
+  if (!window.fosemApp) window.fosemApp = {};
+  window.fosemApp.setMobileMenuOpen = setMobileMenuOpen;
+
+  if (mobileMenuBtn && mainNav) {
+    mobileMenuBtn.type = 'button';
+    mobileMenuBtn.setAttribute('aria-controls', mainNav.id || 'main-nav');
+    mobileMenuBtn.setAttribute('aria-expanded', 'false');
+    mobileMenuBtn.setAttribute('aria-label', 'Open navigation menu');
+  }
+
   // Scroll transparency & shadow
   window.addEventListener('scroll', () => {
     header.classList.toggle('scrolled', window.scrollY > 20);
@@ -26,43 +66,65 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Mobile menu toggle
   if (mobileMenuBtn) {
-    const mobileBtnCallback = () => {
-      mainNav.classList.toggle('active'); // CSS might use .open or .active, let's keep both for safety
-      mainNav.classList.toggle('open');
-      mobileMenuBtn.classList.toggle('active');
-    };
+    const mobileBtnCallback = () => setMobileMenuOpen(mobileMenuBtn.getAttribute('aria-expanded') !== 'true');
     mobileMenuBtn.addEventListener('click', mobileBtnCallback);
   }
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 768 && mobileMenuBtn?.getAttribute('aria-expanded') === 'true') {
+      setMobileMenuOpen(false);
+    }
+  }, { passive: true });
 
   // Mobile dropdown toggles
   document.querySelectorAll('.nav-item .nav-link').forEach(link => {
     link.addEventListener('click', () => {
-      if (window.innerWidth <= 1024) {
-        // Close other open dropdowns
-        document.querySelectorAll('.nav-item').forEach(item => {
-          if (item !== link.parentElement) {
-            item.classList.remove('active');
-          }
-        });
-        link.parentElement.classList.toggle('active');
-      }
+      const currentItem = link.parentElement;
+      const currentMenu = currentItem.querySelector('.dropdown-menu');
+      const nextState = link.getAttribute('aria-expanded') !== 'true';
+
+      document.querySelectorAll('.nav-item').forEach(item => {
+        const trigger = item.querySelector(':scope > .nav-link');
+        const menu = item.querySelector(':scope > .dropdown-menu');
+        const isCurrent = item === currentItem && nextState;
+        item.classList.toggle('active', isCurrent);
+        item.classList.toggle('is-open', isCurrent);
+        trigger?.setAttribute('aria-expanded', String(isCurrent));
+        if (isCurrent) menu?.classList.remove('force-closed', 'de-emphasized');
+      });
+    });
+
+    link.addEventListener('keydown', (event) => {
+      if (event.key !== 'ArrowDown') return;
+      event.preventDefault();
+      if (link.getAttribute('aria-expanded') !== 'true') link.click();
+      link.parentElement?.querySelector('.dropdown-menu a')?.focus();
     });
   });
 
   // Logo tagline toggle & goHome
   if (logoContainer) {
-    logoContainer.style.cursor = 'pointer';
-    let taglineVisible = false;
-    logoContainer.addEventListener('click', (e) => {
+    logoContainer.removeAttribute('onclick');
+    logoContainer.removeAttribute('style');
+    logoContainer.setAttribute('role', 'link');
+    logoContainer.setAttribute('tabindex', '0');
+    logoContainer.setAttribute('aria-label', 'Fosem Controls home');
+    const activateLogo = (event) => {
+      event.preventDefault();
+      const homeView = document.getElementById('home-view');
       const solView = document.getElementById('solutions-view');
-      if (solView && !solView.classList.contains('view-hidden')) {
-        e.preventDefault();
-        window.fosemApp.goHome();
-      } else if (logoTagline) {
-        taglineVisible = !taglineVisible;
-        logoTagline.classList.toggle('visible', taglineVisible);
+      if (homeView && solView) {
+        if (!solView.classList.contains('view-hidden')) window.fosemApp.goHome();
+        else window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        window.location.href = 'index.html';
       }
+    };
+    logoContainer.addEventListener('click', activateLogo);
+    logoContainer.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') activateLogo(event);
     });
+    logoTagline?.setAttribute('aria-hidden', 'true');
   }
 
   /* --- Hero Carousel --- */
@@ -74,12 +136,28 @@ document.addEventListener('DOMContentLoaded', () => {
   
   let currentSlideIndex = 0;
   let carouselInterval = null;
+  let carouselPreloadTimer = null;
+  let carouselIsVisible = true;
   const totalSlides = slides.length;
+  const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  function hydrateSlide(index) {
+    if (!totalSlides) return;
+    const normalizedIndex = (index + totalSlides) % totalSlides;
+    const image = slides[normalizedIndex]?.querySelector('img[data-src]');
+    if (!image) return;
+    if (image.dataset.srcset) image.srcset = image.dataset.srcset;
+    image.src = image.dataset.src;
+    image.removeAttribute('data-src');
+    image.removeAttribute('data-srcset');
+  }
 
   function updateCarousel(index) {
     // Wrap around
     if (index < 0) index = totalSlides - 1;
     if (index >= totalSlides) index = 0;
+
+    hydrateSlide(index);
     
     currentSlideIndex = index;
 
@@ -90,21 +168,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Update active states
     slides.forEach((slide, i) => {
-      slide.classList.toggle('active', i === currentSlideIndex);
+      const isActive = i === currentSlideIndex;
+      slide.classList.toggle('active', isActive);
+      slide.setAttribute('aria-hidden', String(!isActive));
     });
     
     dots.forEach((dot, i) => {
-      dot.classList.toggle('active', i === currentSlideIndex);
+      const isActive = i === currentSlideIndex;
+      dot.classList.toggle('active', isActive);
+      if (isActive) dot.setAttribute('aria-current', 'true');
+      else dot.removeAttribute('aria-current');
     });
   }
 
   function startAuto() {
     stopAuto();
-    carouselInterval = setInterval(() => updateCarousel(currentSlideIndex + 1), 8000);
+    if (totalSlides <= 1 || reducedMotionQuery.matches || document.hidden || !carouselIsVisible) return;
+    const nextIndex = (currentSlideIndex + 1) % totalSlides;
+    carouselPreloadTimer = window.setTimeout(() => hydrateSlide(nextIndex), 5000);
+    carouselInterval = window.setTimeout(() => {
+      updateCarousel(nextIndex);
+      startAuto();
+    }, 8000);
   }
 
   function stopAuto() {
-    if (carouselInterval) clearInterval(carouselInterval);
+    if (carouselInterval) clearTimeout(carouselInterval);
+    if (carouselPreloadTimer) clearTimeout(carouselPreloadTimer);
+    carouselInterval = null;
+    carouselPreloadTimer = null;
   }
 
   if (nextBtn) {
@@ -126,6 +218,8 @@ document.addEventListener('DOMContentLoaded', () => {
       updateCarousel(i);
       startAuto();
     });
+    dot.addEventListener('pointerenter', () => hydrateSlide(i), { passive: true });
+    dot.addEventListener('focus', () => hydrateSlide(i));
   });
 
   // Swipe Support
@@ -148,6 +242,35 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { passive: true });
   }
 
+  const carouselWrapper = document.querySelector('.carousel-wrapper');
+  if (carouselWrapper && totalSlides > 1) {
+    carouselWrapper.addEventListener('mouseenter', stopAuto);
+    carouselWrapper.addEventListener('mouseleave', startAuto);
+    carouselWrapper.addEventListener('focusin', stopAuto);
+    carouselWrapper.addEventListener('focusout', (event) => {
+      if (!carouselWrapper.contains(event.relatedTarget)) startAuto();
+    });
+    carouselWrapper.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        updateCarousel(currentSlideIndex - 1);
+      } else if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        updateCarousel(currentSlideIndex + 1);
+      }
+    });
+
+    const carouselVisibilityObserver = new IntersectionObserver(([entry]) => {
+      carouselIsVisible = entry.isIntersecting;
+      if (carouselIsVisible) startAuto();
+      else stopAuto();
+    }, { threshold: 0.05 });
+    carouselVisibilityObserver.observe(carouselWrapper);
+  }
+
+  document.addEventListener('visibilitychange', () => document.hidden ? stopAuto() : startAuto());
+  reducedMotionQuery.addEventListener?.('change', () => reducedMotionQuery.matches ? stopAuto() : startAuto());
+  updateCarousel(0);
   startAuto();
 
   /* --- Animation Intersection Observer --- */
@@ -263,9 +386,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 150);
   }
 
+  document.querySelectorAll('.expandable-card .read-more-label').forEach(button => {
+    button.addEventListener('click', () => {
+      const card = button.closest('.expandable-card');
+      if (!card) return;
+      const nextExpanded = !card.classList.contains('expanded');
+      card.classList.toggle('expanded', nextExpanded);
+      button.setAttribute('aria-expanded', String(nextExpanded));
+      button.textContent = nextExpanded ? 'Show less' : 'Read more';
+    });
+  });
+
   /* --- Stat Counter Observer --- */
   const statNumbers = document.querySelectorAll('.mv-stat-number');
   let statsStarted = false;
+  if (!reducedMotionQuery.matches) {
+    statNumbers.forEach(num => { num.textContent = '0'; });
+  }
 
   const statsObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
@@ -280,6 +417,10 @@ document.addEventListener('DOMContentLoaded', () => {
   function animateStats() {
     statNumbers.forEach(num => {
       const target = parseInt(num.dataset.target);
+      if (reducedMotionQuery.matches) {
+        num.textContent = target;
+        return;
+      }
       const duration = 2000;
       const start = performance.now();
       num.classList.add('counting');
@@ -312,6 +453,35 @@ document.addEventListener('DOMContentLoaded', () => {
   const statsContainer = document.querySelector('.mv-stats');
   if (statsContainer) statsObserver.observe(statsContainer);
 
+  /* --- Mission statement progressive disclosure --- */
+  const missionToggle = document.querySelector('.mv-read-more');
+  const missionCard = document.getElementById('mv-card-mission');
+  const missionStatement = document.getElementById('mission-statement');
+
+  if (missionToggle && missionCard && missionStatement) {
+    const syncMissionExpandedHeight = () => {
+      missionStatement.style.setProperty('--mission-expanded-height', `${missionStatement.scrollHeight}px`);
+    };
+
+    missionToggle.addEventListener('click', () => {
+      const isExpanded = missionToggle.getAttribute('aria-expanded') === 'true';
+      const nextExpandedState = !isExpanded;
+
+      syncMissionExpandedHeight();
+      missionToggle.setAttribute('aria-expanded', String(nextExpandedState));
+      missionCard.classList.toggle('is-expanded', nextExpandedState);
+      missionStatement.classList.toggle('is-expanded', nextExpandedState);
+      missionToggle.querySelector('span').textContent = nextExpandedState ? 'Read less' : 'Read more';
+    });
+
+    let missionResizeFrame;
+    window.addEventListener('resize', () => {
+      if (missionToggle.getAttribute('aria-expanded') !== 'true') return;
+      cancelAnimationFrame(missionResizeFrame);
+      missionResizeFrame = requestAnimationFrame(syncMissionExpandedHeight);
+    });
+  }
+
 });
 
 
@@ -322,18 +492,6 @@ document.addEventListener('DOMContentLoaded', () => {
    FOSEM CONTROLS — SPA Navigation & Content Logic
    ============================================ */
 
-const svgIcons = {
-  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>',
-  shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>',
-  server: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>',
-  zap: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>',
-  activity: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>',
-  settings: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>',
-  target: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>',
-  building: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="9" y1="22" x2="9" y2="22"></line><line x1="15" y1="22" x2="15" y2="22"></line><line x1="9" y1="6" x2="9.01" y2="6"></line><line x1="15" y1="6" x2="15.01" y2="6"></line><line x1="9" y1="10" x2="9.01" y2="10"></line><line x1="15" y1="10" x2="15.01" y2="10"></line><line x1="9" y1="14" x2="9.01" y2="14"></line><line x1="15" y1="14" x2="15.01" y2="14"></line><line x1="9" y1="18" x2="9.01" y2="18"></line><line x1="15" y1="18" x2="15.01" y2="18"></line></svg>',
-  eye: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>'
-};
-
 const solutionsData = {
   'security-solutions': {
     title: 'Security Solutions',
@@ -341,12 +499,12 @@ const solutionsData = {
     heroImage: 'https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&w=1600&q=80',
     how: 'Every security deployment begins with a rigorous threat and vulnerability assessment of your facility. Fosem engineers then design a heavily redundant, micro-segmented network topology specifically for your surveillance and access control hardware. We seamlessly integrate globally trusted OEM equipment, ensuring zero blind spots and absolute data integrity. Our internationally certified teams handle the entire installation process, from complex civil works and structured cabling to the final software commissioning. Following handover, our Network Operations Center provides continuous remote monitoring, ensuring rapid field response and preventative maintenance to keep your high-risk environments secure around the clock.',
     deliverables: [
-      { icon: svgIcons.eye, title: 'Video Surveillance', desc: 'High-definition IP camera networks with AI-driven analytics.' },
-      { icon: svgIcons.shield, title: 'Access Control', desc: 'Biometric and credential-based physical access management.' },
-      { icon: svgIcons.activity, title: 'Intrusion Detection', desc: 'Perimeter and interior sensors linked to central command.' },
-      { icon: svgIcons.target, title: 'Visitor Management', desc: 'Automated tracking and auditing for facility guests.' },
-      { icon: svgIcons.server, title: 'Command Centre Integration', desc: 'Single-pane-of-glass platforms aggregating all security data.' },
-      { icon: svgIcons.check, title: 'Preventive Maintenance', desc: 'Scheduled servicing and immediate incident response SLA.' }
+{ title: 'Video Surveillance', desc: 'High-definition IP camera networks with AI-driven analytics.' },
+      { title: 'Access Control', desc: 'Biometric and credential-based physical access management.' },
+      { title: 'Intrusion Detection', desc: 'Perimeter and interior sensors linked to central command.' },
+      { title: 'Visitor Management', desc: 'Automated tracking and auditing for facility guests.' },
+      { title: 'Command Centre Integration', desc: 'Single-pane-of-glass platforms aggregating all security data.' },
+      { title: 'Preventive Maintenance', desc: 'Scheduled servicing and immediate incident response SLA.' }
     ],
     gallery: [
       'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1600&q=80',
@@ -359,12 +517,12 @@ const solutionsData = {
     heroImage: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1600&q=80',
     how: 'Fosem approaches building automation as a holistic engineering challenge. We analyze your existing mechanical, electrical, and plumbing assets to design a unified control architecture based on open protocols like BACnet and KNX. Our engineers program intelligent, dynamic policies that automatically adapt HVAC, lighting, and power distribution to real-time facility occupancy and environmental conditions. We handle the complete integration—installing field sensors, programming programmable logic controllers, and commissioning the central management platform. Post-deployment, our team conducts continuous energy audits and predictive maintenance, ensuring your building operates at peak efficiency while lowering operational expenditure.',
     deliverables: [
-      { icon: svgIcons.building, title: 'Building Management Systems', desc: 'Centralized platforms for complete facility oversight.' },
-      { icon: svgIcons.zap, title: 'HVAC Automation', desc: 'Dynamic climate control based on live occupancy metrics.' },
-      { icon: svgIcons.settings, title: 'Lighting Control', desc: 'Automated daylight harvesting and scheduled illumination.' },
-      { icon: svgIcons.activity, title: 'Energy Monitoring', desc: 'Granular tracking of power consumption across all zones.' },
-      { icon: svgIcons.target, title: 'Environmental Controls', desc: 'Precision temperature and humidity regulation for critical areas.' },
-      { icon: svgIcons.server, title: 'Centralised Monitoring', desc: 'Real-time alerting for mechanical faults and inefficiencies.' }
+      { title: 'Building Management Systems', desc: 'Centralized platforms for complete facility oversight.' },
+      { title: 'HVAC Automation', desc: 'Dynamic climate control based on live occupancy metrics.' },
+      { title: 'Lighting Control', desc: 'Automated daylight harvesting and scheduled illumination.' },
+      { title: 'Energy Monitoring', desc: 'Granular tracking of power consumption across all zones.' },
+      { title: 'Environmental Controls', desc: 'Precision temperature and humidity regulation for critical areas.' },
+      { title: 'Centralised Monitoring', desc: 'Real-time alerting for mechanical faults and inefficiencies.' }
     ],
     gallery: [
       'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1600&q=80',
@@ -377,12 +535,12 @@ const solutionsData = {
     heroImage: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1600&q=80',
     how: 'Every infrastructure project begins with rigorous capacity planning and spatial design. Fosem engineers map out resilient, redundant network topologies that eliminate single points of failure. We deploy certified teams to execute precision structured cabling, fiber-optic splicing, and active switching installations, strictly adhering to BICSI and TIA/EIA international standards. Beyond cabling, we construct complete data center environments, including raised flooring, precision cooling, and uninterruptible power. Upon completion, every node and link is Fluke-tested and certified, providing you with a fully documented, robust foundation ready to support your most demanding enterprise applications.',
     deliverables: [
-      { icon: svgIcons.server, title: 'Data Center Buildouts', desc: 'Complete facility engineering including power and cooling.' },
-      { icon: svgIcons.target, title: 'Structured Cabling', desc: 'Certified copper and fiber-optic backbone installations.' },
-      { icon: svgIcons.activity, title: 'Core Switching', desc: 'High-throughput, redundant enterprise network distribution.' },
-      { icon: svgIcons.shield, title: 'Secure Architecture', desc: 'Micro-segmented networks designed with zero-trust principles.' },
-      { icon: svgIcons.zap, title: 'Wireless LAN', desc: 'High-density, low-latency wireless coverage for large campuses.' },
-      { icon: svgIcons.check, title: 'Performance Certification', desc: 'Rigorous testing and documentation of all physical links.' }
+      { title: 'Data Center Buildouts', desc: 'Complete facility engineering including power and cooling.' },
+      { title: 'Structured Cabling', desc: 'Certified copper and fiber-optic backbone installations.' },
+      { title: 'Core Switching', desc: 'High-throughput, redundant enterprise network distribution.' },
+      { title: 'Secure Architecture', desc: 'Micro-segmented networks designed with zero-trust principles.' },
+      { title: 'Wireless LAN', desc: 'High-density, low-latency wireless coverage for large campuses.' },
+      { title: 'Performance Certification', desc: 'Rigorous testing and documentation of all physical links.' }
     ],
     gallery: [
       'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1600&q=80',
@@ -395,12 +553,12 @@ const solutionsData = {
     heroImage: 'https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=1600&q=80',
     how: "Every power project begins with deep analysis of your facility's load profile, identifying peak demands and critical operational dependencies. We then engineer a bespoke hybrid power architecture that intelligently synchronizes grid power, diesel generation, solar PV arrays, and battery energy storage systems (BESS). Our certified technicians handle the complex high-tension electrical integration, ensuring seamless, zero-millisecond failovers during utility outages. We configure advanced SCADA systems to provide you with live telemetry on power generation, storage health, and consumption, backed by our maintenance teams who ensure your power infrastructure operates flawlessly year-round.",
     deliverables: [
-      { icon: svgIcons.zap, title: 'Hybrid Power Integration', desc: 'Seamless synchronization of grid, solar, and generator power.' },
-      { icon: svgIcons.server, title: 'Battery Storage (BESS)', desc: 'Industrial-scale energy storage for peak shaving and backup.' },
-      { icon: svgIcons.target, title: 'Solar PV Arrays', desc: 'Commercial solar generation designed for maximum yield.' },
-      { icon: svgIcons.shield, title: 'Uninterruptible Power', desc: 'Enterprise UPS systems protecting mission-critical assets.' },
-      { icon: svgIcons.activity, title: 'Load Profiling', desc: 'Precision engineering based on exact facility power draw.' },
-      { icon: svgIcons.settings, title: 'Remote Telemetry', desc: 'Live monitoring of generation, storage, and consumption.' }
+      { title: 'Hybrid Power Integration', desc: 'Seamless synchronization of grid, solar, and generator power.' },
+      { title: 'Battery Storage (BESS)', desc: 'Industrial-scale energy storage for peak shaving and backup.' },
+      { title: 'Solar PV Arrays', desc: 'Commercial solar generation designed for maximum yield.' },
+      { title: 'Uninterruptible Power', desc: 'Enterprise UPS systems protecting mission-critical assets.' },
+      { title: 'Load Profiling', desc: 'Precision engineering based on exact facility power draw.' },
+      { title: 'Remote Telemetry', desc: 'Live monitoring of generation, storage, and consumption.' }
     ],
     gallery: [
       'https://images.unsplash.com/photo-1497440001374-f26997328c1b?auto=format&fit=crop&w=1600&q=80',
@@ -413,12 +571,12 @@ const solutionsData = {
     heroImage: 'assets/images/engineering_airport.webp',
     how: 'We provide end-to-end mechanical, electrical, and plumbing engineering. Our certified teams design, install, and integrate complex HVAC, electrical power grids, and sanitation networks. From initial load planning to system commissioning, we ensure compliance with international construction standards and optimal facility utility performance.',
     deliverables: [
-      { icon: svgIcons.building, title: 'Mechanical Systems', desc: 'Centralized heating, cooling, and ventilation designs.' },
-      { icon: svgIcons.zap, title: 'Electrical Engineering', desc: 'Secure power distribution, wiring, and safety grids.' },
-      { icon: svgIcons.settings, title: 'Plumbing & Sanitation', desc: 'Efficient water supply, drainage, and waste management.' },
-      { icon: svgIcons.shield, title: 'Code Compliance', desc: 'Strict adherence to local building and safety codes.' },
-      { icon: svgIcons.check, title: 'Preventive Maintenance', desc: 'Regular inspections and servicing of mechanical units.' },
-      { icon: svgIcons.server, title: 'Facility Management Integration', desc: 'Connecting mechanical systems to building automation.' }
+      { title: 'Mechanical Systems', desc: 'Centralized heating, cooling, and ventilation designs.' },
+      { title: 'Electrical Engineering', desc: 'Secure power distribution, wiring, and safety grids.' },
+      { title: 'Plumbing & Sanitation', desc: 'Efficient water supply, drainage, and waste management.' },
+      { title: 'Code Compliance', desc: 'Strict adherence to local building and safety codes.' },
+      { title: 'Preventive Maintenance', desc: 'Regular inspections and servicing of mechanical units.' },
+      { title: 'Facility Management Integration', desc: 'Connecting mechanical systems to building automation.' }
     ],
     gallery: [
       'assets/images/service-installation.webp',
@@ -428,15 +586,15 @@ const solutionsData = {
   'access-control': {
     title: 'Access Control',
     desc: 'Enterprise-grade credentialing, identity verification, and physical access barrier management designed to safeguard critical assets and facilities.',
-    heroImage: 'https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&w=1600&q=80',
+    heroImage: 'assets/images/solutions/access-control.webp',
     how: 'Fosem engineers design access control systems with safety, security, and traceability in mind. We assess entry and exit points across your facilities, designing a secure topology bridging RFID readers, biometric scanning, and mobile credentials. We handle the complete electrical and mechanical integration, installing turnstiles, electromagnetic locks, and barrier gates linked with emergency fire override controls. Our software deployments centralize management, offering real-time auditing and automated directory sync.',
     deliverables: [
-      { icon: svgIcons.shield, title: 'Biometric Readers', desc: 'Fingerprint, facial recognition, and iris credential scanners.' },
-      { icon: svgIcons.settings, title: 'Mobile Credentials', desc: 'Secure smartphone-based Bluetooth and NFC access.' },
-      { icon: svgIcons.target, title: 'Physical Barriers', desc: 'High-throughput optical turnstiles and security speed gates.' },
-      { icon: svgIcons.server, title: 'Visitor Management', desc: 'Self-service kiosks and automated digital guest badging.' },
-      { icon: svgIcons.activity, title: 'Unified Control Software', desc: 'Centralized management dashboards with instant activity logs.' },
-      { icon: svgIcons.check, title: 'Compliance & Audits', desc: 'Ensuring life safety, ADA compliance, and data privacy audits.' }
+      { title: 'Biometric Readers', desc: 'Fingerprint, facial recognition, and iris credential scanners.' },
+      { title: 'Mobile Credentials', desc: 'Secure smartphone-based Bluetooth and NFC access.' },
+      { title: 'Physical Barriers', desc: 'High-throughput optical turnstiles and security speed gates.' },
+      { title: 'Visitor Management', desc: 'Self-service kiosks and automated digital guest badging.' },
+      { title: 'Unified Control Software', desc: 'Centralized management dashboards with instant activity logs.' },
+      { title: 'Compliance & Audits', desc: 'Ensuring life safety, ADA compliance, and data privacy audits.' }
     ],
     gallery: [
       'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1600&q=80',
@@ -446,15 +604,15 @@ const solutionsData = {
   'fire-safety': {
     title: 'Fire Safety',
     desc: 'Code-compliant addressable fire detection networks, automated suppression integration, and rapid-response life safety notification systems.',
-    heroImage: 'https://images.unsplash.com/photo-1582139329536-e7284fece509?auto=format&fit=crop&w=1600&q=80',
+    heroImage: 'assets/images/solutions/fire-detection-safety.webp',
     how: "Fosem approaches fire protection with zero compromise. We perform code validation and draft cause-and-effect matrix plans for complex facilities. Our certified teams install addressable alarm systems and VESDA early warning smoke detection in high-value environments. We execute the integrations with HVAC dampers, elevator recall, and access control overrides to guarantee automatic containment during emergency triggers.",
     deliverables: [
-      { icon: svgIcons.target, title: 'Addressable Panels', desc: 'Pinpoint device location mapping for fast hazard response.' },
-      { icon: svgIcons.activity, title: 'Aspirating Detection', desc: 'VESDA air sampling networks for ultra-early warning.' },
-      { icon: svgIcons.settings, title: 'HVAC & Vent Control', desc: 'Automatic fan and smoke damper actuation controls.' },
-      { icon: svgIcons.server, title: 'Suppression Integration', desc: 'Clean agent gaseous fire extinguishing triggers.' },
-      { icon: svgIcons.shield, title: 'Emergency Audio Evac', desc: 'Voice evacuation and public address announcement feeds.' },
-      { icon: svgIcons.check, title: 'SLA Inspections', desc: 'Routine preventative testing conforming to local regulations.' }
+      { title: 'Addressable Panels', desc: 'Pinpoint device location mapping for fast hazard response.' },
+      { title: 'Aspirating Detection', desc: 'VESDA air sampling networks for ultra-early warning.' },
+      { title: 'HVAC & Vent Control', desc: 'Automatic fan and smoke damper actuation controls.' },
+      { title: 'Suppression Integration', desc: 'Clean agent gaseous fire extinguishing triggers.' },
+      { title: 'Emergency Audio Evac', desc: 'Voice evacuation and public address announcement feeds.' },
+      { title: 'SLA Inspections', desc: 'Routine preventative testing conforming to local regulations.' }
     ],
     gallery: [
       'https://images.unsplash.com/photo-1582139329536-e7284fece509?auto=format&fit=crop&w=1600&q=80',
@@ -464,15 +622,15 @@ const solutionsData = {
   'automation-systems': {
     title: 'Automation Systems',
     desc: 'Programmable Logic Controller (PLC) systems, SCADA telemetry platforms, and centralized mechanical-electrical coordination frameworks.',
-    heroImage: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1600&q=80',
+    heroImage: 'assets/images/solutions/automation-system.webp',
     how: 'We streamline facility operations by integrating mechanical-electrical components under high-availability automation logic. Our engineers program rugged PLCs and design intuitive SCADA HMI interfaces to map all mechanical, power, and thermal assets. We deploy edge-gateway routers to gather and analyze fieldbus telemetry (Modbus, BACnet, Profibus), giving operators unified oversight of critical systems.',
     deliverables: [
-      { icon: svgIcons.settings, title: 'PLC Development', desc: 'Custom logic control scripts engineered for industrial hardware.' },
-      { icon: svgIcons.activity, title: 'SCADA Telemetry', desc: 'Rich visualization screens mapping facility sensor nodes.' },
-      { icon: svgIcons.zap, title: 'Motor & Drive Control', desc: 'VFD calibration to balance motor loads and save power.' },
-      { icon: svgIcons.server, title: 'Industrial Gateways', desc: 'Secure communication conversion bridging legacy protocols.' },
-      { icon: svgIcons.target, title: 'Process Optimisation', desc: 'Tuning feedback loops (PID) to reduce system wear.' },
-      { icon: svgIcons.check, title: 'Routine Diagnostics', desc: 'Periodic firmware updates and input-output loop validation.' }
+      { title: 'PLC Development', desc: 'Custom logic control scripts engineered for industrial hardware.' },
+      { title: 'SCADA Telemetry', desc: 'Rich visualization screens mapping facility sensor nodes.' },
+      { title: 'Motor & Drive Control', desc: 'VFD calibration to balance motor loads and save power.' },
+      { title: 'Industrial Gateways', desc: 'Secure communication conversion bridging legacy protocols.' },
+      { title: 'Process Optimisation', desc: 'Tuning feedback loops (PID) to reduce system wear.' },
+      { title: 'Routine Diagnostics', desc: 'Periodic firmware updates and input-output loop validation.' }
     ],
     gallery: [
       'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1600&q=80',
@@ -482,15 +640,15 @@ const solutionsData = {
   'cctv-surveillance': {
     title: 'CCTV & Surveillance',
     desc: 'High-definition network IP video architectures combined with edge AI analytics and centralized storage command structures.',
-    heroImage: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1600&q=80',
+    heroImage: 'assets/images/solutions/cctv-surveillance.webp',
     how: 'Our surveillance team engineers systems tailored for high-risk and high-density areas. We analyze lens focal lengths and coverage zones to design IP camera distributions with zero blind spots. We configure robust network storage arrays (NVR/SAN), set up automated failovers, and integrate advanced edge-analytics like path-intrusion detection, facial matching, and automated license-plate recognition (LPR).',
     deliverables: [
-      { icon: svgIcons.eye, title: 'Ultra-HD IP Cameras', desc: 'Low-light, 4K, and thermal cameras for extreme conditions.' },
-      { icon: svgIcons.activity, title: 'Edge AI Analytics', desc: 'Intelligent filters for motion, intrusion, and facial logs.' },
-      { icon: svgIcons.server, title: 'Network Recording', desc: 'Redundant high-capacity storage servers with hot-swaps.' },
-      { icon: svgIcons.target, title: 'Control Room Video Walls', desc: 'High-density displays integrated into central desks.' },
-      { icon: svgIcons.shield, title: 'Video Encription', desc: 'Zero-trust stream encryption preventing stream hijacking.' },
-      { icon: svgIcons.check, title: 'SLA Support', desc: 'Immediate lens cleaning, re-focus checks, and storage health audits.' }
+      { title: 'Ultra-HD IP Cameras', desc: 'Low-light, 4K, and thermal cameras for extreme conditions.' },
+      { title: 'Edge AI Analytics', desc: 'Intelligent filters for motion, intrusion, and facial logs.' },
+      { title: 'Network Recording', desc: 'Redundant high-capacity storage servers with hot-swaps.' },
+      { title: 'Control Room Video Walls', desc: 'High-density displays integrated into central desks.' },
+      { title: 'Video Encription', desc: 'Zero-trust stream encryption preventing stream hijacking.' },
+      { title: 'SLA Support', desc: 'Immediate lens cleaning, re-focus checks, and storage health audits.' }
     ],
     gallery: [
       'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1600&q=80',
@@ -498,6 +656,154 @@ const solutionsData = {
     ]
   }
 };
+
+/* Product catalogue presented in the Products & Solutions navigation. */
+solutionsData['security-integrated-solutions'] = {
+  ...solutionsData['security-solutions'],
+  title: 'Security Integrated Solutions',
+  desc: 'Unified physical-security architecture connecting surveillance, access control, alarms, intercoms, analytics, and command-centre operations into one accountable system.',
+  heroImage: 'assets/images/integrated_security_ecosystem.webp',
+  how: 'Fosem begins with a site-wide threat and operational assessment, then develops a coordinated security architecture with clear device, network, control-room, and response requirements. We integrate surveillance, access control, perimeter detection, alarm monitoring, visitor management, and communications on resilient infrastructure. Each subsystem is tested independently and as part of the complete operating workflow before handover, documentation, training, and ongoing maintenance support.'
+};
+
+solutionsData['cctv-surveillance'] = {
+  ...solutionsData['cctv-surveillance'],
+  title: 'CCTV and Surveillance'
+};
+
+solutionsData['fire-detection-safety-systems'] = {
+  ...solutionsData['fire-safety'],
+  title: 'Fire Detection and Safety Systems',
+  desc: 'Addressable fire detection, early-warning monitoring, evacuation notification, and life-safety integrations engineered for rapid, coordinated emergency response.'
+};
+
+solutionsData['automation-system'] = {
+  ...solutionsData['automation-systems'],
+  title: 'Automation System',
+  desc: 'Centralised automation for building, electrical, mechanical, and operational systems, providing reliable control, live status visibility, and measurable efficiency.'
+};
+
+solutionsData['alarm-systems'] = {
+  title: 'Alarm Systems',
+  desc: 'Professionally engineered intrusion, duress, perimeter, and critical-event alarm systems with dependable verification, escalation, and response workflows.',
+  heroImage: 'assets/images/solutions/alarm-systems.webp',
+  how: 'We assess the facility, identify protected zones and response priorities, and design an alarm architecture around the actual operating risk. Detection devices, panic controls, control panels, communications paths, and monitoring software are configured with clear alarm priorities and escalation procedures. Every zone is commissioned through activation testing, signal verification, backup-power checks, user training, and documented maintenance schedules.',
+  deliverables: [
+    { title: 'Intrusion Detection', desc: 'Door, window, motion, vibration, and glass-break detection for protected areas.' },
+    { title: 'Perimeter Alarms', desc: 'Early warning for fences, gates, external approaches, and restricted zones.' },
+    { title: 'Panic & Duress', desc: 'Fixed and wireless emergency controls for staff and high-risk locations.' },
+    { title: 'Central Monitoring', desc: 'Prioritised alarm events, audit trails, and operator response workflows.' },
+    { title: 'Resilient Communications', desc: 'Multi-path IP and cellular signalling with supervised backup power.' },
+    { title: 'Testing & Maintenance', desc: 'Routine device testing, battery checks, reporting, and corrective support.' }
+  ],
+  gallery: [
+    'assets/images/integrated_security_ecosystem.webp',
+    'assets/images/slide2-surveillance-new.webp'
+  ]
+};
+
+solutionsData['renewable-energy'] = {
+  ...solutionsData['energy'],
+  title: 'Renewable Energy',
+  desc: 'Commercial solar, battery storage, hybrid generation, and energy monitoring systems designed for dependable power, lower operating costs, and long-term resilience.',
+  heroImage: 'assets/images/slide5-renewable-energy.webp'
+};
+
+solutionsData['vehicles-management-system'] = {
+  title: 'Vehicles Management System',
+  desc: 'Integrated fleet visibility, vehicle access, driver accountability, route monitoring, and security controls for safer and more efficient transport operations.',
+  heroImage: 'assets/images/engineering_airport.webp',
+  how: 'Fosem maps each fleet workflow—from dispatch and authorised use to site entry, route activity, and incident review—before selecting the required telematics and security controls. GPS devices, driver identification, geofencing, vehicle access, cameras, and management software are integrated into a single operational view. The system is configured with practical alerts and reports, then validated through live route, communication, and exception testing before operator training and handover.',
+  deliverables: [
+    { title: 'Live Vehicle Tracking', desc: 'Real-time fleet location, route history, geofencing, and movement alerts.' },
+    { title: 'Vehicle Access Control', desc: 'Authorised entry using tags, ANPR, barriers, and registered vehicle records.' },
+    { title: 'Driver Monitoring', desc: 'Driver identification, behaviour events, utilisation, and accountability reporting.' },
+    { title: 'Mobile Video', desc: 'On-vehicle cameras and event footage for safety and incident investigation.' },
+    { title: 'Operational Alerts', desc: 'Speed, route, idle-time, unauthorised-use, and maintenance notifications.' },
+    { title: 'Fleet Reporting', desc: 'Central dashboards for trip, utilisation, incident, and compliance records.' }
+  ],
+  gallery: [
+    'assets/images/engineering_airport.webp',
+    'assets/images/engineering_soc.webp'
+  ]
+};
+
+solutionsData['it-structural-cabling'] = {
+  ...solutionsData['infrastructure'],
+  title: 'IT and Structural Cabling',
+  desc: 'Certified copper, fibre, wireless, server-room, and voice-data infrastructure forming a reliable digital backbone for modern facilities.',
+  heroImage: 'assets/images/engineering_datacenter.webp',
+  how: 'We survey the facility, document capacity and service requirements, and design an organised cable and network architecture with defined pathways, distribution points, cabinets, labelling, grounding, and redundancy. Certified teams install and terminate copper and fibre links, configure racks and active network equipment, and validate every connection through professional testing. The completed system is delivered with test results, schedules, as-built records, and a clear maintenance plan.',
+  deliverables: [
+    { title: 'Server & Network Rooms', desc: 'Organised racks, cabinets, patching, power, cooling coordination, and monitoring.' },
+    { title: 'Copper Cabling', desc: 'Standards-compliant Category 6 and Category 6A voice-data installations.' },
+    { title: 'Fibre Backbone', desc: 'Single-mode and multimode fibre installation, splicing, termination, and testing.' },
+    { title: 'Pathways & Labelling', desc: 'Managed containment, identification, schedules, and maintainable cable routing.' },
+    { title: 'Wireless Infrastructure', desc: 'Access-point cabling and network foundations for reliable facility coverage.' },
+    { title: 'Certification & Records', desc: 'Link certification, as-built drawings, port schedules, and handover documentation.' }
+  ],
+  gallery: [
+    'assets/images/engineering_datacenter.webp',
+    'assets/images/service-installation.webp'
+  ]
+};
+
+/* Curated solution photography gives each service a clear, real-world context. */
+const solutionHeroImages = {
+  'security-integrated-solutions': 'assets/images/integrated_security_ecosystem.webp',
+  'mep': 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1400&q=85',
+  'renewable-energy': 'https://images.unsplash.com/photo-1514488034139-5905ab173d22?auto=format&fit=crop&w=1400&q=85',
+  'vehicles-management-system': 'https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=1400&q=85',
+  'it-structural-cabling': 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1400&q=85'
+};
+
+Object.entries(solutionHeroImages).forEach(([solutionKey, imageUrl]) => {
+  if (solutionsData[solutionKey]) solutionsData[solutionKey].heroImage = imageUrl;
+});
+
+/* Small inline SVGs avoid a separate icon-font request while keeping every
+   solution capability visually distinct. */
+const solutionIconRules = [
+  { pattern: /video|camera|surveillance/i, icon: 'videocam' },
+  { pattern: /access|biometric|credential|visitor|barrier|driver/i, icon: 'badge' },
+  { pattern: /fire|suppression|evac|aspirat/i, icon: 'local_fire_department' },
+  { pattern: /alarm|intrusion|perimeter|panic|duress/i, icon: 'notifications_active' },
+  { pattern: /solar|photovoltaic|\bpv\b/i, icon: 'solar_power' },
+  { pattern: /battery|power|electrical|energy|ups|motor|drive/i, icon: 'bolt' },
+  { pattern: /server|network|cabling|fibre|fiber|copper|wireless|switching|gateway/i, icon: 'hub' },
+  { pattern: /mechanical|plumbing|sanitation|hvac|vent|cooling|temperature|humidity/i, icon: 'engineering' },
+  { pattern: /monitor|telemetry|report|analytics|tracking|scada|profiling|dashboard/i, icon: 'analytics' },
+  { pattern: /automation|control|lighting|logic|plc|integration|command centre|building management/i, icon: 'settings' },
+  { pattern: /test|maintenance|support|compliance|audit|certification|diagnostic|inspection|record/i, icon: 'verified' },
+  { pattern: /secure|safety|protection|encryption/i, icon: 'shield' }
+];
+
+const solutionIconFor = (deliverableTitle) => {
+  const match = solutionIconRules.find(({ pattern }) => pattern.test(deliverableTitle));
+  return match ? match.icon : 'shield';
+};
+
+const solutionIconPaths = {
+  videocam: '<rect x="3" y="6" width="12" height="12" rx="2"/><path d="m15 10 6-3v10l-6-3z"/>',
+  badge: '<rect x="5" y="3" width="14" height="18" rx="2"/><circle cx="12" cy="9" r="2.5"/><path d="M8.5 16c.8-2.3 6.2-2.3 7 0"/>',
+  local_fire_department: '<path d="M13.5 3.5c.8 3.2-.6 4.6-2 6.2-.7-1.6-1.8-2.5-3.1-3.3.1 2.9-3.4 4.8-2.4 9.2A6.3 6.3 0 0 0 18.3 13c.1-3.6-2.1-6.5-4.8-9.5Z"/><path d="M10 17.5c0-1.6 1-2.7 2-3.8 1 1.1 2 2.2 2 3.8a2 2 0 0 1-4 0Z"/>',
+  notifications_active: '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z"/><path d="M10 21h4M4.5 4.5 3 3m16.5 1.5L21 3"/>',
+  solar_power: '<circle cx="6" cy="6" r="2.5"/><path d="M6 1v1M6 10v1M1 6h1m8 0h1M2.5 2.5l.7.7m5.6 5.6.7.7M9.5 2.5l-.7.7M3.2 8.8l-.7.7M5 14h14l2 7H3zM8 14l-1 7m9-7 1 7m-13-3h16"/>',
+  bolt: '<path d="m13 2-8 12h7l-1 8 8-12h-7z"/>',
+  hub: '<circle cx="12" cy="12" r="3"/><circle cx="4" cy="5" r="2"/><circle cx="20" cy="5" r="2"/><circle cx="4" cy="19" r="2"/><circle cx="20" cy="19" r="2"/><path d="m6 6.5 4 3.5m8-3.5-4 3.5m-8 7.5 4-3.5m8 3.5-4-3.5"/>',
+  engineering: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M5 5l2.2 2.2M16.8 16.8 19 19M19 5l-2.2 2.2M7.2 16.8 5 19"/>',
+  analytics: '<path d="M4 20V10m6 10V4m6 16v-7m4 7H2"/><path d="m4 7 5-4 5 4 6-5"/>',
+  settings: '<path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="2" fill="currentColor" stroke="none"/><circle cx="11" cy="18" r="2" fill="currentColor" stroke="none"/>',
+  verified: '<circle cx="12" cy="12" r="9"/><path d="m8 12 2.7 2.7L16.5 9"/>',
+  shield: '<path d="M12 3 4 6v5c0 5.3 3.4 8.7 8 10 4.6-1.3 8-4.7 8-10V6z"/><path d="m8.5 12 2.3 2.3 4.7-5"/>'
+};
+
+const inlineSolutionIcon = (deliverableTitle) => {
+  const iconName = solutionIconFor(deliverableTitle);
+  const paths = solutionIconPaths[iconName] || solutionIconPaths.shield;
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false">${paths}</svg>`;
+};
+
 if (!window.fosemApp) window.fosemApp = {};
 Object.assign(window.fosemApp, {
   renderContent: function(data, isInitialLoad) {
@@ -505,61 +811,89 @@ Object.assign(window.fosemApp, {
     
     const applyHtml = () => {
       let html = `
-        <!-- 1. Hero -->
-        <section class="sol-hero fade-up">
+        <!-- 1. Solution brief -->
+        <section class="sol-hero sol-hero--editorial fade-up" data-image-shape="balanced">
           <div class="sol-hero-text fade-left" style="--stagger: 100ms">
+            <p class="sol-hero-kicker">Integrated systems expertise</p>
             <h1 class="sol-hero-title">${data.title}</h1>
             <p class="sol-hero-desc">${data.desc}</p>
           </div>
           <div class="sol-hero-image-wrapper scale-in" style="--stagger: 200ms">
-            <img src="${data.heroImage}" alt="${data.title}" class="sol-hero-image" decoding="async">
+            <div class="sol-hero-image-viewport">
+              <img src="${data.heroImage}" alt="${data.title}" class="sol-hero-image" loading="lazy" decoding="async">
+            </div>
           </div>
         </section>
 
         <!-- 2. How Fosem Delivers -->
-        <section class="sol-section fade-up">
-          <h2 class="sol-section-title">How Fosem Delivers This Solution</h2>
+        <section class="sol-section sol-section--split fade-up">
+          <div class="sol-section-intro">
+            <p class="sol-section-label">Project approach</p>
+            <h2 class="sol-section-title">How Fosem Delivers This Solution</h2>
+          </div>
           <div class="sol-how">
             <p>${data.how}</p>
           </div>
         </section>
 
         <!-- 3. What We Deliver -->
-        <section class="sol-section fade-up">
-          <h2 class="sol-section-title">What We Deliver</h2>
-          <div class="sol-deliverables-grid">
+        <section class="sol-section sol-section--deliverables fade-up">
+          <div class="sol-section-heading">
+            <h2 class="sol-section-title">What We Deliver</h2>
+            <p>Every component is engineered as part of one coordinated, maintainable solution.</p>
+          </div>
+          <div class="sol-deliverables-grid" role="list">
             ${data.deliverables.map((d, index) => `
-              <div class="sol-deliverable fade-up" style="--stagger: ${(index % 3 + 1) * 100}ms">
-                <div class="sol-deliverable-icon">${d.icon}</div>
-                <h3>${d.title}</h3>
-                <p>${d.desc}</p>
-              </div>
+              <article class="sol-deliverable fade-up" role="listitem" style="--stagger: ${(index % 3 + 1) * 100}ms">
+                <span class="sol-deliverable-icon" aria-hidden="true">${inlineSolutionIcon(d.title)}</span>
+                <div class="sol-deliverable-copy">
+                  <h3>${d.title}</h3>
+                  <p>${d.desc}</p>
+                </div>
+              </article>
             `).join('')}
           </div>
         </section>
 
-        <!-- 4. Project Gallery -->
-        <section class="sol-section fade-up">
-          <h2 class="sol-section-title">Project Gallery</h2>
-          <div class="sol-gallery-grid">
-            ${data.gallery.map((img, index) => `
-              <img src="${img}" alt="Project installation" class="sol-gallery-image scale-in" style="--stagger: ${(index + 1) * 100}ms" decoding="async">
-            `).join('')}
-          </div>
-        </section>
-
-        <!-- 5. Consultation -->
+        <!-- 4. Consultation -->
         <section class="sol-consultation fade-up">
-          <h2 class="sol-consultation-title">Ready to discuss your project?</h2>
-          <p>Talk with our engineering team to design a solution tailored to your requirements.</p>
+          <div class="sol-consultation-copy">
+            <h2 class="sol-consultation-title">Ready to discuss your project?</h2>
+            <p>Talk with our engineering team to design a solution tailored to your requirements.</p>
+          </div>
           <div class="sol-consultation-actions">
-            <a href="mailto:engineering@fosemcontrols.com" class="sol-btn-primary">Request Consultation</a>
-            <a href="#" class="sol-btn-secondary">Download Company Profile</a>
+            <a href="mailto:engineering@fosemcontrols.com" class="sol-btn-primary">Request Consultation<span class="sol-arrow-icon" aria-hidden="true">→</span></a>
           </div>
         </section>
       `;
 
       container.innerHTML = html;
+
+      const hero = container.querySelector('.sol-hero--editorial');
+      const heroImage = container.querySelector('.sol-hero-image');
+      const fitHeroFrameToImage = () => {
+        if (!hero || !heroImage || !heroImage.naturalWidth || !heroImage.naturalHeight) return;
+
+        const width = heroImage.naturalWidth;
+        const height = heroImage.naturalHeight;
+        const ratio = width / height;
+        const shape = ratio < 0.84
+          ? 'portrait'
+          : ratio < 1.16
+            ? 'square'
+            : ratio > 1.85
+              ? 'panorama'
+              : 'landscape';
+
+        hero.dataset.imageShape = shape;
+        hero.style.setProperty('--sol-image-ratio', `${width} / ${height}`);
+        heroImage.width = width;
+        heroImage.height = height;
+      };
+
+      if (heroImage?.complete) fitHeroFrameToImage();
+      else heroImage?.addEventListener('load', fitHeroFrameToImage, { once: true });
+
       document.querySelector('.sol-content-area').scrollTo({ top: 0, behavior: 'instant' });
       
       // Observe all dynamic fade-up/scale-in elements inside solutions-content
@@ -610,6 +944,7 @@ Object.assign(window.fosemApp, {
 
     const homeView = document.getElementById('home-view');
     const solView = document.getElementById('solutions-view');
+    document.querySelector('.skip-link')?.setAttribute('href', '#solutions-view');
 
     // If we are on a static subpage, redirect to index.html with hash
     if (!homeView || !solView) {
@@ -651,6 +986,7 @@ Object.assign(window.fosemApp, {
   goHome: function() {
     const homeView = document.getElementById('home-view');
     const solView = document.getElementById('solutions-view');
+    document.querySelector('.skip-link')?.setAttribute('href', '#home-view');
     
     // Clear hash silently
     if (window.location.hash) {
@@ -685,12 +1021,19 @@ Object.assign(window.fosemApp, {
     }
 
     // Remove focus highlights from any existing elements first
-    document.querySelectorAll('.focus-highlight-pop, .focus-highlight-nudge').forEach(el => {
-      el.classList.remove('focus-highlight-pop', 'focus-highlight-nudge');
+    document.querySelectorAll('.focus-highlight-pop, .focus-highlight-nudge, .focus-highlight-reduced').forEach(el => {
+      el.classList.remove('focus-highlight-pop', 'focus-highlight-nudge', 'focus-highlight-reduced');
     });
 
     const isPrefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (isPrefersReduced) return;
+    if (isPrefersReduced) {
+      targetEl.classList.add('focus-highlight-reduced');
+      window.fosemApp.focusTimeoutId = setTimeout(() => {
+        targetEl.classList.remove('focus-highlight-reduced');
+        window.fosemApp.focusTimeoutId = null;
+      }, 1200);
+      return;
+    }
 
     // Check if element is already 60% visible in the viewport
     const rect = targetEl.getBoundingClientRect();
@@ -705,17 +1048,17 @@ Object.assign(window.fosemApp, {
 
     if (isAlreadyVisible) {
       animClass = 'focus-highlight-nudge';
-      duration = 1000;
+      duration = 1950;
     } else {
       animClass = 'focus-highlight-pop';
-      duration = 1200;
+      duration = 2050;
     }
 
     targetEl.classList.add(animClass);
     
     // Store the timeout ID so we can cancel it if another card is focused
     window.fosemApp.focusTimeoutId = setTimeout(() => {
-      targetEl.classList.remove('focus-highlight-pop', 'focus-highlight-nudge');
+      targetEl.classList.remove('focus-highlight-pop', 'focus-highlight-nudge', 'focus-highlight-reduced');
       window.fosemApp.focusTimeoutId = null;
     }, duration);
   },
@@ -778,33 +1121,50 @@ Object.assign(window.fosemApp, {
 // Intercept Clicks, Sidebar Navigation and Back to Home
 document.addEventListener('DOMContentLoaded', () => {
   // Close all dropdowns helper
-  const closeAllDropdowns = () => {
-    document.querySelectorAll('.dropdown-menu').forEach(menu => {
-      menu.classList.add('force-closed');
+  const closeAllDropdowns = ({ lockUntilPointerExit = true } = {}) => {
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.classList.remove('active', 'is-open');
+      item.querySelector(':scope > .nav-link')?.setAttribute('aria-expanded', 'false');
+      const menu = item.querySelector('.dropdown-menu');
+      if (menu) {
+        menu.classList.toggle('force-closed', lockUntilPointerExit);
+      }
     });
   };
 
-  // Reset force-closed and de-emphasized state when mouse leaves any nav-item
+  // A click outside or Escape can deliberately lock a menu closed. Release that
+  // lock as soon as the user starts a fresh interaction so the first hover works.
   document.querySelectorAll('.nav-item').forEach(item => {
-    item.addEventListener('mouseleave', () => {
+    const resetDropdownLock = () => {
       const menu = item.querySelector('.dropdown-menu');
       if (menu) {
         menu.classList.remove('force-closed', 'de-emphasized');
       }
-    });
+    };
+
+    item.addEventListener('mouseenter', resetDropdownLock);
+    item.addEventListener('pointerenter', resetDropdownLock);
+    item.addEventListener('focusin', resetDropdownLock);
+    item.addEventListener('mouseleave', resetDropdownLock);
   });
 
   // Close menus on Escape press
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       closeAllDropdowns();
+      const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+      if (mobileMenuBtn?.getAttribute('aria-expanded') === 'true') {
+        window.fosemApp.setMobileMenuOpen?.(false, { returnFocus: true });
+      }
     }
   });
 
   // Close menus on click outside
   document.addEventListener('click', (e) => {
-    if (!e.target.closest('.nav-item')) {
-      closeAllDropdowns();
+    if (!e.target.closest('.nav-item') && !e.target.closest('#mobile-menu-btn')) {
+      // The pointer is already outside the navigation, so no persistent lock is
+      // needed. Leaving one behind is what made the next hover appear broken.
+      closeAllDropdowns({ lockUntilPointerExit: false });
     }
   });
 
@@ -820,63 +1180,70 @@ document.addEventListener('DOMContentLoaded', () => {
         const homeView = document.getElementById('home-view');
         const solView = document.getElementById('solutions-view');
 
-        // Close mobile menu if open
+        const isServiceOption = slug.startsWith('service-');
+        const isIndustryOption = slug.startsWith('industry-') || slug.startsWith('expertise-');
         const mainNav = document.getElementById('main-nav');
         const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        if (mainNav) {
-          mainNav.classList.remove('active', 'open');
+        const closeNavigation = () => {
+          window.fosemApp.setMobileMenuOpen?.(false);
+          document.querySelectorAll('.nav-item').forEach(item => {
+            item.classList.remove('active', 'is-open');
+            item.querySelector(':scope > .nav-link')?.setAttribute('aria-expanded', 'false');
+          });
+        };
+
+        // Resolve a product choice before changing the menu state. This makes
+        // the first product item as reliable as every other product link.
+        if (solutionsData[slug]) {
+          e.preventDefault();
+          const solutionView = document.getElementById('solutions-view');
+          const homeIsShowing = !homeView?.classList.contains('view-hidden');
+          const solutionIsHidden = solutionView?.classList.contains('view-hidden');
+          if (window.fosemApp.currentSolution !== slug || homeIsShowing || solutionIsHidden) {
+            window.fosemApp.loadSolution(slug);
+          }
+
+          closeNavigation();
+          document.querySelectorAll('.dropdown-menu').forEach(menu => {
+            menu.classList.remove('is-selecting', 'de-emphasized');
+            menu.classList.add('force-closed');
+          });
+
+          const navbar = document.querySelector('.site-header');
+          const navHeight = navbar ? navbar.offsetHeight : 80;
+          setTimeout(() => {
+            const targetView = document.getElementById('solutions-view');
+            if (!targetView) return;
+            const targetOffset = targetView.getBoundingClientRect().top + window.scrollY - navHeight - 24;
+            window.scrollTo({ top: targetOffset, behavior: 'smooth' });
+          }, 150);
+          return;
         }
-        if (mobileMenuBtn) {
-          mobileMenuBtn.classList.remove('active');
-        }
-        document.querySelectorAll('.nav-item').forEach(item => {
-          item.classList.remove('active');
-        });
+
+        // Service links remain visible briefly
+        // so the selection animation can connect the menu choice to the card.
+        if (!isServiceOption) closeNavigation();
         
         const parentMenu = link.closest('.dropdown-menu');
         if (parentMenu) {
           parentMenu.classList.remove('force-closed');
-          parentMenu.classList.add('de-emphasized');
-          // Restore dropdown after the scroll and card focus animations are completely finished
-          setTimeout(() => {
-            parentMenu.classList.remove('de-emphasized');
-          }, 1850);
-        }
-
-        // Case A: Products & Solutions key
-        if (solutionsData[slug]) {
-          if (homeView && solView) {
-            e.preventDefault();
-
-            // Load solution if it's different from current
-            if (window.fosemApp.currentSolution !== slug) {
-              window.fosemApp.loadSolution(slug);
-            }
-
-            if (isNavigating) return;
-            isNavigating = true;
-            setTimeout(() => { isNavigating = false; }, 400);
-
-            // Always scroll window to the top of solutions view (no highlights)
-            setTimeout(() => {
-              const rect = solView.getBoundingClientRect();
-              const navbar = document.querySelector('.site-header');
-              const navHeight = navbar ? navbar.offsetHeight : 80;
-              
-              // Retrieve the actual de-emphasized dropdown height if active
-              const deEmphasizedMenu = document.querySelector('.dropdown-menu.de-emphasized');
-              const dropdownHeight = deEmphasizedMenu ? deEmphasizedMenu.offsetHeight : 0;
-              
-              const targetOffset = rect.top + window.pageYOffset - navHeight - dropdownHeight - 24;
-              window.scrollTo({
-                top: targetOffset,
-                behavior: 'smooth'
-              });
-            }, 150); // Wait 150ms for dropdown to begin fading first
+          if (isServiceOption) {
+            parentMenu.classList.add('is-selecting');
+            link.classList.add('is-selected');
+            setTimeout(closeNavigation, 260);
+          } else {
+            parentMenu.classList.add('force-closed');
           }
+
+          // Reset transient selection state before the next menu interaction.
+          setTimeout(() => {
+            parentMenu.classList.remove('is-selecting');
+            link.classList.remove('is-selected');
+          }, 520);
         }
-        // Case B: Services & Support key
-        else if (slug.startsWith('service-')) {
+
+        // Case A: Services & Support key
+        if (slug.startsWith('service-')) {
           if (homeView && solView) {
             e.preventDefault();
 
@@ -885,14 +1252,14 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => { isNavigating = false; }, 400);
 
             const performScrollAndFocus = () => {
-              // Wait 150ms for dropdown to begin fading before starting scroll
+              // Let the selected menu item register, then begin the page transition.
               setTimeout(() => {
                 const targetEl = document.getElementById(slug);
                 if (!targetEl) return;
 
                 const header = document.querySelector('.site-header');
-                window.fosemApp.scrollTargetIntoSafeView(targetEl, parentMenu, header);
-              }, 150);
+                window.fosemApp.scrollTargetIntoSafeView(targetEl, null, header);
+              }, 180);
             };
 
             // Transition from solutions view back to home first
@@ -902,6 +1269,39 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
               performScrollAndFocus();
             }
+          }
+        }
+        // Case B: Industries directory item
+        else if (isIndustryOption) {
+          e.preventDefault();
+
+          const performIndustryFocus = () => {
+            const targetEl = document.getElementById(slug);
+            if (!targetEl) return;
+
+            document.querySelectorAll('.industry-focus-active').forEach(el => {
+              el.classList.remove('industry-focus-active');
+            });
+            targetEl.classList.add('industry-focus-active');
+
+            if (window.fosemApp.industryFocusTimeoutId) {
+              clearTimeout(window.fosemApp.industryFocusTimeoutId);
+            }
+            window.fosemApp.industryFocusTimeoutId = setTimeout(() => {
+              targetEl.classList.remove('industry-focus-active');
+              window.fosemApp.industryFocusTimeoutId = null;
+            }, 6000);
+
+            window.history.replaceState(null, '', `#${slug}`);
+            const header = document.querySelector('.site-header');
+            window.fosemApp.scrollTargetIntoSafeView(targetEl, null, header);
+          };
+
+          if (homeView && solView && !solView.classList.contains('view-hidden')) {
+            window.fosemApp.goHome();
+            setTimeout(performIndustryFocus, 350);
+          } else {
+            setTimeout(performIndustryFocus, 120);
           }
         }
       }
@@ -917,7 +1317,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Exempt solution and service detail links from normal page redirects
       if (href && href.includes('#')) {
         const slug = href.split('#')[1];
-        if (solutionsData[slug] || slug.startsWith('service-')) {
+        if (solutionsData[slug] || slug.startsWith('service-') || slug.startsWith('industry-') || slug.startsWith('expertise-')) {
           return;
         }
       }
@@ -975,6 +1375,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const homeView = document.getElementById('home-view');
         const solView = document.getElementById('solutions-view');
         if (homeView && solView) {
+          document.querySelector('.skip-link')?.setAttribute('href', '#solutions-view');
           homeView.style.opacity = '0';
           setTimeout(() => {
             homeView.classList.add('view-hidden');
@@ -990,6 +1391,10 @@ document.addEventListener('DOMContentLoaded', () => {
       } else if (solutionsData[solutionKey]) {
         window.fosemApp.loadSolution(solutionKey);
       } else if (solutionKey.startsWith('service-')) {
+        setTimeout(() => {
+          window.fosemApp.scrollToAndFocus(solutionKey);
+        }, 300);
+      } else if (solutionKey.startsWith('industry-') || solutionKey.startsWith('expertise-')) {
         setTimeout(() => {
           window.fosemApp.scrollToAndFocus(solutionKey);
         }, 300);
@@ -1010,6 +1415,8 @@ document.addEventListener('DOMContentLoaded', () => {
         window.fosemApp.loadSolution(solutionKey);
       } else if (solutionKey.startsWith('service-')) {
         window.fosemApp.scrollToAndFocus(solutionKey);
+      } else if (solutionKey.startsWith('industry-') || solutionKey.startsWith('expertise-')) {
+        window.fosemApp.scrollToAndFocus(solutionKey);
       }
     } else {
       window.fosemApp.goHome();
@@ -1019,10 +1426,41 @@ document.addEventListener('DOMContentLoaded', () => {
   /* --- Footer Enquiry Form Handler --- */
   const footerEnquiryForm = document.getElementById('footer-enquiry-form');
   if (footerEnquiryForm) {
-    footerEnquiryForm.addEventListener('submit', (e) => {
+    footerEnquiryForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      alert('Thank you for your enquiry. We will get back to you shortly.');
-      footerEnquiryForm.reset();
+      const status = document.getElementById('footer-enquiry-status');
+      const submitButton = footerEnquiryForm.querySelector('[type="submit"]');
+
+      if (!footerEnquiryForm.checkValidity()) {
+        footerEnquiryForm.reportValidity();
+        if (status) status.textContent = 'Please complete all required fields correctly.';
+        return;
+      }
+
+      if (status) status.textContent = 'Sending your enquiry…';
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.setAttribute('aria-busy', 'true');
+      }
+
+      try {
+        const formData = new FormData(footerEnquiryForm);
+        const response = await fetch('/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams(formData).toString()
+        });
+        if (!response.ok) throw new Error(`Form submission failed with ${response.status}`);
+        footerEnquiryForm.reset();
+        if (status) status.textContent = 'Thank you. Your enquiry has been sent successfully.';
+      } catch (error) {
+        if (status) status.textContent = 'We could not send your enquiry. Please email sales@fosemcontrols.com instead.';
+      } finally {
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.removeAttribute('aria-busy');
+        }
+      }
     });
   }
 
@@ -1056,6 +1494,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Rotation state
     let theta = 0;
+    let globeFrameId = null;
+    let globeIsVisible = false;
+    const reduceGlobeMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     
     // active Ripples (waves expanding on laser impact)
     const activeRipples = [];
@@ -1108,6 +1549,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Render loop
     const render = () => {
+      globeFrameId = null;
       // Increment rotation
       theta += 0.0022;
       if (theta > 2 * Math.PI) theta -= 2 * Math.PI;
@@ -1433,10 +1875,37 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
       
-      requestAnimationFrame(render);
+      if (globeIsVisible && !document.hidden && !reduceGlobeMotion.matches) {
+        globeFrameId = requestAnimationFrame(render);
+      }
     };
-    
-    requestAnimationFrame(render);
+
+    const startGlobe = () => {
+      if (!globeIsVisible || document.hidden || globeFrameId !== null) return;
+      globeFrameId = requestAnimationFrame(render);
+    };
+
+    const globeObserver = new IntersectionObserver(([entry]) => {
+      globeIsVisible = entry.isIntersecting;
+      if (!globeIsVisible && globeFrameId !== null) {
+        cancelAnimationFrame(globeFrameId);
+        globeFrameId = null;
+      } else if (globeIsVisible) {
+        startGlobe();
+      }
+    }, { rootMargin: '120px 0px', threshold: 0.01 });
+
+    globeObserver.observe(canvas);
+    document.addEventListener('visibilitychange', startGlobe);
+    reduceGlobeMotion.addEventListener?.('change', () => {
+      if (reduceGlobeMotion.matches && globeFrameId !== null) {
+        cancelAnimationFrame(globeFrameId);
+        globeFrameId = null;
+        render();
+      } else {
+        startGlobe();
+      }
+    });
   };
   
   initGlobeCanvas();

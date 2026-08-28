@@ -5,28 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Building Systems by Fosem Controls. BMS &amp; Automation solutions to optimize efficiency and comfort.">
   <title>Building Systems | Fosem Controls</title>
-    <!-- Resource Hints and Fonts (Optimized for FCP/LCP) -->
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <link rel="dns-prefetch" href="https://images.unsplash.com">
-
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=5.0">
+  <!-- Critical styles -->
+  <link rel="stylesheet" href="styles.css?v=8.0">
   <link rel="icon" type="image/jpeg" href="assets/images/logo.jpg">
   
   <!-- Preload Critical Assets -->
-  <link rel="preload" href="assets/images/new-logo-fixed.webp" as="image">
-  <link rel="preload" href="assets/images/slide2-bms-new.webp" as="image">
+  <link rel="preload" href="assets/images/responsive/slide2-bms-new-1280.webp" as="image" type="image/webp" fetchpriority="high" imagesrcset="assets/images/responsive/slide2-bms-new-640.webp 640w, assets/images/responsive/slide2-bms-new-1280.webp 1280w, assets/images/slide2-bms-new.webp 1632w" imagesizes="(max-width: 768px) 100vw, 50vw">
   
-  <!-- Floating UI Dependency -->
-  <script src="https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.6.12/dist/floating-ui.dom.umd.min.js" defer></script>
   <!-- Deferred Scripts -->
-  <script src="assets/js/main.js?v=6.0" defer></script>
+  <script src="assets/js/subpage.js?v=8.0" defer></script>
 </head>
 <body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
 
   <!-- ============================================
        HEADER
@@ -35,13 +25,13 @@
     <div class="header-inner">
 
       <!-- Logo -->
-      <div class="logo-container" id="logo-container" onclick="window.location.href='index.html'" style="cursor: pointer;">
-        <img src="assets/images/new-logo-fixed.webp" alt="Fosem Controls Logo" class="logo-img" decoding="sync">
+      <div class="logo-container" id="logo-container">
+        <img src="assets/images/responsive/fosem-logo-header.webp" alt="Fosem Controls Logo" class="logo-img" width="360" height="182" decoding="async">
         <span class="logo-tagline" id="logo-tagline">Systems Integrator, surveillance and business automation</span>
       </div>
 
       <!-- Mobile menu button -->
-      <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle navigation menu">
+      <button class="mobile-menu-btn" id="mobile-menu-btn" type="button" aria-label="Open navigation menu" aria-controls="main-nav" aria-expanded="false">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="3" y1="6" x2="21" y2="6"/>
           <line x1="3" y1="12" x2="21" y2="12"/>
@@ -63,15 +53,16 @@
           <div class="dropdown-menu mega-menu">
             <div class="mega-menu-header">Products &amp; Solutions</div>
             <div class="mega-menu-grid">
-              <a href="index.html#security-solutions">Security Solutions</a>
-              <a href="index.html#building-systems">Building Systems</a>
-              <a href="index.html#infrastructure">Infrastructure</a>
-              <a href="index.html#energy">Energy</a>
-              <a href="index.html#mep">MEP</a>
+              <a href="index.html#security-integrated-solutions">Security Integrated Solutions</a>
+              <a href="index.html#cctv-surveillance">CCTV and Surveillance</a>
+              <a href="index.html#fire-detection-safety-systems">Fire Detection and Safety Systems</a>
+              <a href="index.html#automation-system">Automation System</a>
               <a href="index.html#access-control">Access Control</a>
-              <a href="index.html#fire-safety">Fire Safety</a>
-              <a href="index.html#automation-systems">Automation Systems</a>
-              <a href="index.html#cctv-surveillance">CCTV &amp; Surveillance</a>
+              <a href="index.html#alarm-systems">Alarm Systems</a>
+              <a href="index.html#mep">MEP</a>
+              <a href="index.html#renewable-energy">Renewable Energy</a>
+              <a href="index.html#vehicles-management-system">Vehicles Management System</a>
+              <a href="index.html#it-structural-cabling">IT and Structural Cabling</a>
             </div>
           </div>
         </div>
@@ -118,10 +109,10 @@
                   <h5 class="mega-col-title">Critical &amp; Energy</h5>
                 </div>
                 <div class="mega-col-items">
-                  <a href="index.html#expertise">Oil &amp; Gas</a>
-                  <a href="index.html#expertise">Airports &amp; Ports</a>
-                  <a href="index.html#expertise">Data Centers</a>
-                  <a href="index.html#expertise">Network Security &amp; Power</a>
+                  <a href="index.html#industry-oil-gas">Oil &amp; Gas</a>
+                  <a href="index.html#industry-airports-ports">Airports &amp; Ports</a>
+                  <a href="index.html#industry-data-centers">Data Centers</a>
+                  <a href="index.html#industry-network-power">Network Security &amp; Power</a>
                 </div>
               </div>
 
@@ -132,13 +123,12 @@
                   <h5 class="mega-col-title">Commercial &amp; Real Estate</h5>
                 </div>
                 <div class="mega-col-items">
-                  <a href="index.html#expertise">Banking</a>
-                  <a href="index.html#expertise">Commercial Properties</a>
-                  <a href="index.html#expertise">High-Rise Developments</a>
-                  <a href="index.html#expertise">Retail</a>
-                  <a href="index.html#expertise">Internet Services</a>
-                  <a href="index.html#expertise">Software</a>
-                  <a href="index.html#expertise">Telecom</a>
+                  <a href="index.html#industry-banking">Banking</a>
+                  <a href="index.html#industry-commercial-properties">Commercial Properties</a>
+                  <a href="index.html#industry-high-rise">High-Rise Developments</a>
+                  <a href="index.html#industry-retail">Retail</a>
+                  <a href="index.html#industry-internet-services-software">Internet Services &amp; Software</a>
+                  <a href="index.html#industry-telecom">Telecom</a>
                 </div>
               </div>
 
@@ -149,10 +139,10 @@
                   <h5 class="mega-col-title">Urban &amp; Civil</h5>
                 </div>
                 <div class="mega-col-items">
-                  <a href="index.html#expertise">Urban Surveillance</a>
-                  <a href="index.html#expertise">Traffic &amp; Smart Cities</a>
-                  <a href="index.html#expertise">Civil Infrastructure</a>
-                  <a href="index.html#expertise">Residential Hubs</a>
+                  <a href="index.html#industry-urban-surveillance">Urban Surveillance</a>
+                  <a href="index.html#industry-smart-cities">Traffic &amp; Smart Cities</a>
+                  <a href="index.html#industry-civil-infrastructure">Civil Infrastructure</a>
+                  <a href="index.html#industry-residential-hubs">Residential Hubs</a>
                 </div>
               </div>
 
@@ -169,9 +159,9 @@
             </svg>
           </span>
           <div class="dropdown-menu">
-            <a href="index.html#about">Who We Are</a>
-            <a href="index.html#about">Our Mission</a>
-            <a href="index.html#about">Our Vision</a>
+              <a href="index.html#mission-vision">Who We Are</a>
+              <a href="index.html#mv-card-mission">Our Mission</a>
+              <a href="index.html#mv-card-vision">Our Vision</a>
           </div>
         </div>
       </nav>
@@ -182,7 +172,7 @@
   <!-- ============================================
        SUBPAGE CONTENT
        ============================================ -->
-  <div class="subpage-container">
+  <main class="subpage-container" id="main-content" tabindex="-1">
     
     <!-- Hero Section -->
     <section class="subpage-hero">
@@ -192,7 +182,7 @@
         <p class="subpage-hero-desc">Smart building technologies that improve comfort, efficiency, energy use, and operational control.</p>
       </div>
       <div class="subpage-hero-image fade-right" style="--stagger: 150ms">
-        <img src="assets/images/slide2-bms-new.webp" alt="Smart Building Control & Automation" decoding="async">
+        <img src="assets/images/slide2-bms-new.webp" srcset="assets/images/responsive/slide2-bms-new-640.webp 640w, assets/images/responsive/slide2-bms-new-1280.webp 1280w, assets/images/slide2-bms-new.webp 1632w" sizes="(max-width: 768px) 100vw, 50vw" alt="Smart Building Control & Automation" fetchpriority="high" loading="eager" width="1632" height="640" decoding="async">
       </div>
     </section>
 
@@ -215,12 +205,12 @@
     <section class="subpage-gallery">
       <div class="subpage-gallery-grid">
         <div class="subpage-gallery-item scale-in" style="--stagger: 100ms">
-          <img src="assets/images/service-management.webp" alt="Building Automation Panel & Facility Management" decoding="async">
+          <img src="assets/images/service-management.webp" alt="Building Automation Panel & Facility Management" loading="lazy" width="800" height="450" decoding="async">
         </div>
       </div>
     </section>
 
-  </div>
+  </main>
 
   <!-- ============================================
        FOOTER
@@ -232,12 +222,12 @@
         <!-- ZONE 1: BRAND ZONE -->
         <div class="footer-brand">
           <div class="footer-logo">
-            <img src="assets/images/logo-dark.webp" alt="Fosem Controls Logo" class="footer-logo-img" decoding="async">
+            <img src="assets/images/logo-dark.webp" alt="Fosem Controls Logo" class="footer-logo-img" loading="lazy" width="1024" height="1024" decoding="async">
             <span class="logo-tagline logo-tagline--footer">Systems Integrator, surveillance and business automation</span>
           </div>
           <p class="footer-brand-desc">Cross-border security and business automation systems integrator serving West Africa.</p>
           <div class="footer-stats">
-            <div class="stat-item"><span class="stat-num">3</span> Countries Served</div>
+            <div class="stat-item"><span class="stat-num">7</span> Countries Served</div>
             <div class="stat-item"><span class="stat-num">24/7</span> Technical Support</div>
           </div>
         </div>
@@ -268,16 +258,16 @@
             <ul>
               <li><a href="index.html#mission-vision">Who We Are</a></li>
               <li><a href="index.html#why-us">Why Choose Us</a></li>
-              <li><a href="#">Careers</a></li>
+              <li><a href="mailto:sales@fosemcontrols.com?subject=Careers%20at%20Fosem%20Controls">Careers</a></li>
             </ul>
           </div>
           <div class="footer-links">
             <h4>Industries</h4>
             <ul>
-              <li><a href="index.html#services">Banking</a></li>
-              <li><a href="index.html#services">Oil &amp; Gas</a></li>
-              <li><a href="index.html#services">Hospitality</a></li>
-              <li><a href="index.html#services">Commercial Property</a></li>
+              <li><a href="index.html#industry-banking">Banking</a></li>
+              <li><a href="index.html#industry-oil-gas">Oil &amp; Gas</a></li>
+              <li><a href="index.html#expertise-real-estate">Hospitality</a></li>
+              <li><a href="index.html#industry-commercial-properties">Commercial Property</a></li>
             </ul>
           </div>
           <div class="footer-links">
@@ -323,30 +313,33 @@
         <div class="footer-enquiry">
           <div class="enquiry-card">
             <h4 class="enquiry-title">ENQUIRY</h4>
-            <form class="enquiry-form" id="footer-enquiry-form">
+            <form class="enquiry-form" id="footer-enquiry-form" name="enquiry" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" novalidate>
+              <input type="hidden" name="form-name" value="enquiry">
+              <p class="form-honeypot" aria-hidden="true"><label>Do not fill this field <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
               <div class="enquiry-grid-row">
                 <div class="form-group">
                   <label class="form-label" for="footer-name">NAME</label>
-                  <input type="text" id="footer-name" name="name" placeholder="Name" required>
+                  <input type="text" id="footer-name" name="name" placeholder="Name" autocomplete="name" required>
                 </div>
                 <div class="form-group">
                   <label class="form-label" for="footer-phone">PHONE</label>
-                  <input type="tel" id="footer-phone" name="phone" placeholder="Phone" required>
+                  <input type="tel" id="footer-phone" name="phone" placeholder="Phone" autocomplete="tel" inputmode="tel" required>
                 </div>
               </div>
               <div class="form-group">
                 <label class="form-label" for="footer-email">EMAIL</label>
-                <input type="email" id="footer-email" name="email" placeholder="Email" required>
+                <input type="email" id="footer-email" name="email" placeholder="Email" autocomplete="email" required>
               </div>
               <div class="form-group">
                 <label class="form-label" for="footer-company">COMPANY</label>
-                <input type="text" id="footer-company" name="company" placeholder="Company" required>
+                <input type="text" id="footer-company" name="company" placeholder="Company" autocomplete="organization" required>
               </div>
               <div class="form-group">
                 <label class="form-label" for="footer-message">MESSAGE</label>
                 <textarea id="footer-message" name="message" placeholder="Message" required></textarea>
               </div>
               <button type="submit" class="enquiry-submit-btn">Submit Enquiry</button>
+              <p class="form-status" id="footer-enquiry-status" role="status" aria-live="polite"></p>
             </form>
           </div>
         </div>
