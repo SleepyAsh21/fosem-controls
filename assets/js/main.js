@@ -11,96 +11,16 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Upgrade the visual navigation labels to real, keyboard-operable controls.
-  document.querySelectorAll('.nav-item > .nav-link').forEach((trigger, index) => {
-    const menu = trigger.parentElement?.querySelector('.dropdown-menu');
-    if (!menu) return;
-
-    let control = trigger;
-    if (trigger.tagName !== 'BUTTON') {
-      control = document.createElement('button');
-      control.type = 'button';
-      control.className = trigger.className;
-      control.innerHTML = trigger.innerHTML;
-      trigger.replaceWith(control);
-    }
-
-    const menuId = menu.id || `nav-menu-${index + 1}`;
-    menu.id = menuId;
-    control.setAttribute('aria-haspopup', 'true');
-    control.setAttribute('aria-controls', menuId);
-    control.setAttribute('aria-expanded', 'false');
-  });
-  
-  /* --- Navigation & Header --- */
+  /* --- Header --- */
   const header = document.getElementById('site-header');
-  const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-  const mainNav = document.getElementById('main-nav');
   const logoContainer = document.getElementById('logo-container');
   const logoTagline = document.getElementById('logo-tagline');
-
-  const setMobileMenuOpen = (isOpen, { returnFocus = false } = {}) => {
-    if (!mainNav || !mobileMenuBtn) return;
-    mainNav.classList.toggle('active', isOpen);
-    mainNav.classList.toggle('open', isOpen);
-    mobileMenuBtn.classList.toggle('active', isOpen);
-    mobileMenuBtn.setAttribute('aria-expanded', String(isOpen));
-    mobileMenuBtn.setAttribute('aria-label', isOpen ? 'Close navigation menu' : 'Open navigation menu');
-    document.body.classList.toggle('nav-open', isOpen && window.innerWidth <= 768);
-    if (returnFocus) mobileMenuBtn.focus();
-  };
   if (!window.fosemApp) window.fosemApp = {};
-  window.fosemApp.setMobileMenuOpen = setMobileMenuOpen;
-
-  if (mobileMenuBtn && mainNav) {
-    mobileMenuBtn.type = 'button';
-    mobileMenuBtn.setAttribute('aria-controls', mainNav.id || 'main-nav');
-    mobileMenuBtn.setAttribute('aria-expanded', 'false');
-    mobileMenuBtn.setAttribute('aria-label', 'Open navigation menu');
-  }
 
   // Scroll transparency & shadow
   window.addEventListener('scroll', () => {
-    header.classList.toggle('scrolled', window.scrollY > 20);
+    header?.classList.toggle('scrolled', window.scrollY > 20);
   }, { passive: true });
-
-  // Mobile menu toggle
-  if (mobileMenuBtn) {
-    const mobileBtnCallback = () => setMobileMenuOpen(mobileMenuBtn.getAttribute('aria-expanded') !== 'true');
-    mobileMenuBtn.addEventListener('click', mobileBtnCallback);
-  }
-
-  window.addEventListener('resize', () => {
-    if (window.innerWidth > 768 && mobileMenuBtn?.getAttribute('aria-expanded') === 'true') {
-      setMobileMenuOpen(false);
-    }
-  }, { passive: true });
-
-  // Mobile dropdown toggles
-  document.querySelectorAll('.nav-item .nav-link').forEach(link => {
-    link.addEventListener('click', () => {
-      const currentItem = link.parentElement;
-      const currentMenu = currentItem.querySelector('.dropdown-menu');
-      const nextState = link.getAttribute('aria-expanded') !== 'true';
-
-      document.querySelectorAll('.nav-item').forEach(item => {
-        const trigger = item.querySelector(':scope > .nav-link');
-        const menu = item.querySelector(':scope > .dropdown-menu');
-        const isCurrent = item === currentItem && nextState;
-        item.classList.toggle('active', isCurrent);
-        item.classList.toggle('is-open', isCurrent);
-        trigger?.setAttribute('aria-expanded', String(isCurrent));
-        if (isCurrent) menu?.classList.remove('force-closed', 'de-emphasized');
-      });
-    });
-
-    link.addEventListener('keydown', (event) => {
-      if (event.key !== 'ArrowDown') return;
-      event.preventDefault();
-      if (link.getAttribute('aria-expanded') !== 'true') link.click();
-      link.parentElement?.querySelector('.dropdown-menu a')?.focus();
-    });
-  });
 
   // Logo tagline toggle & goHome
   if (logoContainer) {
@@ -761,49 +681,6 @@ Object.entries(solutionHeroImages).forEach(([solutionKey, imageUrl]) => {
   if (solutionsData[solutionKey]) solutionsData[solutionKey].heroImage = imageUrl;
 });
 
-/* Small inline SVGs avoid a separate icon-font request while keeping every
-   solution capability visually distinct. */
-const solutionIconRules = [
-  { pattern: /video|camera|surveillance/i, icon: 'videocam' },
-  { pattern: /access|biometric|credential|visitor|barrier|driver/i, icon: 'badge' },
-  { pattern: /fire|suppression|evac|aspirat/i, icon: 'local_fire_department' },
-  { pattern: /alarm|intrusion|perimeter|panic|duress/i, icon: 'notifications_active' },
-  { pattern: /solar|photovoltaic|\bpv\b/i, icon: 'solar_power' },
-  { pattern: /battery|power|electrical|energy|ups|motor|drive/i, icon: 'bolt' },
-  { pattern: /server|network|cabling|fibre|fiber|copper|wireless|switching|gateway/i, icon: 'hub' },
-  { pattern: /mechanical|plumbing|sanitation|hvac|vent|cooling|temperature|humidity/i, icon: 'engineering' },
-  { pattern: /monitor|telemetry|report|analytics|tracking|scada|profiling|dashboard/i, icon: 'analytics' },
-  { pattern: /automation|control|lighting|logic|plc|integration|command centre|building management/i, icon: 'settings' },
-  { pattern: /test|maintenance|support|compliance|audit|certification|diagnostic|inspection|record/i, icon: 'verified' },
-  { pattern: /secure|safety|protection|encryption/i, icon: 'shield' }
-];
-
-const solutionIconFor = (deliverableTitle) => {
-  const match = solutionIconRules.find(({ pattern }) => pattern.test(deliverableTitle));
-  return match ? match.icon : 'shield';
-};
-
-const solutionIconPaths = {
-  videocam: '<rect x="3" y="6" width="12" height="12" rx="2"/><path d="m15 10 6-3v10l-6-3z"/>',
-  badge: '<rect x="5" y="3" width="14" height="18" rx="2"/><circle cx="12" cy="9" r="2.5"/><path d="M8.5 16c.8-2.3 6.2-2.3 7 0"/>',
-  local_fire_department: '<path d="M13.5 3.5c.8 3.2-.6 4.6-2 6.2-.7-1.6-1.8-2.5-3.1-3.3.1 2.9-3.4 4.8-2.4 9.2A6.3 6.3 0 0 0 18.3 13c.1-3.6-2.1-6.5-4.8-9.5Z"/><path d="M10 17.5c0-1.6 1-2.7 2-3.8 1 1.1 2 2.2 2 3.8a2 2 0 0 1-4 0Z"/>',
-  notifications_active: '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z"/><path d="M10 21h4M4.5 4.5 3 3m16.5 1.5L21 3"/>',
-  solar_power: '<circle cx="6" cy="6" r="2.5"/><path d="M6 1v1M6 10v1M1 6h1m8 0h1M2.5 2.5l.7.7m5.6 5.6.7.7M9.5 2.5l-.7.7M3.2 8.8l-.7.7M5 14h14l2 7H3zM8 14l-1 7m9-7 1 7m-13-3h16"/>',
-  bolt: '<path d="m13 2-8 12h7l-1 8 8-12h-7z"/>',
-  hub: '<circle cx="12" cy="12" r="3"/><circle cx="4" cy="5" r="2"/><circle cx="20" cy="5" r="2"/><circle cx="4" cy="19" r="2"/><circle cx="20" cy="19" r="2"/><path d="m6 6.5 4 3.5m8-3.5-4 3.5m-8 7.5 4-3.5m8 3.5-4-3.5"/>',
-  engineering: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M5 5l2.2 2.2M16.8 16.8 19 19M19 5l-2.2 2.2M7.2 16.8 5 19"/>',
-  analytics: '<path d="M4 20V10m6 10V4m6 16v-7m4 7H2"/><path d="m4 7 5-4 5 4 6-5"/>',
-  settings: '<path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="2" fill="currentColor" stroke="none"/><circle cx="11" cy="18" r="2" fill="currentColor" stroke="none"/>',
-  verified: '<circle cx="12" cy="12" r="9"/><path d="m8 12 2.7 2.7L16.5 9"/>',
-  shield: '<path d="M12 3 4 6v5c0 5.3 3.4 8.7 8 10 4.6-1.3 8-4.7 8-10V6z"/><path d="m8.5 12 2.3 2.3 4.7-5"/>'
-};
-
-const inlineSolutionIcon = (deliverableTitle) => {
-  const iconName = solutionIconFor(deliverableTitle);
-  const paths = solutionIconPaths[iconName] || solutionIconPaths.shield;
-  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false">${paths}</svg>`;
-};
-
 if (!window.fosemApp) window.fosemApp = {};
 Object.assign(window.fosemApp, {
   renderContent: function(data, isInitialLoad) {
@@ -911,10 +788,10 @@ Object.assign(window.fosemApp, {
   updateSidebarState: function(solutionKey) {
     const buttons = document.querySelectorAll('.sol-nav-btn');
     buttons.forEach(btn => {
-      btn.classList.remove('active');
-      if (btn.getAttribute('data-sol') === solutionKey) {
-        btn.classList.add('active');
-      }
+      const isCurrent = btn.getAttribute('data-sol') === solutionKey;
+      btn.classList.toggle('active', isCurrent);
+      if (isCurrent) btn.setAttribute('aria-current', 'page');
+      else btn.removeAttribute('aria-current');
     });
   },
 
@@ -926,6 +803,7 @@ Object.assign(window.fosemApp, {
     const homeView = document.getElementById('home-view');
     const solView = document.getElementById('solutions-view');
     document.querySelector('.skip-link')?.setAttribute('href', '#solutions-view');
+    window.fosemNavigation?.closeAll();
 
     // If we are on a static subpage, redirect to index.html with hash
     if (!homeView || !solView) {
@@ -946,20 +824,18 @@ Object.assign(window.fosemApp, {
       homeView.style.opacity = '0';
       setTimeout(() => {
         homeView.classList.add('view-hidden');
+        homeView.setAttribute('aria-hidden', 'true');
         this.renderContent(data, true);
         solView.classList.remove('view-hidden');
+        solView.setAttribute('aria-hidden', 'false');
         void solView.offsetWidth;
         solView.style.opacity = '1';
+        solView.focus({ preventScroll: true });
       }, 300);
     } else {
       this.renderContent(data, false);
     }
 
-    // Close mobile menu if open
-    document.getElementById('main-nav')?.classList.remove('active');
-    document.getElementById('main-nav')?.classList.remove('open');
-    document.getElementById('mobile-menu-btn')?.classList.remove('active');
-    
     // Add detail-active for mobile master-detail layout
     document.querySelector('.sol-layout-wrapper')?.classList.add('detail-active');
   },
@@ -968,6 +844,7 @@ Object.assign(window.fosemApp, {
     const homeView = document.getElementById('home-view');
     const solView = document.getElementById('solutions-view');
     document.querySelector('.skip-link')?.setAttribute('href', '#home-view');
+    window.fosemNavigation?.closeAll();
     
     // Clear hash silently
     if (window.location.hash) {
@@ -981,10 +858,13 @@ Object.assign(window.fosemApp, {
       solView.style.opacity = '0';
       setTimeout(() => {
         solView.classList.add('view-hidden');
+        solView.setAttribute('aria-hidden', 'true');
         if (homeView) {
           homeView.classList.remove('view-hidden');
+          homeView.setAttribute('aria-hidden', 'false');
           void homeView.offsetWidth;
           homeView.style.opacity = '1';
+          homeView.focus({ preventScroll: true });
         }
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }, 300);
@@ -1101,54 +981,6 @@ Object.assign(window.fosemApp, {
 
 // Intercept Clicks, Sidebar Navigation and Back to Home
 document.addEventListener('DOMContentLoaded', () => {
-  // Close all dropdowns helper
-  const closeAllDropdowns = ({ lockUntilPointerExit = true } = {}) => {
-    document.querySelectorAll('.nav-item').forEach(item => {
-      item.classList.remove('active', 'is-open');
-      item.querySelector(':scope > .nav-link')?.setAttribute('aria-expanded', 'false');
-      const menu = item.querySelector('.dropdown-menu');
-      if (menu) {
-        menu.classList.toggle('force-closed', lockUntilPointerExit);
-      }
-    });
-  };
-
-  // A click outside or Escape can deliberately lock a menu closed. Release that
-  // lock as soon as the user starts a fresh interaction so the first hover works.
-  document.querySelectorAll('.nav-item').forEach(item => {
-    const resetDropdownLock = () => {
-      const menu = item.querySelector('.dropdown-menu');
-      if (menu) {
-        menu.classList.remove('force-closed', 'de-emphasized');
-      }
-    };
-
-    item.addEventListener('mouseenter', resetDropdownLock);
-    item.addEventListener('pointerenter', resetDropdownLock);
-    item.addEventListener('focusin', resetDropdownLock);
-    item.addEventListener('mouseleave', resetDropdownLock);
-  });
-
-  // Close menus on Escape press
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      closeAllDropdowns();
-      const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-      if (mobileMenuBtn?.getAttribute('aria-expanded') === 'true') {
-        window.fosemApp.setMobileMenuOpen?.(false, { returnFocus: true });
-      }
-    }
-  });
-
-  // Close menus on click outside
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('.nav-item') && !e.target.closest('#mobile-menu-btn')) {
-      // The pointer is already outside the navigation, so no persistent lock is
-      // needed. Leaving one behind is what made the next hover appear broken.
-      closeAllDropdowns({ lockUntilPointerExit: false });
-    }
-  });
-
   // Handle click on any dropdown link with smooth scroll and zero-lag tab switching
   const dropdownLinks = document.querySelectorAll('.nav-item .dropdown-menu a');
   let isNavigating = false;
@@ -1161,17 +993,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const homeView = document.getElementById('home-view');
         const solView = document.getElementById('solutions-view');
 
-        const isServiceOption = slug.startsWith('service-');
         const isIndustryOption = slug.startsWith('industry-') || slug.startsWith('expertise-');
-        const mainNav = document.getElementById('main-nav');
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const closeNavigation = () => {
-          window.fosemApp.setMobileMenuOpen?.(false);
-          document.querySelectorAll('.nav-item').forEach(item => {
-            item.classList.remove('active', 'is-open');
-            item.querySelector(':scope > .nav-link')?.setAttribute('aria-expanded', 'false');
-          });
-        };
+        window.fosemNavigation?.closeAll();
 
         // Resolve a product choice before changing the menu state. This makes
         // the first product item as reliable as every other product link.
@@ -1184,12 +1007,6 @@ document.addEventListener('DOMContentLoaded', () => {
             window.fosemApp.loadSolution(slug);
           }
 
-          closeNavigation();
-          document.querySelectorAll('.dropdown-menu').forEach(menu => {
-            menu.classList.remove('is-selecting', 'de-emphasized');
-            menu.classList.add('force-closed');
-          });
-
           const navbar = document.querySelector('.site-header');
           const navHeight = navbar ? navbar.offsetHeight : 80;
           setTimeout(() => {
@@ -1199,28 +1016,6 @@ document.addEventListener('DOMContentLoaded', () => {
             window.scrollTo({ top: targetOffset, behavior: 'smooth' });
           }, 150);
           return;
-        }
-
-        // Service links remain visible briefly
-        // so the selection animation can connect the menu choice to the card.
-        if (!isServiceOption) closeNavigation();
-        
-        const parentMenu = link.closest('.dropdown-menu');
-        if (parentMenu) {
-          parentMenu.classList.remove('force-closed');
-          if (isServiceOption) {
-            parentMenu.classList.add('is-selecting');
-            link.classList.add('is-selected');
-            setTimeout(closeNavigation, 260);
-          } else {
-            parentMenu.classList.add('force-closed');
-          }
-
-          // Reset transient selection state before the next menu interaction.
-          setTimeout(() => {
-            parentMenu.classList.remove('is-selecting');
-            link.classList.remove('is-selected');
-          }, 520);
         }
 
         // Case A: Services & Support key
@@ -1233,14 +1028,13 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => { isNavigating = false; }, 400);
 
             const performScrollAndFocus = () => {
-              // Let the selected menu item register, then begin the page transition.
               setTimeout(() => {
                 const targetEl = document.getElementById(slug);
                 if (!targetEl) return;
 
                 const header = document.querySelector('.site-header');
                 window.fosemApp.scrollTargetIntoSafeView(targetEl, null, header);
-              }, 180);
+              }, 60);
             };
 
             // Transition from solutions view back to home first
@@ -1360,13 +1154,14 @@ document.addEventListener('DOMContentLoaded', () => {
           homeView.style.opacity = '0';
           setTimeout(() => {
             homeView.classList.add('view-hidden');
+            homeView.setAttribute('aria-hidden', 'true');
             solView.classList.remove('view-hidden');
+            solView.setAttribute('aria-hidden', 'false');
             void solView.offsetWidth;
             solView.style.opacity = '1';
             document.querySelector('.sol-layout-wrapper')?.classList.remove('detail-active');
-            // Close mobile menu if open
-            document.getElementById('main-nav')?.classList.remove('active', 'open');
-            document.getElementById('mobile-menu-btn')?.classList.remove('active');
+            window.fosemNavigation?.closeAll();
+            solView.focus({ preventScroll: true });
           }, 300);
         }
       } else if (solutionsData[solutionKey]) {

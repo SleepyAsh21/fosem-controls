@@ -1488,6 +1488,42 @@ ul {
 }
 
 /* ============================================
+   DETERMINISTIC NAVIGATION STATE
+   Dropdown visibility is controlled by navigation.js. Keeping hover and
+   focus-within out of the final state prevents a selected menu from lingering.
+   ============================================ */
+@media (min-width: 769px) {
+  .main-nav .nav-item:not(.active):not(.is-open) > .dropdown-menu {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transform: translateY(8px) !important;
+  }
+
+  .main-nav .nav-item.active > .dropdown-menu,
+  .main-nav .nav-item.is-open > .dropdown-menu {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    transform: translateY(0) !important;
+  }
+}
+
+.main-nav .nav-link[aria-expanded="true"] .chevron {
+  transform: rotate(180deg);
+}
+
+.main-nav .nav-link .chevron {
+  transition: transform 180ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .main-nav .nav-link .chevron {
+    transition: none;
+  }
+}
+
+/* ============================================
    SCROLL ANIMATIONS
    ============================================ */
 .fade-up {
