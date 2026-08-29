@@ -550,6 +550,8 @@ Object.assign(window.fosemApp, {
     const container = document.getElementById('solutions-content');
     
     const applyHtml = () => {
+      const consultationSubject = encodeURIComponent(`Fosem Controls Consultation: ${data.title}`);
+      const consultationBody = encodeURIComponent(`Hello Fosem Controls,\n\nI would like to request a consultation about ${data.title}.\n\nProject details:\n`);
       let html = `
         <!-- 1. Hero -->
         <section class="sol-hero fade-up">
@@ -599,7 +601,7 @@ Object.assign(window.fosemApp, {
           <h2 class="sol-consultation-title">Ready to discuss your project?</h2>
           <p>Talk with our engineering team to design a solution tailored to your requirements.</p>
           <div class="sol-consultation-actions">
-            <a href="mailto:sales@fosemcontrols.com?subject=Fosem%20Controls%20Consultation" class="sol-btn-primary" aria-label="Email sales@fosemcontrols.com to request a consultation">Request Consultation</a>
+            <a href="mailto:sales@fosemcontrols.com?subject=${consultationSubject}&amp;body=${consultationBody}" class="sol-btn-primary" aria-label="Email sales@fosemcontrols.com about ${data.title}">Request Consultation</a>
             <a href="#" class="sol-btn-secondary">Download Company Profile</a>
           </div>
         </section>
