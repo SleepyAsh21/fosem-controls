@@ -599,7 +599,7 @@ Object.assign(window.fosemApp, {
           <h2 class="sol-consultation-title">Ready to discuss your project?</h2>
           <p>Talk with our engineering team to design a solution tailored to your requirements.</p>
           <div class="sol-consultation-actions">
-            <a href="mailto:engineering@fosemcontrols.com" class="sol-btn-primary">Request Consultation</a>
+            <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=sales%40fosemcontrols.com&amp;su=Fosem%20Controls%20Consultation" class="sol-btn-primary" target="_blank" rel="noopener noreferrer" aria-label="Compose a consultation email to sales@fosemcontrols.com in Gmail">Request Consultation</a>
             <a href="#" class="sol-btn-secondary">Download Company Profile</a>
           </div>
         </section>
