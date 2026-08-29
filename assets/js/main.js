@@ -722,7 +722,7 @@ Object.assign(window.fosemApp, {
             <p>Bring us your brief. Our engineering team will shape it into a coordinated solution tailored to your requirements.</p>
           </div>
           <div class="sol-consultation-actions">
-            <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=sales%40fosemcontrols.com&amp;su=Fosem%20Controls%20Consultation" class="sol-btn-primary" target="_blank" rel="noopener noreferrer" aria-label="Compose a consultation email to sales@fosemcontrols.com in Gmail">Request Consultation<span class="sol-arrow-icon" aria-hidden="true">→</span></a>
+            <a href="mailto:sales@fosemcontrols.com?subject=Fosem%20Controls%20Consultation" class="sol-btn-primary" aria-label="Email sales@fosemcontrols.com to request a consultation">Request Consultation<span class="sol-arrow-icon" aria-hidden="true">→</span></a>
           </div>
         </section>
       `;
