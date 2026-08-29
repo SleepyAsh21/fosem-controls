@@ -2313,7 +2313,7 @@ ul {
 
 .footer-nav-zone {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 24px;
 }
 
@@ -2598,7 +2598,7 @@ ul {
   }
 
   .footer-nav-zone {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .footer-solutions ul {
@@ -5481,9 +5481,6 @@ h4.industry-highlight-active {
     row-gap: 32px;
   }
 
-  .footer-nav-zone > .footer-links:nth-child(3) {
-    grid-column: 1 / -1;
-  }
 }
 
 /* Keep every mega-menu restrained at every breakpoint. */
