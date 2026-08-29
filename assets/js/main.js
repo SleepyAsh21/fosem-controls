@@ -672,7 +672,9 @@ solutionsData['it-structural-cabling'] = {
 const solutionHeroImages = {
   'security-integrated-solutions': 'assets/images/security-integrated-solutions-2026.jpg',
   'mep': 'assets/images/mep-2026.jpg',
-  'renewable-energy': 'https://images.unsplash.com/photo-1514488034139-5905ab173d22?auto=format&fit=crop&w=1400&q=85',
+  'renewable-energy': 'assets/images/renewable-energy-2026.jpg',
+  'automation-system': 'assets/images/automation-system-2026.jpg',
+  'alarm-systems': 'assets/images/alarm-systems-2026.jpg',
   'vehicles-management-system': 'assets/images/vehicles-management-system-2026.jpg',
   'it-structural-cabling': 'assets/images/it-structural-cabling-2026.jpg'
 };
